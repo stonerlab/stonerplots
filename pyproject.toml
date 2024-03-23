@@ -1,0 +1,33 @@
+[project]
+name = "StonerPlots"
+version = "1.0.0"
+authors = [
+  { name="Gavin Burnell", email="G.Burnell@leeds.ac.uk" },
+]
+description = "This is a fork of scienceplots and provides a range of matplotlib styles for plotting physics..."
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+keywords = [
+    "matplotlib-style-sheets",
+    "matplotlib-figures",
+    "scientific-papers",
+    "thesis-template",
+    "matplotlib-styles",
+    "python",
+]
+dynamic = ["version", "description"]
+
+[project.urls]
+Homepage = "https://github.com/gb119/StonerPlots/"
+Issues = "https://github.com/gb119/StonerPlots/issues"
+
+[build-system]
+requires = ["setuptools>=61.0",     "setuptools-scm>=8.0" ]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
