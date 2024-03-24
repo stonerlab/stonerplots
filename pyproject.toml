@@ -22,8 +22,8 @@ keywords = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/gb119/StonerPlots/"
-Issues = "https://github.com/gb119/StonerPlots/issues"
+Homepage = "https://github.com/stonerlab/stonerplots/"
+Issues = "https://github.com/stonerlab/stonerplots/issues"
 
 [build-system]
 requires = ["setuptools>=65.0", "setuptools-scm>=8.0" ]

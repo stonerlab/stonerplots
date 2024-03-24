@@ -13,28 +13,51 @@ manager:
 
     from stonerplots import SavedFigure
 
-    with SavedFigure("my_figure.pdf", style=["science","aps"]):
+    with SavedFigure("my_figure.pdf", style=["stoner","aps"]):
         plt.figure()
         plt.plot(x,y,label="Dataset")
         ...
 
+The SavedFigure context manager will handle the call to the matplotlib style context manager and will also save any
+figures opened within the context manager. If the filename for the figure has an embedded place holder for {ix}, then
+multiple figures can be saved without clobbering the filename.
+
 Available Styles
 ----------------
 
- * science - this is the base style sheet
+ * stoner - this is the base style sheet
+ * poster - makes everything bigger for printing on a poster
+ * notebook - makes things a little bigger for a Jupyter notebook - from the original scienceplots package
 
 Journal Styles
-~~~~~~~~~~~~~~
+--------------
 
- * nature - for Nature group journals
- * ieee - for IEEE Transactions journals
+ * nature - for Nature group journals - from the original scienceplots package
+ * ieee - for IEEE Transactions journals - from the original scienceplots package
  * aps - for American Physical Society Journals (like Phys Rev Lett etc.)
 
 Modifiers
-~~~~~~~~~
+---------
 
  * aps1.5 - Switch to 1.5 column format
  * aps2.0 - Switch to 2 column format
+
+Colour Cycles
+-------------
+
+The default colour cycle is based on the London Underground map colour scheme (why not?) and goes
+
+ * Northern
+ * Central
+ * Picadily
+ * District
+ * Metropolitan
+ * Bakerloo
+ * JUbilee
+ * Overground
+ * Victoria
+ * Elizabeth
+ * Circle
 
 
 This package draws heavily on scienceplots, so it seems only fair to cite the original work....
