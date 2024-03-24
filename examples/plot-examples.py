@@ -2,287 +2,201 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import scienceplots
+import matplotlib as mpl
+from stonerplots import SavedFigure
 
-import os
+from pathlib import Path
 
-# Check we are in examples dir
-current_dir = os.getcwd().lower()
-if (current_dir.endswith('scienceplots')):
-    os.chdir('./examples')
-# Create 'figures' folder if it does not exist
-if (not os.path.exists('./figures')):
-    os.makedirs('figures')
+figures = Path(__file__).parent / "figures"
+
 
 def model(x, p):
+    """Make some nice data."""
     return x ** (2 * p + 1) / (1 + x ** (2 * p))
 
 
-pparam = dict(xlabel='Voltage (mV)', ylabel=r'Current ($\mu$A)')
+pparam = dict(xlabel="Voltage (mV)", ylabel=r"Current ($\mu$A)")
 
 x = np.linspace(0.75, 1.25, 201)
 
-with plt.style.context(['science']):
+with SavedFigure(figures / "fig01a.png", style=["stoner"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:
         ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order')
+    ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
-    fig.savefig('figures/fig01a.jpg', dpi=300)
-    plt.close()
 
-with plt.style.context(['science', 'no-latex']):
+with SavedFigure(figures / "fig01b.png", style=["stoner", "no-latex"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:
         ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order')
+    ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
-    fig.savefig('figures/fig01b.jpg', dpi=300)
-    plt.close()
 
-with plt.style.context(['science', 'ieee']):
+with SavedFigure(figures / "fig02a.png", style=["stoner", "ieee"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 20, 40, 100]:
         ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order')
+    ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
-    fig.savefig('figures/fig02a.jpg', dpi=300)
-    plt.close()
 
-with plt.style.context(['science', 'ieee', 'std-colors']):
+with SavedFigure(figures / "fig02b.png", style=["stoner", "std-colours"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:
         ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order')
+    ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
-    fig.savefig('figures/fig02b.jpg', dpi=300)
-    plt.close()
 
-with plt.style.context(['science', 'nature']):
+with SavedFigure(figures / "fig02c.png", style=["stoner", "aps"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:
         ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order')
+    ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
-    fig.savefig('figures/fig02c.jpg', dpi=300)
-    plt.close()
 
-with plt.style.context(['science', 'scatter']):
+with SavedFigure(figures / "fig02c.pdf", style=["stoner", "aps"], autoclose=True):
+    fig, ax = plt.subplots()
+    for p in [10, 15, 20, 30, 50, 100]:
+        ax.plot(x, model(x, p), label=p)
+    ax.legend(title="Order")
+    ax.autoscale(tight=True)
+    ax.set(**pparam)
+
+
+with SavedFigure(figures / "fig02d.png", style=["stoner", "aps", "aps1.5"], autoclose=True):
+    fig, ax = plt.subplots()
+    for p in [10, 15, 20, 30, 50, 100]:
+        ax.plot(x, model(x, p), label=p)
+    ax.legend(title="Order")
+    ax.autoscale(tight=True)
+    ax.set(**pparam)
+
+with SavedFigure(figures / "fig02e.png", style=["stoner", "aps", "aps2"], autoclose=True):
+    fig, ax = plt.subplots()
+    for p in [10, 15, 20, 30, 50, 100]:
+        ax.plot(x, model(x, p), label=p)
+    ax.legend(title="Order")
+    ax.autoscale(tight=True)
+    ax.set(**pparam)
+
+with SavedFigure(figures / "fig02g.png", style=["stoner", "poster"], autoclose=True):
+    fig, ax = plt.subplots()
+    for p in [10, 15, 20, 30, 50, 100]:
+        line=ax.plot(x, model(x, p), label=p)
+        ax.scatter(x[::5],model(x[::5],p),label=None, c=line[0].get_color())
+    ax.legend(title="Order")
+    ax.autoscale(tight=True)
+    ax.set(**pparam)
+
+
+with SavedFigure(figures / "fig02f.png", style=["stoner", "nature"], autoclose=True):
+    fig, ax = plt.subplots()
+    for p in [10, 15, 20, 30, 50, 100]:
+        ax.plot(x, model(x, p), label=p)
+    ax.legend(title="Order")
+    ax.autoscale(tight=True)
+    ax.set(**pparam)
+
+with SavedFigure(figures / "fig03.png", style=["stoner", "scatter"], autoclose=True):
     fig, ax = plt.subplots(figsize=(4, 4))
-    ax.plot([-2, 2], [-2, 2], 'k--')
-    ax.fill_between([-2, 2], [-2.2, 1.8], [-1.8, 2.2],
-                    color='dodgerblue', alpha=0.2, lw=0)
+    ax.plot([-2, 2], [-2, 2], "k--")
+    ax.fill_between([-2, 2], [-2.2, 1.8], [-1.8, 2.2], color="dodgerblue", alpha=0.2, lw=0)
     for i in range(7):
         x1 = np.random.normal(0, 0.5, 10)
         y1 = x1 + np.random.normal(0, 0.2, 10)
-        ax.plot(x1, y1, label=r"$^\#${}".format(i+1))
-    lgd = r"$\mathring{P}=\begin{cases}1&\text{if $\nu\geq0$}\\0&\text{if $\nu<0$}\end{cases}$"
+        ax.plot(x1, y1, label=r"$^\#${}".format(i + 1))
+    lgd = r"$\mathring{P}=\begin{cases}1 \mathrm{if \nu\geq0}\\0 \mathrm{if \nu<0}\end{cases}$"
     ax.legend(title=lgd, loc=2, ncol=2)
     xlbl = r"$\log_{10}\left(\frac{L_\mathrm{IR}}{\mathrm{L}_\odot}\right)$"
-    ylbl = r"$\log_{10}\left(\frac{L_\circledast}{\mathrm{L}_\odot}\right)$"
+    ylbl = r"$\log_{10}\left(\frac{L_\ast}{\mathrm{L}_\odot}\right)$"
     ax.set_xlabel(xlbl)
     ax.set_ylabel(ylbl)
     ax.set_xlim([-2, 2])
     ax.set_ylim([-2, 2])
-    fig.savefig('figures/fig03.jpg', dpi=300)
-    plt.close()
 
-with plt.style.context(['science', 'high-vis']):
+with SavedFigure(figures / "fig04.png", style=["stoner", "high-vis"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:
         ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order')
+    ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
-    fig.savefig('figures/fig04.jpg', dpi=300)
-    plt.close()
 
-with plt.style.context(['dark_background', 'science', 'high-vis']):
+with SavedFigure(figures / "fig05.png", style=["dark_background", "stoner", "high-vis"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:
         ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order')
+    ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
-    fig.savefig('figures/fig05.jpg', dpi=300)
-    plt.close()
-
-with plt.style.context(['science', 'notebook']):
-    fig, ax = plt.subplots()
-    for p in [10, 15, 20, 30, 50, 100]:
-        ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order')
-    ax.autoscale(tight=True)
-    ax.set(**pparam)
-    fig.savefig('figures/fig10.jpg', dpi=300)
-    plt.close()
 
 # Plot different color cycles
 
-with plt.style.context(['science', 'bright']):
+with SavedFigure(figures / "fig06.png", style=["stoner", "bright"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [5, 10, 15, 20, 30, 50, 100]:
         ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order')
+    ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
-    fig.savefig('figures/fig06.jpg', dpi=300)
-    plt.close()
 
-with plt.style.context(['science', 'vibrant']):
+with SavedFigure(figures / "fig07.png", style=["stoner", "vibrant"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [5, 10, 15, 20, 30, 50, 100]:
         ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order')
+    ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
-    fig.savefig('figures/fig07.jpg', dpi=300)
-    plt.close()
 
-with plt.style.context(['science', 'muted']):
+with SavedFigure(figures / "fig08.png", style=["stoner", "muted"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [5, 7, 10, 15, 20, 30, 38, 50, 100, 500]:
         ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order', fontsize=7)
+    ax.legend(title="Order", fontsize=7)
     ax.autoscale(tight=True)
     ax.set(**pparam)
-    fig.savefig('figures/fig08.jpg', dpi=300)
-    plt.close()
 
-with plt.style.context(['science', 'retro']):
+with SavedFigure(figures / "fig09.png", style=["stoner", "retro"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:
         ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order')
+    ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
-    fig.savefig('figures/fig09.jpg', dpi=300)
-    plt.close()
 
-with plt.style.context(['science', 'grid']):
+with SavedFigure(figures / "fig10.png", style=["stoner", "notebook"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:
         ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order')
+    ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
-    fig.savefig('figures/fig11.jpg', dpi=300)
-    plt.close()
 
-with plt.style.context(['science', 'high-contrast']):
+with SavedFigure(figures / "fig11.png", style=["stoner", "grid"], autoclose=True):
+    fig, ax = plt.subplots()
+    for p in [10, 15, 20, 30, 50, 100]:
+        ax.plot(x, model(x, p), label=p)
+    ax.legend(title="Order")
+    ax.autoscale(tight=True)
+    ax.set(**pparam)
+
+with SavedFigure(figures / "fig12.png", style=["stoner", "high-contrast"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 20, 50]:
         ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order')
+    ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
-    fig.savefig('figures/fig12.jpg', dpi=300)
-    plt.close()
 
-with plt.style.context(['science', 'light']):
+with SavedFigure(figures / "fig13.png", style=["stoner", "light"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [5, 7, 10, 15, 20, 30, 38, 50, 100]:
         ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order', fontsize=7)
+    ax.legend(title="Order", fontsize=7)
     ax.autoscale(tight=True)
     ax.set(**pparam)
-    fig.savefig('figures/fig13.jpg', dpi=300)
-    plt.close()
-
-# Note: You need to install the Noto Serif CJK Fonts before running 
-# examples 14 and 15. See FAQ in README.
-
-with plt.style.context(['science', 'no-latex', 'cjk-tc-font']):
-    fig, ax = plt.subplots()
-    for p in [5, 7, 10, 15, 20, 30, 38, 50, 100]:
-        ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order', fontsize=7)
-    ax.set(xlabel=r'電壓 (mV)')
-    ax.set(ylabel=r'電流 ($\mu$A)')
-    ax.autoscale(tight=True)
-    fig.savefig('figures/fig14a.jpg', dpi=300)
-    plt.close()
-
-with plt.style.context(['science', 'no-latex', 'cjk-sc-font']):
-    fig, ax = plt.subplots()
-    for p in [5, 7, 10, 15, 20, 30, 38, 50, 100]:
-        ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order', fontsize=7)
-    ax.set(xlabel=r'电压 (mV)')
-    ax.set(ylabel=r'电流 ($\mu$A)')
-    ax.autoscale(tight=True)
-    fig.savefig('figures/fig14b.jpg', dpi=300)
-    plt.close()
-
-with plt.style.context(['science', 'no-latex', 'cjk-jp-font']):
-    fig, ax = plt.subplots()
-    for p in [5, 7, 10, 15, 20, 30, 38, 50, 100]:
-        ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order', fontsize=7)
-    ax.set(xlabel=r'電圧 (mV)')
-    ax.set(ylabel=r'電気 ($\mu$A)')
-    ax.autoscale(tight=True)
-    fig.savefig('figures/fig14c.jpg', dpi=300)
-    plt.close()
-
-with plt.style.context(['science', 'no-latex', 'cjk-kr-font']):
-    fig, ax = plt.subplots()
-    for p in [5, 7, 10, 15, 20, 30, 38, 50, 100]:
-        ax.plot(x, model(x, p), label=p)
-    ax.legend(title='Order', fontsize=7)
-    ax.set(xlabel=r'전압 (mV)')
-    ax.set(ylabel=r'전류 ($\mu$A)')
-    ax.autoscale(tight=True)
-    fig.savefig('figures/fig14d.jpg', dpi=300)
-    plt.close()
-
-# import matplotlib
-# matplotlib.use('pgf')  # stwich backend to pgf
-# matplotlib.rcParams.update({
-#     "pgf.preamble": [
-#         "\\usepackage{fontspec}",
-#         '\\usepackage{xeCJK}',
-#         r'\setmainfont{Times New Roman}',  # EN fonts Romans
-#         r'\setCJKmainfont{SimHei}',  # set CJK fonts as SimSun
-#         r'\setCJKsansfont{SimHei}',
-#         r'\newCJKfontfamily{\Song}{SimSun}',
-#         ]
-# })
-
-# with plt.style.context(['science', 'cjk-tc-font']):
-#     fig, ax = plt.subplots()
-#     for p in [5, 7, 10, 15, 20, 30, 38, 50, 100]:
-#         ax.plot(x, model(x, p), label=p)
-#     ax.legend(title='Order', fontsize=7)
-#     ax.set(xlabel=r'電壓 (mV)') 
-#     ax.set(ylabel=r'電流 ($\mu$A)')
-#     ax.autoscale(tight=True)
-#     fig.savefig('figures/fig15.pdf', backend='pgf')
-#     plt.close()
-
-with plt.style.context(['science', 'russian-font']):
-    fig, ax = plt.subplots()
-    for p in [5, 7, 10, 15, 20, 30, 38, 50, 100]:
-        ax.plot(x, model(x, p), label=p)
-    ax.legend(title=r'Число', fontsize=7)
-    ax.set(xlabel=r'Напряжение (mV)')
-    ax.set(ylabel=r'Сила тока ($\mu$A)')
-    ax.autoscale(tight=True)
-    fig.savefig('figures/fig16.jpg', dpi=300)
-    plt.close()
-    
-with plt.style.context(['science', 'turkish-font']):
-    fig, ax = plt.subplots()
-    for p in [5, 7, 10, 15, 20, 30, 38, 50, 100]:
-        ax.plot(x, model(x, p), label=p)
-    ax.legend(title=r'Düzen', fontsize=7)
-    ax.set(xlabel=r'Gerilim/Volt (mV)')
-    ax.set(ylabel=r'Mevcut Güç/Akım ($\mu$A)')
-    ax.autoscale(tight=True)
-    fig.savefig('figures/fig17.jpg', dpi=300)
-    plt.close()

@@ -1,0 +1,35 @@
+# Matplotlib style for Nature journal figures.
+# In general, they advocate for all fonts to be panel labels to be sans serif
+# and all font sizes in a figure to be 7 pt and panel labels to be 8 pt bold.
+
+# Figure size
+figure.figsize : 3.375, 2.20  # max width is 3.375 for single column
+figure.dpi: 100
+
+# Font sizes
+axes.labelsize: 10
+xtick.labelsize: 10
+ytick.labelsize: 10
+legend.fontsize: 9
+figure.labelsize: medium
+figure.titlesize: 12
+axes.titlesize: 10
+font.size: 10
+
+# Font Family
+font.family: sans-serif
+font.sans-serif: Helvetica, Arial, DejaVu Sans, Lucida Grande, Verdana, Geneva, Lucid, Avant Garde, sans-serif
+mathtext.fontset : dejavusans
+
+# Set line widths
+axes.linewidth : 0.75
+grid.linewidth : 0.5
+lines.linewidth : 0.8
+lines.markersize: 2.6
+
+# Always save as 'tight'
+# savefig.bbox : tight
+# savefig.pad_inches : 0.01  # Use virtually all space when we specify figure dimensions
+
+# LaTeX packages
+text.latex.preamble : \usepackage{amsmath} \usepackage{amssymb} \usepackage{sfmath}

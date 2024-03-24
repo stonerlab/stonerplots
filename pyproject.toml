@@ -20,14 +20,19 @@ keywords = [
     "matplotlib-styles",
     "python",
 ]
-dynamic = ["version", "description"]
 
 [project.urls]
 Homepage = "https://github.com/gb119/StonerPlots/"
 Issues = "https://github.com/gb119/StonerPlots/issues"
 
 [build-system]
-requires = ["setuptools>=61.0",     "setuptools-scm>=8.0" ]
+requires = ["setuptools>=65.0", "setuptools-scm>=8.0" ]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools_scm]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
