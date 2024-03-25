@@ -1,0 +1,43 @@
+{% set name = "stonerplots" %}
+{% set version = "1.0.0" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  path: ..
+
+build:
+  noarch: python
+  script: {{ PYTHON }} setup.py install --single-version-externally-managed --record=record.txt
+  number: 0
+
+requirements:
+  host:
+    - matplotlib >=3.6
+    - python >=3.10
+    - setuptools >=65.0
+    - setuptools-scm >=8.0
+    - pip
+  run:
+    - matplotlib >=3.6
+    - python >=3.10
+    
+test:
+  imports:
+    - stonerplots
+  commands:
+    - pip check
+  requires:
+    - pip
+
+about:
+  home: https://github.com/stonerlab/stonerplots
+  summary: This is a fork of scienceplots and provides a range of matplotlib styles for plotting physics...
+  license: MIT
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - gb119
