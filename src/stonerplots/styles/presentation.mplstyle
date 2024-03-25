@@ -1,0 +1,37 @@
+# Matplotlib style for Presentations notebooks
+
+# Set default figure size
+figure.figsize : 7,5
+figure.dpi: 200
+
+# Set x axis
+xtick.major.size : 8
+xtick.major.width : 1.2
+xtick.minor.size : 5
+xtick.minor.width : 1.2
+
+# Set y axis
+ytick.major.size : 8
+ytick.major.width : 1.2
+ytick.minor.size : 5
+ytick.minor.width : 1.2
+
+# Fontsizes
+xtick.labelsize : 18
+ytick.labelsize : 18
+legend.fontsize : 16
+legend.title_fontsize : 16
+axes.titlesize : 24
+axes.labelsize : 20
+
+# Set line widths
+axes.linewidth : 1.5
+grid.linewidth : 1
+lines.linewidth : 2.
+
+# Use sans-serif fonts
+font.family : sans-serif
+mathtext.fontset : dejavusans
+
+# Use LaTeX for math formatting
+text.usetex : False

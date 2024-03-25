@@ -22,12 +22,25 @@ The SavedFigure context manager will handle the call to the matplotlib style con
 figures opened within the context manager. If the filename for the figure has an embedded place holder for {ix}, then
 multiple figures can be saved without clobbering the filename.
 
+There is also an InsetPlot context manager that can help you get insets placed correctly so that axes
+labels don't escape over the edge of the surrounding figure.
+
+    with SavedFigure("my_figure.pdf", style=["stoner","aps"]):
+        plt.figure()
+        plt.plot(x,y,label="Dataset")
+        ...
+        with InsetPlot(loc="lower right", width=0.25, height=0.25, padding=0.05) as inset:
+            inset.plot(x, model(x, 200), linestyle="--")
+
+
 Available Styles
 ----------------
 
  * stoner - this is the base style sheet
  * poster - makes everything bigger for printing on a poster
  * notebook - makes things a little bigger for a Jupyter notebook - from the original scienceplots package
+ * presentation - a style suitable for the main graph on a powerpoint slide
+ * presentation_sm - a style for making 1/2 width graphs.
 
 Journal Styles
 --------------

@@ -3,7 +3,7 @@
 # see: https://github.com/garrettj403/SciencePlots
 
 # Set color cycle: Northern, Central, Picadily, District, Metropolitan, Bakerloo, JUbilee, Overground, Victoria, Elizabeth, Circle
-axes.prop_cycle : cycler('color', ['000000', 'DC241F', '0019A8', '007D32',  '9B0058', 'B26300', 'A1A5A7', 'EF7B10', '0098D8', '9364CC', 'FFD329'])
+axes.prop_cycle : (cycler('color', ['000000', 'DC241F', '0019A8', '007D32',  '9B0058', 'B26300', 'A1A5A7', 'EF7B10', '0098D8', '9364CC', 'FFD329']) + cycler('marker', ['o', 'd', 's', '*', '<', '>', 'P', 'X', '^', 'v', 'D']))
 
 # Set default figure size
 figure.figsize : 3.5, 2.625

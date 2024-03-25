@@ -1,9 +1,9 @@
 """Build the list of stylesheets and add to matplotlib."""
 from pathlib import Path
 import matplotlib.pyplot as plt
-from .context import SavedFigure
+from .context import SavedFigure,InsetPlot
 
-__all__ = ["SavedFigure"]
+__all__ = ["SavedFigure","InsetPlot"]
 __version__ = "1.0.0"
 
 # register the included stylesheet in the matplotlib style library
