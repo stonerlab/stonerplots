@@ -1,7 +1,8 @@
-![![PyPi version](https://pypip.in/v/stonerplots/badge.png)](https://crate.io/packages/stonerplots/)
-![Conda Version]("https://anaconda.org/phygbu/stonerplots/badges/version.svg")
-![Not platform specific]("https://anaconda.org/phygbu/stonerplots/badges/platforms.svg")
-![MIT Licensed]("https://anaconda.org/phygbu/stonerplots/badges/license.svg")
+[![GitHub version](https://badge.fury.io/gh/stonerlab%2Fstonerplots.svg)](https://badge.fury.io/gh/stonerlab%2Fstonerplots)
+[![PyPI version](https://badge.fury.io/py/StonerPlots.svg)](https://badge.fury.io/py/StonerPlots)
+![Conda Version](https://anaconda.org/phygbu/stonerplots/badges/version.svg)
+![Not platform specific](https://anaconda.org/phygbu/stonerplots/badges/platforms.svg)
+![MIT Licensed](https://anaconda.org/phygbu/stonerplots/badges/license.svg)
 
 
 Stoner Plots
@@ -9,7 +10,7 @@ Stoner Plots
 
 Stoner Plots is a fork of Science Plots
 
-![APS PlotStyle]("https://raw.githubusercontent.com/stonerlab/stonerplots/main/examples/figures/fig15.png" | width=640)
+<img src="https://raw.githubusercontent.com/stonerlab/stonerplots/main/examples/figures/fig15.png" width=640 alt="Presentation Style Image"/>
 
 Usage
 -----
