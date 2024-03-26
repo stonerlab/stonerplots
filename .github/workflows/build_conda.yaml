@@ -44,6 +44,7 @@ jobs:
         run: |
          cd ..
          echo `pwd`
-          conda activate build-environment
-          python setup.py sdist bdist_wheel
-          twine upload dist/*
+         conda init
+         conda activate build-environment
+         python setup.py sdist bdist_wheel
+         twine upload dist/*
