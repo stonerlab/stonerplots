@@ -44,7 +44,7 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-         cd /home/runner/stonerplots
+         cd /home/runner/work/stonerplots/stonerplots
          conda info
          python setup.py sdist bdist_wheel
          twine upload dist/*
