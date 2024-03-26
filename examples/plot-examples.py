@@ -76,13 +76,6 @@ with SavedFigure(figures / "fig02e.png", style=["stoner", "aps", "aps2"], autocl
     ax.autoscale(tight=True)
     ax.set(**pparam)
 
-with SavedFigure(figures / "fig02g.png", style=["stoner", "poster"], autoclose=True):
-    fig, ax = plt.subplots()
-    for p in [10, 15, 20, 30, 50, 100]:
-        line = ax.plot(x, model(x, p), label=p,marker="")
-        ax.plot(x[::5], model(x[::5], p), label=None, c=line[0].get_color(), linestyle="")
-    ax.legend(title="Order")
-    ax.autoscale(tight=True)
     ax.set(**pparam)
 
 
@@ -93,6 +86,24 @@ with SavedFigure(figures / "fig02f.png", style=["stoner", "nature"], autoclose=T
     ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
+
+with SavedFigure(figures / "fig02g.png", style=["stoner", "poster"], autoclose=True):
+    fig, ax = plt.subplots()
+    for p in [10, 15, 20, 30, 50, 100]:
+        line = ax.plot(x, model(x, p), label=p,marker="")
+        ax.plot(x[::5], model(x[::5], p), label=None, c=line[0].get_color(), linestyle="")
+    ax.legend(title="Order")
+    ax.autoscale(tight=True)
+
+
+with SavedFigure(figures / "fig02h.png", style=["stoner", "aip", "hi-res"], autoclose=True):
+    fig, ax = plt.subplots()
+    for p in [10, 15, 20, 30, 50, 100]:
+        ax.plot(x, model(x, p), label=p, marker="")
+    ax.legend(title="Order")
+    ax.autoscale(tight=True)
+    ax.set(**pparam)
+
 
 with SavedFigure(figures / "fig03.png", style=["stoner", "scatter"], autoclose=True):
     fig, ax = plt.subplots(figsize=(4, 4))

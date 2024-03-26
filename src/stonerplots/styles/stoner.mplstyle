@@ -44,6 +44,10 @@ savefig.pad_inches : 0.05
 font.family : serif
 mathtext.fontset : dejavuserif
 
+#ps and pdf rendering with TrueType
+pdf.fonttype: 42
+ps.fonttype: 42
+
 # Use LaTeX for math formatting
 text.usetex : True
-text.latex.preamble : \usepackage{amsmath,amsbsy,amsfonts,amssymb,amsxtra}
+text.latex.preamble : \usepackage{amsmath,amsbsy,amsfonts,amssymb,amsxtra,mathptmx,times} 

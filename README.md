@@ -55,12 +55,14 @@ Journal Styles
  * nature - for Nature group journals - from the original scienceplots package
  * ieee - for IEEE Transactions journals - from the original scienceplots package
  * aps - for American Physical Society Journals (like Phys Rev Lett etc.)
+ * aip - for AIP journals such as Applied Physics Letters - labels in Serif Fonts
 
 Modifiers
 ---------
 
  * aps1.5 - Switch to 1.5 column format
  * aps2.0 - Switch to 2 column format
+ * hi-res - Switches to 600dpi plotting (but using eps, pdf or svg is generally a better option)
 
 Colour Cycles
 -------------
@@ -73,7 +75,7 @@ The default colour cycle is based on the London Underground map colour scheme (w
  * District
  * Metropolitan
  * Bakerloo
- * JUbilee
+ * Jubilee
  * Overground
  * Victoria
  * Elizabeth

@@ -1,0 +1,33 @@
+# Matplotlib style for AIP journal figures.
+# In general, they advocate for all fonts to be panel labels to be sans serif
+# and all font sizes in a figure to be 7 pt and panel labels to be 8 pt bold.
+
+# Figure size
+figure.figsize : 3.37, 2.17  # max width is 3.37 for single column
+figure.constrained_layout.use: True
+figure.dpi: 100
+
+# Font sizes
+axes.labelsize: 9
+xtick.labelsize: 9
+ytick.labelsize: 10
+legend.fontsize: 9
+figure.labelsize: small
+figure.titlesize: 10
+axes.titlesize: 10
+font.size: 9
+
+# Font Family
+font.family: Times New Roman
+font.serif:      Times New Roman, Times, Palatino, Charter, DejaVu Serif, Bitstream Vera Serif, New Century Schoolbook, Century Schoolbook L, Utopia, ITC Bookman, Bookman, Nimbus Roman No9 L,  serif
+mathtext.fontset : dejavuserif
+
+# Set line widths
+axes.linewidth : 0.75
+grid.linewidth : 0.5
+lines.linewidth : 0.8
+lines.markersize: 2.6
+
+
+# LaTeX packages
+text.latex.preamble : \usepackage{amsmath} \usepackage{amssymb} \usepackage{sfmath}
