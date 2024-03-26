@@ -6,7 +6,9 @@ on:
     types: ['released', 'prereleased']
 
 # workflow_dispatch:        # Un comment line if you also want to trigger action manually
-
+defaults:
+  run:
+    shell: bash -l {0}
 jobs:
   conda_deployment_with_new_tag:
     name: Conda deployment of package for platform ${{ matrix.os }} with Python ${{ matrix.python-version }}
@@ -38,18 +40,11 @@ jobs:
           overwrite: true
           token: ${{ secrets.ANACONDA }} # Replace with the right name of your secret
       - name: Build and upload wheel
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-          environment-file: recipe/build-env.yml    # Path to the build conda environment
-          activate-environment: build-environment
-          auto-update-conda: true
-          auto-activate-base: false
-          show-channel-urls: false
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
          cd /home/runner
+         conda info
          python setup.py sdist bdist_wheel
          twine upload dist/*
