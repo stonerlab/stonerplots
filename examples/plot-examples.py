@@ -30,7 +30,7 @@ with SavedFigure(figures / "fig01a.png", style=["stoner"], autoclose=True):
 with SavedFigure(figures / "fig01b.png", style=["stoner", "no-latex"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:
-        ax.plot(x, model(x, p), label=p,marker="")
+        ax.plot(x, model(x, p), label=p, marker="")
     ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
@@ -38,7 +38,7 @@ with SavedFigure(figures / "fig01b.png", style=["stoner", "no-latex"], autoclose
 with SavedFigure(figures / "fig02a.png", style=["stoner", "ieee"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 20, 40, 100]:
-        ax.plot(x, model(x, p), label=p,marker="")
+        ax.plot(x, model(x, p), label=p, marker="")
     ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
@@ -46,7 +46,7 @@ with SavedFigure(figures / "fig02a.png", style=["stoner", "ieee"], autoclose=Tru
 with SavedFigure(figures / "fig02b.png", style=["stoner", "std-colours"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:
-        ax.plot(x, model(x, p), label=p,marker="")
+        ax.plot(x, model(x, p), label=p, marker="")
     ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
@@ -90,7 +90,7 @@ with SavedFigure(figures / "fig02f.png", style=["stoner", "nature"], autoclose=T
 with SavedFigure(figures / "fig02g.png", style=["stoner", "poster"], autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:
-        line = ax.plot(x, model(x, p), label=p,marker="")
+        line = ax.plot(x, model(x, p), label=p, marker="")
         ax.plot(x[::5], model(x[::5], p), label=None, c=line[0].get_color(), linestyle="")
     ax.legend(title="Order")
     ax.autoscale(tight=True)
@@ -105,7 +105,7 @@ with SavedFigure(figures / "fig02h.png", style=["stoner", "aip", "hi-res"], auto
     ax.set(**pparam)
 
 
-with SavedFigure(figures / "fig03.png", style=["stoner", "scatter"], autoclose=True):
+with SavedFigure(figures / "fig03.png", style=["stoner", "scatter", "latex"], autoclose=True):
     fig, ax = plt.subplots(figsize=(4, 4))
     ax.plot([-2, 2], [-2, 2], "k--")
     ax.fill_between([-2, 2], [-2.2, 1.8], [-1.8, 2.2], color="dodgerblue", alpha=0.2, lw=0)
@@ -214,14 +214,6 @@ with SavedFigure(figures / "fig14.png", style=["stoner"], autoclose=True):
     with InsetPlot(loc="lower right") as inset:
         inset.plot(x, model(x, 200), linestyle="--")
 
-with SavedFigure(figures / "fig16.png", style=["stoner", "presentation", "presentation_sm"], autoclose=True):
-    fig, ax = plt.subplots()
-    for p in [10, 15, 20, 30, 50, 100]:
-        ax.plot(x, model(x, p), label=p, marker="")
-    ax.legend(title="Order")
-    ax.autoscale(tight=True)
-    ax.set(**pparam)
-    ax.set_title("Dataet 1")
 
 with SavedFigure(figures / "fig15.png", style=["stoner", "presentation"], autoclose=True):
     fig, ax = plt.subplots()
@@ -230,3 +222,12 @@ with SavedFigure(figures / "fig15.png", style=["stoner", "presentation"], autocl
     ax.legend(title="Order")
     ax.autoscale(tight=True)
     ax.set(**pparam)
+
+with SavedFigure(figures / "fig16.png", style=["stoner", "presentation", "presentation_sm"], autoclose=True):
+    fig, ax = plt.subplots()
+    for p in [5, 6, 8, 10, 15, 20, 30, 50, 100, 150]:
+        ax.plot(x, model(x, p), label=p, marker="")
+    ax.legend(title="Order", labelspacing = 0.2)
+    ax.autoscale(tight=True)
+    ax.set(**pparam)
+    ax.set_title("Dataet 1")

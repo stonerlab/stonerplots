@@ -3,7 +3,7 @@
 # and all font sizes in a figure to be 7 pt and panel labels to be 8 pt bold.
 
 # Figure size
-figure.figsize : 3.375, 2.20  # max width is 3.375 for single column
+figure.figsize : 3.375, 2.53  # max width is 3.375 for single column
 figure.dpi: 100
 
 # Font sizes

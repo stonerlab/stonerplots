@@ -9,6 +9,10 @@ axes.prop_cycle : (cycler('color', ['000000', 'DC241F', '0019A8', '007D32',  '9B
 figure.figsize : 3.5, 2.625
 figure.constrained_layout.use: True
 
+#Formatting
+axes.formatter.limits: -2, 4
+axes.formatter.useoffset: False
+
 # Set x axis
 xtick.direction : in
 xtick.major.size : 3
@@ -39,15 +43,24 @@ legend.frameon : False
 savefig.bbox : tight
 savefig.pad_inches : 0.05
 
-# Use serif fonts
-# font.serif : Times
-font.family : serif
-mathtext.fontset : dejavuserif
+# Use sans-serif fonts
+font.sans-serif : Helvetica, Arial, DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid,  Avant Garde, sans-serif
+font.family : sans-serif
+mathtext.fontset: dejavusans 
+mathtext.bf:  sans:bold
+mathtext.bfit: sans:italic:bold
+mathtext.cal: cursive
+mathtext.it:  sans:italic
+mathtext.rm:  sans
+mathtext.sf:  sans
+mathtext.tt:  monospace
+mathtext.fallback: stixsans
+mathtext.default: regular
 
 #ps and pdf rendering with TrueType
 pdf.fonttype: 42
 ps.fonttype: 42
 
 # Use LaTeX for math formatting
-text.usetex : True
-text.latex.preamble : \usepackage{amsmath,amsbsy,amsfonts,amssymb,amsxtra,mathptmx,times} 
+text.usetex : False
+text.latex.preamble : \usepackage{amsmath,amsbsy,amsfonts,amssymb,amsxtra,cmbright} 

@@ -1,0 +1,6 @@
+# Matplotlib style for AIP 2 column journal figures.
+# In general, they advocate for all fonts to be panel labels to be sans serif
+# and all font sizes in a figure to be 7 pt and panel labels to be 8 pt bold.
+
+# Figure size
+figure.figsize : 6.69, 4.3  # max width is 6.69in for 2 coloumn in AIP jopurnals

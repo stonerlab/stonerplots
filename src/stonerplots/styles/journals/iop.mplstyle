@@ -1,9 +1,9 @@
-# Matplotlib style for AIP journal figures.
+# Matplotlib style for IOP  journal figures.
 # In general, they advocate for all fonts to be panel labels to be sans serif
 # and all font sizes in a figure to be 7 pt and panel labels to be 8 pt bold.
 
 # Figure size
-figure.figsize : 3.37, 2.53  # max width is 3.37 for single column
+figure.figsize : 3.35, 2.5  # max width is 3.37 for single column
 figure.constrained_layout.use: True
 figure.dpi: 100
 
@@ -30,4 +30,4 @@ lines.markersize: 2.6
 
 
 # LaTeX packages
-text.latex.preamble :\usepackage{amsmath,amsbsy,amsfonts,amssymb,amsxtra,mathptmx,times} 
+text.latex.preamble : \usepackage{amsmath,amsbsy,amsfonts,amssymb,amsxtra,mathptmx,times} 
