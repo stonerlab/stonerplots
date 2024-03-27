@@ -1,6 +1,6 @@
 [project]
 name = "StonerPlots"
-version = "1.0.0"
+dynamic = ["version"]
 authors = [
   { name="Gavin Burnell", email="G.Burnell@leeds.ac.uk" },
 ]
@@ -33,6 +33,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {attr = "stonerplots.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["src"]

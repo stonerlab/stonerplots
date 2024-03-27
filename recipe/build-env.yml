@@ -7,5 +7,6 @@ dependencies:
    - conda-build
    - anaconda-client
    - setuptools
+   - build
    - wheel
    - twine

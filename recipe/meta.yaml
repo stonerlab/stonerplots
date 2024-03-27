@@ -1,5 +1,5 @@
 {% set name = "stonerplots" %}
-{% set version = "1.0.0" %}
+{% set version = "1.1.0" %}
 
 package:
   name: {{ name|lower }}
@@ -23,7 +23,7 @@ requirements:
   run:
     - matplotlib >=3.6
     - python >=3.10
-    
+
 test:
   imports:
     - stonerplots
