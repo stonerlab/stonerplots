@@ -225,7 +225,7 @@ with SavedFigure(figures / "fig15.png", style=["stoner", "presentation"], autocl
 
 with SavedFigure(figures / "fig16.png", style=["stoner", "presentation", "presentation_sm"], autoclose=True):
     fig, ax = plt.subplots()
-    for p in [5, 6, 8, 10, 15, 20, 30, 50, 100, 150]:
+    for p in [5, 6, 8, 10, 12, 15, 20, 30, 50, 100, 150]:
         ax.plot(x, model(x, p), label=p, marker="")
     ax.legend(title="Order", labelspacing = 0.2)
     ax.autoscale(tight=True)

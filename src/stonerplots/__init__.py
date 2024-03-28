@@ -1,10 +1,12 @@
 """Build the list of stylesheets and add to matplotlib."""
 from pathlib import Path
 import matplotlib.pyplot as plt
-from .context import SavedFigure,InsetPlot
+from matplotlib.colors import _colors_full_map
+from .context import SavedFigure, InsetPlot
+from .colours import tube_colours, tube_colours_90, tube_colours_70, tube_colours_10
 
-__all__ = ["SavedFigure","InsetPlot"]
-__version__ = "1.1.0"
+__all__ = ["context", "SavedFigure", "InsetPlot"]
+__version__ = "1.2.0"
 
 # register the included stylesheet in the matplotlib style library
 stonerplots_path = Path(__file__).parent
@@ -22,3 +24,16 @@ for inode in styles_path.rglob("*"):
 # Update dictionary of styles
 plt.style.core.update_nested_dict(plt.style.library, stylesheets)
 plt.style.core.available[:] = sorted(plt.style.library.keys())
+
+_colors_full_map.update(
+    tube_colours
+)
+_colors_full_map.update(
+    tube_colours_90
+)
+_colors_full_map.update(
+    tube_colours_70
+)
+_colors_full_map.update(
+    tube_colours_90
+)

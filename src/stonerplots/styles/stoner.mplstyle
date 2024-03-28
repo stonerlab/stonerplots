@@ -2,8 +2,9 @@
 # This is the base style for "SciencePlots"
 # see: https://github.com/garrettj403/SciencePlots
 
-# Set color cycle: Northern, Central, Picadily, District, Metropolitan, Bakerloo, JUbilee, Overground, Victoria, Elizabeth, Circle
-axes.prop_cycle : (cycler('color', ['000000', 'DC241F', '0019A8', '007D32',  '9B0058', 'B26300', 'A1A5A7', 'EF7B10', '0098D8', '9364CC', 'FFD329']) + cycler('marker', ['o', 'd', 's', '*', '<', '>', 'P', 'X', '^', 'v', 'D']))
+# Set color cycle
+#axes.prop_cycle : (cycler('color', ['northern', 'central', 'picadily', 'district',  'metropolitan', 'bakerloo', 'jubilee', 'overground', 'victoria', 'elizabeth', 'circle']) + cycler('marker', ['o', 'd', 's', '*', '<', '>', 'P', 'X', '^', 'v', 'D']))
+axes.prop_cycle : (cycler('color', ['000000', 'DC241F', '0019A8', '007D32',  '9B0058', 'B26300', '838D93', 'FA7B05', '039BE5', '60399E', 'FFC80A']) + cycler('marker', ['o', 'd', 's', '*', '<', '>', 'P', 'X', '^', 'v', 'D']))
 
 # Set default figure size
 figure.figsize : 3.5, 2.625
@@ -46,7 +47,7 @@ savefig.pad_inches : 0.05
 # Use sans-serif fonts
 font.sans-serif : Helvetica, Arial, DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid,  Avant Garde, sans-serif
 font.family : sans-serif
-mathtext.fontset: dejavusans 
+mathtext.fontset: dejavusans
 mathtext.bf:  sans:bold
 mathtext.bfit: sans:italic:bold
 mathtext.cal: cursive
@@ -63,4 +64,4 @@ ps.fonttype: 42
 
 # Use LaTeX for math formatting
 text.usetex : False
-text.latex.preamble : \usepackage{amsmath,amsbsy,amsfonts,amssymb,amsxtra,cmbright} 
+text.latex.preamble : \usepackage{amsmath,amsbsy,amsfonts,amssymb,amsxtra,cmbright}

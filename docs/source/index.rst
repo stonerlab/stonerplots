@@ -9,7 +9,7 @@ Welcome to StonerPlots's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-   
+
 Introduction
 ------------
 
@@ -28,11 +28,11 @@ Installation
 StonerPlots can be installed wither with pip or with conda::
 
     pip install stonerplots
-    
+
 Conda packages are uploaded to the Anaconda channel phygbu::
 
     conda install -c phygbu stonerplots
-    
+
 It is packaged for python >= 3.10 and you need to have matplotlib installed as well (obviously!). The
 example code also uses numpy.
 
@@ -44,11 +44,11 @@ styles and also collects any new figures and saves them to disk.::
 
     x = np.linspace(-np.pi,np.pi,181)
     params = {"xlabel":r"Angle $^\circ$","ylabel":"Signal (V)"}
-    
+
     with SavedFigure(figures / "example-1.png"):
         fig, ax = plt.subplots()
         for i in range(1,6):
-            ax.plot(x*180/np.pi,(1/i)*np.sin(x*i+np.pi/i), 
+            ax.plot(x*180/np.pi,(1/i)*np.sin(x*i+np.pi/i),
                                     marker="", label=f"{i=}")
         ax.legend(title="Curve")
         ax.set(**params)
@@ -58,6 +58,15 @@ default "stoner" stylesheet will be applied.
 
 .. image:: figures/example-1.png
   :alt: Example figure formatted with the 'stoner' style sheet.
+
+Sections
+========
+
+.. toctree::
+   :maxdepth: 2
+
+   Colours <colours>
+   API <api>
 
 Indices and tables
 ==================

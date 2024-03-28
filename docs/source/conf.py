@@ -6,24 +6,30 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'StonerPlots'
-copyright = '2024, University of Leeds'
-author = 'Gavin Burnell'
+import sys
+from pathlib import Path
+
+modpath = Path(__file__).parent.parent.parent / "src"
+sys.path.insert(0, str(modpath))
+
+project = "StonerPlots"
+copyright = "2024, University of Leeds"
+author = "Gavin Burnell"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx_copybutton',
+    "sphinx_copybutton",
+    "sphinx.ext.autodoc",
 ]
 
-templates_path = ['_templates']
+templates_path = ["_templates"]
 exclude_patterns = []
-
 
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'alabaster'
-html_static_path = ['_static']
+html_theme = "alabaster"
+html_static_path = ["_static"]
