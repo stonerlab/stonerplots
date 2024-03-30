@@ -1,6 +1,6 @@
 [![GitHub version](https://badge.fury.io/gh/stonerlab%2Fstonerplots.svg)](https://badge.fury.io/gh/stonerlab%2Fstonerplots)
 [![PyPI version](https://badge.fury.io/py/StonerPlots.svg)](https://badge.fury.io/py/StonerPlots)
-[![Build Docs](https://github.com/stonerlab/stonerplots/actions/workflows/publish_sphinx.yaml/badge.svg)](https://github.com/stonerlab/stonerplots/actions/workflows/publish_sphinx.yaml)
+[![Build Docs](https://github.com/stonerlab/stonerplots/actions/workflows/publish_sphinx.yaml/badge.svg)](https://stonerlab.github.io/stonerplots/)
 [![Conda](https://github.com/stonerlab/stonerplots/actions/workflows/build_conda.yaml/badge.svg?branch=main)](https://github.com/stonerlab/stonerplots/actions/workflows/build_conda.yaml)
 ![Conda Version](https://anaconda.org/phygbu/stonerplots/badges/version.svg)
 ![Not platform specific](https://anaconda.org/phygbu/stonerplots/badges/platforms.svg)
