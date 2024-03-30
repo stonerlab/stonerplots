@@ -1,3 +1,4 @@
+.. currentmodule:: stonerplots
 Stoner Plots Style Gallery
 ==========================
 
@@ -134,13 +135,12 @@ There are specific stylesheets for producing plots at the correct size and style
 |    :alt: Dark themed plot figure                    |                                                   |
 |    :align: center                                   |                                                   |
 |                                                     |                                                   |
-| Using styles ["stoner", "stoner-dark"], in addition |                                                   |
-| to the dark bakground, the tuve_colours50 palette   |                                                   |
-| gives a reasonable constrast for the plot lines.    |                                                   |
+| Using styles ["stoner", "stoner-dark"]              |                                                   |
 |                                                     |                                                   |
 +-----------------------------------------------------+---------------------------------------------------+
 
-
+In addition to switching the background to TfL Night Service black, the *stoner-dark* scheme also switches the colour
+cycler to using the slightly lighter Tube Map 50% shade colours.
 
 5. Different Formats
 --------------------
@@ -151,7 +151,9 @@ There are specific stylesheets for producing plots at the correct size and style
 
 The *grid* style adds an axes grid to the plot.
 
-.. image:: ../../examples/fi
+.. image:: ../../examples/fig06.png
+   :alt: Plot with axes grids
+   :algn: center
 
 This was produced with the style ["stoner", "grid"]
 
@@ -161,7 +163,7 @@ This was produced with the style ["stoner", "grid"]
 Inset Plots
 ~~~~~~~~~~~
 
-The :py:class@`InsetPlot` context manager can be used to add a new set of axes as an inset to a plot.
+The :py:class:`InsetPlot` context manager can be used to add a new set of axes as an inset to a plot.
 
 .. image::  ../../examples/figures/fig07a.png
    :alt: Plot with inset in lower right corner
