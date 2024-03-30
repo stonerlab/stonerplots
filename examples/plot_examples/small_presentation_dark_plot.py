@@ -6,7 +6,11 @@ from stonerplots import SavedFigure
 
 from .common import x, model, pparam, figures
 
-with SavedFigure(figures / "fig05d.png", style=["stoner", "presentation", "presentation_sm"], autoclose=True):
+with SavedFigure(
+    figures / "fig05e.png",
+    style=["stoner", "stoner_dark", "presentation", "presentation_sm", "presentation_dark"],
+    autoclose=True,
+):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:
         line = ax.plot(x, model(x, p), label=p, marker="")

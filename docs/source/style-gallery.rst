@@ -148,12 +148,53 @@ cycler to using the slightly lighter Tube Map 50% shade colours.
 5. Different Formats
 --------------------
 
+Notebooks
+~~~~~~~~~
+
+The *notebook* style is designed for Jupyter Notebooks.
+
+.. image:: ../../examples/figures/fig05a.png
+
+Posters
+~~~~~~~
+
+The *poster* style makes everything bigger for printing onto an A0 poster. Should be used in combination with *hi-res*
+for final printing.
+
+.. image:: ../../examples/figures/fig05b.png
+
+Presentations
+~~~~~~~~~~~~~
+
+The *presentation* style switches to a larger style, designed for use as a single graph on a PowerPoint presentation.
+
+.. image:: ../../examples/figures/fig05c.png
+
+There is a *presnetation_sm* style for when you want two plots on a slide.
+
+.. image:: ../../examples/figures/fig05d.png
+
+The *stoner_dark* style does make everything look a bit heavier and bolder, so the *presentation_dark* lightens
+everything up.
+
+.. image:: ../../examples/figures/fig05e.png
+
+High Resolution Mode
+~~~~~~~~~~~~~~~~~~~~
+
+In general for printed media you should pick a vector format for saving figures - such as eps, svg or pdf. It this
+is not feasible and a bitmapped image is needed, then a higher dpi is needed. This can be done by using the *hi-res*
+style.
+
+.. image:: ../../examples/figures/fig05f.png
+
+
 6. Miscellaneous Tweaks
 -----------------------
 
 The *grid* style adds an axes grid to the plot.
 
-.. image:: ../../examples/fig06.png
+.. image:: ../../examples/figures/fig06.png
    :alt: Plot with axes grids
    :algn: center
 
