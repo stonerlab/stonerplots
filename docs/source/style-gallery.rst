@@ -153,9 +153,11 @@ Notebooks
 
 The *notebook* style is designed for Jupyter Notebooks.
 
+
 .. image:: ../../examples/figures/fig05a.png
   :alt: Notebook mode
-  :algn: center
+  :align: center
+
 
 Posters
 ~~~~~~~
@@ -163,31 +165,39 @@ Posters
 The *poster* style makes everything bigger for printing onto an A0 poster. Should be used in combination with *hi-res*
 for final printing.
 
+
 .. image:: ../../examples/figures/fig05b.png
   :alt: Poster mode
-  :algn: center
+  :align: center
+
 
 Presentations
 ~~~~~~~~~~~~~
 
 The *presentation* style switches to a larger style, designed for use as a single graph on a PowerPoint presentation.
 
+
 .. image:: ../../examples/figures/fig05c.png
   :alt: Full width presentation mode
-  :algn: center
+  :align: center
+
 
 There is a *presnetation_sm* style for when you want two plots on a slide.
 
+
 .. image:: ../../examples/figures/fig05d.png
   :alt: Half-width presentation mode
-  :algn: center
+  :align: center
+
 
 The *stoner_dark* style does make everything look a bit heavier and bolder, so the *presentation_dark* lightens
 everything up.
 
+
 .. image:: ../../examples/figures/fig05e.png
   :alt: Dark presentation mode
-  :algn: center
+  :align: center
+
 
 High Resolution Mode
 ~~~~~~~~~~~~~~~~~~~~
@@ -196,9 +206,10 @@ In general for printed media you should pick a vector format for saving figures 
 is not feasible and a bitmapped image is needed, then a higher dpi is needed. This can be done by using the *hi-res*
 style.
 
+
 .. image:: ../../examples/figures/fig05f.png
   :alt: 600dpi image mode.
-  :algn: center
+  :align: center
 
 
 6. Miscellaneous Tweaks
@@ -206,9 +217,11 @@ style.
 
 The *grid* style adds an axes grid to the plot.
 
+
 .. image:: ../../examples/figures/fig06.png
   :alt: Plot with axes grids
-  :algn: center
+  :align: center
+
 
 This was produced with the style ["stoner", "grid"]
 
@@ -220,15 +233,18 @@ Inset Plots
 
 The :py:class:`stonerplots.InsetPlot` context manager can be used to add a new set of axes as an inset to a plot.
 
+
 .. image::  ../../examples/figures/fig07a.png
   :alt: Plot with inset in lower right corner
   :align: center
+
 
 Stacked Sub-plots
 ~~~~~~~~~~~~~~~~~
 
 When you want to compare several variables against a common independent variable, stacking the plots can be useful.
 The :py:class:`stonerplots.StackedPlots` context manager can be used for this.
+
 
 .. image:: ../../examples/figures/fig7b.png
   :alt: 3-panel vertically stacked plot
