@@ -243,7 +243,7 @@ Stacked Sub-plots
 ~~~~~~~~~~~~~~~~~
 
 When you want to compare several variables against a common independent variable, stacking the plots can be useful.
-The :py:class:`stonerplots.StackedPlots` context manager can be used for this.
+The :py:class:`stonerplots.StackVertical` context manager can be used for this.
 
 
 .. image:: ../../examples/figures/fig7b.png

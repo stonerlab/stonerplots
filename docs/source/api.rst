@@ -1,5 +1,5 @@
 StonerPlots API
 ===============
 
-.. automodule:: stonerplots.context
-   :members:
+.. automodapi:: stonerplots
+   :no-inheritance-diagram:
