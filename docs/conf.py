@@ -9,7 +9,7 @@
 import sys
 from pathlib import Path
 
-modpath = Path(__file__).parent.parent.parent / "src"
+modpath = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(modpath))
 
 project = "StonerPlots"
