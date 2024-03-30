@@ -93,6 +93,9 @@ There are specific stylesheets for producing plots at the correct size and style
 3. Different Plot Types
 -----------------------
 
+There is a *scatter* plot style that sets up for doing scatter plots.
+
+.. image:: ../../examples/figures/fig03.png
 
 4. Different Colour Schemes
 ---------------------------
@@ -145,7 +148,6 @@ cycler to using the slightly lighter Tube Map 50% shade colours.
 5. Different Formats
 --------------------
 
-
 6. Miscellaneous Tweaks
 -----------------------
 
@@ -163,7 +165,7 @@ This was produced with the style ["stoner", "grid"]
 Inset Plots
 ~~~~~~~~~~~
 
-The :py:class:`InsetPlot` context manager can be used to add a new set of axes as an inset to a plot.
+The :py:class:`stonerplots.InsetPlot` context manager can be used to add a new set of axes as an inset to a plot.
 
 .. image::  ../../examples/figures/fig07a.png
    :alt: Plot with inset in lower right corner
@@ -173,8 +175,8 @@ Stacked Sub-plots
 ~~~~~~~~~~~~~~~~~
 
 When you want to compare several variables against a common independent variable, stacking the plots can be useful.
-The :py:class:`StackedPlots` context manager can be used for this.
+The :py:class:`stonerplots.StackedPlots` context manager can be used for this.
 
-.. image:: ../../examples/figures/fig07b.png
+.. image:: ../../examples/figures/fig7b.png
    :alt: 3-panel vertically stacked plot
    :align: center

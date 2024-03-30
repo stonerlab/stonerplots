@@ -12,7 +12,7 @@ Stoner Plots
 
 Stoner Plots is a fork of Science Plots
 
-<img src="https://raw.githubusercontent.com/stonerlab/stonerplots/main/examples/figures/fig15.png" width=640 alt="Presentation Style Image"/>
+<img src="https://raw.githubusercontent.com/stonerlab/stonerplots/main/examples/figures/fig05a.png" width=640 alt="Presentation Style Image"/>
 
 Usage
 -----
