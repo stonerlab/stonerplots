@@ -70,6 +70,7 @@ Modifiers
  * aps1.5 - Switch to 1.5 column wide format
  * aps2.0 - Switch to 2 column wide format
  * aip2 - Switch to 2 column wide format for AIP journals
+ * stoner-dark - Switch to a dark background a lighter plotting colours.
  * hi-res - Switches to 600dpi plotting (but using eps, pdf or svg is generally a better option)
  * presentation_sm - a style for making 1/2 width graphs.
  * presentation_dark - tweak the weight of elements for dark presnetations.
@@ -94,7 +95,7 @@ The default colour cycle is based on the London Underground map colour scheme (w
 The package adds these as named colours in matplotlib, along with 90,50,70 and 10% shade variants of some of them. See
 the [documentation page on colours](https://stonerlab.github.io/stonerplots/colours.html) for a full list.
 
-This package draws heavily on [scienceplots]()https://github.com/garrettj403/SciencePlots, so it seems only fair to cite the original work....
+This package draws heavily on [scienceplots](https://github.com/garrettj403/SciencePlots), so it seems only fair to cite the original work....
 
     @article{StonerPlots,
       author       = {John D. Garrett},
