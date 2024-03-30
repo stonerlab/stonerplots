@@ -1,0 +1,31 @@
+# Similar to matplotib dark_background but using some of the TfL palette
+
+lines.color: white
+patch.edgecolor: white
+
+text.color: white
+
+axes.facecolor: 1A1A36
+axes.edgecolor: white
+axes.labelcolor: white
+# Use tube70 colors
+#axes.prop_cycle : (cycler('color', ['northern', 'central', 'picadily', 'district',  'metropolitan', 'bakerloo', 'jubilee', 'overground', 'victoria', 'elizabeth', 'circle']))
+axes.prop_cycle: cycler('color', ['d5dadd','e96663','4d59ff','4dff94','ff4dba','ff991a','a6a6a6','fdd7b4', '80d0ff','9c7cd0', 'FFC80A'])
+
+xtick.color: white
+ytick.color: white
+
+grid.color: white
+
+figure.facecolor: 1A1A36
+figure.edgecolor: 1A1A36
+
+savefig.facecolor: 1A1A36
+savefig.edgecolor: 1A1A36
+
+### Boxplots
+boxplot.boxprops.color: white
+boxplot.capprops.color: white
+boxplot.flierprops.color: white
+boxplot.flierprops.markeredgecolor: white
+boxplot.whiskerprops.color: white

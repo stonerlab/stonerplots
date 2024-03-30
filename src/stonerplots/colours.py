@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Colour definitions for the stonerplots package."""
-__all__ = ["tube_colours", "tube_colours_90", "tube_colours_70", "tube_colours_10"]
+__all__ = ["tube_colours", "tube_colours_90", "tube_colours_70", "tube_colours_50", "tube_colours_10"]
 
 # Taken from the tfl blog: https://blog.tfl.gov.uk/2022/12/22/digital-colour-standard/
 tube_colours = {
@@ -34,15 +34,19 @@ tube_colours = {
     "tram": "#5FB526",
     "london_coaches": "#FFA600",
     "taxi&private_hire": "#8C88E3",
+    "johnstone_black": '#03071C',
+    "night_service": '#1A1A36',
 }
 
 tube_colours_90 = {
     "bakerloo90": "#753500",
     "central90": "#940000",
+    "district90": "#004d1f",
     "northern90": "#474747",
     "waterloo&city90": "#319475",
     "hammersmith&city90": "#CC526A",
     "jubilee90": "#4E5F6B",
+    "elizabeth90": "#221438",
     "metropolitan90": "#54003A",
     "overground90": "#BD4B00",
     "piccadilly90": "#00004D",
@@ -57,10 +61,12 @@ tube_colours_70 = {
     "bakerloo70": "#9E5200",
     "central70": "#BD0404",
     "hammersmith&city70": "#E06C87",
+    "district70": "#00b347",
     "jubilee70": "#677680",
     "metropolitan70": "#7D004D",
     "northern70": "#333333",
     "overground70": "#E66700",
+    "elizabeth70": "#502f83",
     "piccadilly70": "#000875",
     "thameslink70": "#C42B7F",
     "tram70": "#48A115",
@@ -70,14 +76,36 @@ tube_colours_70 = {
     "night70": "#0E0D21",
 }
 
+tube_colours_50 = {
+    "bakerloo50": "#ff991a",
+    "central50": "#e96663",
+    "hammersmith&city50": "#f2c0cb",
+    "district50": "#4dff94",
+    "jubilee50": "#d5dadd",
+    "metropolitan50": "#ff4dba",
+    "northern50": "#a6a6a6",
+    "overground50": "#fdd7b4",
+    "elizabeth50": "#9c7cd0",
+    "piccadilly50": "#4d59ff",
+    "thameslink50": "#e896c3",
+    "tram50": "#93ea61",
+    "victoria50": "#80d0ff",
+    "waterloo&city50": "#80ccb9",
+    "yellow50": "#ffea4d",
+    "night50": "#837fcd",
+}
+
+
 tube_colours_10 = {
     "bakerloo10": "#F1E3D1",
     "central10": "#F9DCDB",
+    "district10": "#b3ffd1",
     "hammersmith&city10": "#FDE3EA",
     "jubilee10": "#E1E4E5",
     "metropolitan10": "#EFD6E4",
     "northern10": "#E0E0E0",
     "overground10": "#FEE0C3",
+    "elizabeth10": "#d5c7eb",
     "piccadilly10": "#D6DAF1",
     "thameslink10": "#F6D2E5",
     "tram10": "#D9EDCB",

@@ -4,7 +4,6 @@
 
 # Figure size
 figure.figsize : 8, 5.25
-figure.dpi: 100
 
 # Font sizes
 axes.labelsize: 24

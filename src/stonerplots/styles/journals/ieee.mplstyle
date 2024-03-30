@@ -7,6 +7,7 @@ axes.prop_cycle : (cycler('color', ['k', 'r', 'b', 'g']) + cycler('ls', ['-', '-
 
 # Set default figure size
 figure.figsize : 3.3, 2.475
+figure.dpi : 100
 
 # Font sizes
 font.size : 8

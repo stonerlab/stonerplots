@@ -5,7 +5,6 @@
 # Figure size
 figure.figsize : 3.37, 2.53  # max width is 3.37 for single column
 figure.constrained_layout.use: True
-figure.dpi: 100
 
 # Font sizes
 axes.labelsize: 9
@@ -30,4 +29,4 @@ lines.markersize: 2.6
 
 
 # LaTeX packages
-text.latex.preamble :\usepackage{amsmath,amsbsy,amsfonts,amssymb,amsxtra,mathptmx,times} 
+text.latex.preamble :\usepackage{amsmath,amsbsy,amsfonts,amssymb,amsxtra,mathptmx,times}

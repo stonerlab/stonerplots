@@ -2,10 +2,10 @@
 from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.colors import _colors_full_map
-from .context import SavedFigure, InsetPlot
-from .colours import tube_colours, tube_colours_90, tube_colours_70, tube_colours_10
+from .context import SavedFigure, InsetPlot, StackVertical
+from .colours import tube_colours, tube_colours_90, tube_colours_70, tube_colours_50, tube_colours_10
 
-__all__ = ["context", "SavedFigure", "InsetPlot"]
+__all__ = ["context", "SavedFigure", "InsetPlot","StackVertical"]
 __version__ = "1.2.0"
 
 # register the included stylesheet in the matplotlib style library
@@ -35,5 +35,8 @@ _colors_full_map.update(
     tube_colours_70
 )
 _colors_full_map.update(
-    tube_colours_90
+    tube_colours_50
+)
+_colors_full_map.update(
+    tube_colours_10
 )

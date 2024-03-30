@@ -1,0 +1,13 @@
+# On a dark background, light objects look bolder and thicker than visa versa.
+
+xtick.major.width : 1.0
+xtick.minor.width : 1.0
+
+ytick.major.width : 1.0
+ytick.minor.width : 1.0
+
+axes.linewidth : 1.2
+grid.linewidth : 0.8
+lines.linewidth : 1.6
+
+font.weight:  300

@@ -23,6 +23,11 @@ Tube Map 70% Shade Colours
 
 .. image:: figures/colours70.png
 
+Tube Map 50% Shade Colours
+--------------------------
+
+.. image:: figures/colours50.png
+
 Tube Map 10% Shade Colours
 --------------------------
 

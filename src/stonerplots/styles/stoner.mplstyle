@@ -9,6 +9,7 @@ axes.prop_cycle : (cycler('color', ['000000', 'DC241F', '0019A8', '007D32',  '9B
 # Set default figure size
 figure.figsize : 3.5, 2.625
 figure.constrained_layout.use: True
+figure.dpi: 100
 
 #Formatting
 axes.formatter.limits: -2, 4
