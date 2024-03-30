@@ -96,6 +96,51 @@ There are specific stylesheets for producing plots at the correct size and style
 4. Different Colour Schemes
 ---------------------------
 
++-----------------------------------------------------+---------------------------------------------------+
+|                                                     |                                                   |
+| .. image:: ../../examples/figures/fig04a.png        | .. image:: ../../examples/figures/fig04b.png      |
+|    :alt: Standard colours scheme                    |    :alt: Bright palette colour scheme             |
+|    :align: center                                   |    :align: center                                 |
+|                                                     |                                                   |
+| Using styles ["stoner", "std-colours"]              | Using styles ["stoner", "bright"]                 |
+|                                                     |                                                   |
++-----------------------------------------------------+---------------------------------------------------+
+|                                                     |                                                   |
+| .. image:: ../../examples/figures/fig04c.png        | .. image:: ../../examples/figures/fig04d.png      |
+|    :alt: High contrast palette colour scheme        |    :alt: High visibility palette colour scheme    |
+|    :align: center                                   |    :align: center                                 |
+|                                                     |                                                   |
+| Using styles ["stoner", "high-contrast"]            | Using styles ["stoner", "high-vis"]               |
+|                                                     |                                                   |
++-----------------------------------------------------+---------------------------------------------------+
+|                                                     |                                                   |
+| .. image:: ../../examples/figures/fig04e.png        | .. image:: ../../examples/figures/fig04f.png      |
+|    :alt: Light palette colour scheme                |    :alt: Muted palette colour scheme              |
+|    :align: center                                   |    :align: center                                 |
+|                                                     |                                                   |
+| Using styles ["stoner", "light"]                    | Using styles ["stoner", "muted"]                  |
+|                                                     |                                                   |
++-----------------------------------------------------+---------------------------------------------------+
+|                                                     |                                                   |
+| .. image:: ../../examples/figures/fig04g.png        | .. image:: ../../examples/figures/fig04h.png      |
+|    :alt: Retro palette colour scheme                |    :alt: Vibrant palette colour scheme            |
+|    :align: center                                   |    :align: center                                 |
+|                                                     |                                                   |
+| Using styles ["stoner", "retro"]                    | Using styles ["stoner", "vibrant"]                |
+|                                                     |                                                   |
++-----------------------------------------------------+---------------------------------------------------+
+|                                                     |                                                   |
+| .. image:: ../../examples/figures/fig04i.png        |                                                   |
+|    :alt: Dark themed plot figure                    |                                                   |
+|    :align: center                                   |                                                   |
+|                                                     |                                                   |
+| Using styles ["stoner", "stoner-dark"], in addition |                                                   |
+| to the dark bakground, the tuve_colours50 palette   |                                                   |
+| gives a reasonable constrast for the plot lines.    |                                                   |
+|                                                     |                                                   |
++-----------------------------------------------------+---------------------------------------------------+
+
+
 
 5. Different Formats
 --------------------
@@ -104,6 +149,30 @@ There are specific stylesheets for producing plots at the correct size and style
 6. Miscellaneous Tweaks
 -----------------------
 
+The *grid* style adds an axes grid to the plot.
+
+.. image:: ../../examples/fi
+
+This was produced with the style ["stoner", "grid"]
 
 7. Insets and Multi-panel plots
 -------------------------------
+
+Inset Plots
+~~~~~~~~~~~
+
+The :py:class@`InsetPlot` context manager can be used to add a new set of axes as an inset to a plot.
+
+.. image::  ../../examples/figures/fig07a.png
+   :alt: Plot with inset in lower right corner
+   :align: center
+
+Stacked Sub-plots
+~~~~~~~~~~~~~~~~~
+
+When you want to compare several variables against a common independent variable, stacking the plots can be useful.
+The :py:class:`StackedPlots` context manager can be used for this.
+
+.. image:: ../../examples/figures/fig07b.png
+   :alt: 3-panel vertically stacked plot
+   :align: center
