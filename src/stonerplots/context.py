@@ -2,13 +2,14 @@
 """Context Managers to help with plotting and saving figures."""
 from pathlib import Path
 import weakref
+from collections.abc import Sequence
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, InsetPosition
 
 import stonerplots
 
-__all__ = ["SavedFigure", "InsetPlot", "StackVertical"]
+__all__ = ["SavedFigure", "InsetPlot", "StackVertical", "MultiPanel"]
 
 _fontargs = ["font", "fontfamily", "fontname", "fontsize", "fontstretch", "fontstyle", "fontvariant", "fontweight"]
 
@@ -16,7 +17,7 @@ _fontargs = ["font", "fontfamily", "fontname", "fontsize", "fontstretch", "fonts
 def _filter_dict(dic, keys):
     """Return a dictionary derived from dic that only contains the keys in keys."""
     ret = {}
-    for key in set(dic, keys()) & set(keys):
+    for key in set(dic.keys()) & set(keys):
         ret[key] = dic[key]
     return ret
 
@@ -231,6 +232,7 @@ class InsetPlot(object):
         self.height = height
         self.width = width
         self.padding = 0.05
+        self.switch_to_inset = switch_to_inset
 
     def __enter__(self):
         """Create the inset axes using the axes_grid toolkit."""
@@ -323,7 +325,9 @@ class StackVertical(object):
         Matplotlib's constrained layout makes it extra hard to get the pots to stack with no space between them as
         labels and figure titles can get in the way and the whole point of constrained layout is to avoid these
         elements colliding. The context manager gets around this by inspecting the y-ticks and y-limits in the
-        __exit__  method and adjusting limits as necessary to keep the tick lables from clashing.
+        __exit__  method and adjusting limits as necessary to keep the tick lables from clashing. Within the context
+        manager, the current figure will be the one with the stacked axes. The previous active figure is restored on
+        exit.
     """
 
     def __init__(
@@ -348,11 +352,11 @@ class StackVertical(object):
         if isinstance(self.figure, str) and self.figure in plt.get_figlabels:  # If we specified a figure as a label
             self.figure = plt.figure(self.fignum)
 
-        plt.scf(self.figure)
+        plt.figure(self.figure)
         self.gs = None
         self.sharex = sharex
         self.sharey = sharey
-        self.adjust_figsize = adjust_figsize if isinstance(adjust_figsize, float) else float(int(adjust_figsize)) * 0.6
+        self.adjust_figsize = adjust_figsize if isinstance(adjust_figsize, float) else float(int(adjust_figsize)) * 0.8
         self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
         self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
         self.kwargs = kwargs
@@ -363,12 +367,17 @@ class StackVertical(object):
         self.gs = self.figure.add_gridspec(self.number, hspace=hspace)
         self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
         if self.adjust_figsize:
-            extra_h = self.figsize[1] * self.adjust_figsize * (self.number - 1) + self.figsize[0]
+            extra_h = self.figsize[1] * self.adjust_figsize * (self.number - 1) + self.figsize[1]
             self.figure.set_figheight(extra_h)
         if self.label_panels:
+            fig = self.figure
             for ix, ax in enumerate(self.axes):
+                title_pts = ax.title.get_fontsize()
+                ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
+                y = (ax_height - title_pts * 1.25) / ax_height
+
                 ax.set_title(
-                    f" ({_counter(ix,self.label_panels)}", loc="left", y=0.85, **_filter_dict(self.kwargs, _fontargs)
+                    f" {_counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs)
                 )
         return self.axes
 
@@ -378,19 +387,148 @@ class StackVertical(object):
             for ax in self.axes:
                 ax.label_outer()
             plt.draw()
+            fig = self.figure
             for ix, ax in enumerate(self.axes):
+                fnt_pts = ax.yaxis.get_ticklabels()[0].get_fontsize()
+                ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
                 ylim = list(ax.get_ylim())
+                dy = 0.65 * fnt_pts / ax_height * (ylim[1] - ylim[0])  # How much axes space the labels take up
                 yticks = ax.get_yticks()
-                dy = (yticks[1] - yticks[0]) / 4
-                if ylim[0] - yticks[0] < dy and ix != len(self.axes) - 1:  # Adjust range of plots excepty bottom one
-                    ylim[0] = yticks[0] - dy
-                if yticks[-1] - ylim[1] < dy and ix != 0:  # Adjust range of plots except top one.
-                    ylim[1] = yticks[-1] + dy
+                if yticks[1] - ylim[0] < dy and ix != len(self.axes) - 1:  # Adjust range of plots excepty bottom one
+                    ylim[0] -= dy
+                if ylim[1] - yticks[-2] < dy and ix != 0:  # Adjust range of plots except top one.
+                    ylim[1] += dy
                 ax.set_ylim(ylim)
 
             self.figure.get_layout_engine().set(h_pad=0.0, hspace=0.0)
         self.figure.canvas.draw()
-        plt.scf(self._save_fig)
+        plt.figure(self._save_fig)
+
+
+class MultiPanel(object):
+
+    """A context manager for sorting out multi-panel plots in matplotlib.
+
+    Args:
+        panels (tuple[int.int] or int):
+            Nunber of sub-plots to produce. If a tuple then it spewcifies rows, columns. If a integer then it
+            specifies (1, columns)
+
+    Keyword Args:
+        figure (matplotlib.Figure):
+            Figure to use to contain the sub-plots in. If None (default) then the current figure is used.
+        sharex, sharey (bool):
+            Wherther the sub-plots have common x or y axes. Default is neither.
+        adjust_figsize (tuple[float,float], float,bool):
+            Whether to increase the figure height to accomodate the extra plots. If True, the figure is
+            increased by 0.6 of the original height and 1 times the original width  for each additional sub-plot
+            row or column after the first. If a float is given, then the additional height ad width factor is the
+            adjust_figsize value. If a tuple, them separate expansion factors can be given for each dimenion
+            (width, height). The default is True, or 0.8
+        label_panels (str or bool):
+            Whether to add (a), (b) etc. to the sub-plots. Default of True positions labels in the top right corner of
+            the sub-plots. The top sub-plot is the first one. If a string, then use this as a the pattern to determine
+            how to format the plot number to a string. The default value of True corresponds to '({alpha})', other
+            supported counters are
+            - int - simpe numeral
+            - alpha / Alpha - lower / uppper case letters
+            - roman / Roman - lower / upper case Roman numerals.
+
+        kwargs:
+            Other keyword arguments can be used to set the label fonts and are passed into ac.set_title.
+
+    Returns:
+        (List[matplotlib.Axes]):
+            The context manager bariable is the list of axes created.
+
+    Notes:
+        Since double-column figures in journals are more than twice the single figure dimension, it might be useful to
+        use the double width figure stylesheet, and then specify an *adjust_figsize* of (0,<something>) to keep the
+        full width figure setting and expand the height as required (bearing in mind the double column figures often
+        already have more height.)
+    """
+
+    def __init__(
+        self,
+        panels,
+        figure=None,
+        sharex=False,
+        sharey=False,
+        adjust_figsize=True,
+        label_panels=True,
+        **kwargs,
+    ):
+        """Setup a figure and a gridspec for multi-panel plotting."""
+        if isinstance(panels, int):  # Assume 1 x panels
+            panels = (1, panels)
+        self.panels = panels
+
+        self.figure = figure if figure else plt.gcf()
+        self._save_fig = plt.gcf()
+        if isinstance(self.figure, int) and self.figure in plt.get_fignums:  # If we specified a figure as a number
+            self.figure = plt.figure(self.fignum)
+        if isinstance(self.figure, str) and self.figure in plt.get_figlabels:  # If we specified a figure as a label
+            self.figure = plt.figure(self.fignum)
+
+        plt.figure(self.figure)
+        self.gs = None
+        self.sharex = sharex
+        self.sharey = sharey
+        # Adjust fig size can be a tuple
+        if isinstance(adjust_figsize, bool):
+            adjust_figsize = (int(adjust_figsize), int(adjust_figsize) * 0.8)
+        if isinstance(adjust_figsize, float):
+            adjust_figsize = (adjust_figsize, adjust_figsize)
+        self.adjust_figsize = adjust_figsize
+        self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
+        self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
+        self.kwargs = kwargs
+
+    def __enter__(self):
+        """Create the grid of axes."""
+        self.gs = self.figure.add_gridspec(*self.panels, **self.kwargs)
+        self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
+        if self.adjust_figsize:
+            extra_h = self.figsize[1] * self.adjust_figsize[1] * (self.panels[1] - 1) + self.figsize[1]
+            self.figure.set_figheight(extra_h)
+            extra_w = self.figsize[0] * self.adjust_figsize[0] * (self.panels[0] - 1) + self.figsize[0]
+            self.figure.set_figwidth(extra_w)
+        if self.label_panels:
+            fig = self.figure
+            for ix, ax in enumerate(self):
+                title_pts = ax.title.get_fontsize()
+                ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
+                y = (ax_height - title_pts * 1.25) / ax_height
+
+                ax.set_title(
+                    f" {_counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs)
+                )
+        return self
+
+    def __exit__(self, type, value, traceback):
+        """Clean up the axes."""
+        self.figure.canvas.draw()
+        plt.figure(self._save_fig)
+
+    def __len__(self):
+        """Pass through to self.axes."""
+        return self.panels[0] * self.panels[1]
+
+    def __contains__(self, value):
+        """Pass through to self.axes."""
+        return value in self.axes
+
+    def __getitem__(self, index):
+        """Pass through to self.axes."""
+        return self.axex[index]
+
+    def __iter__(self):
+        """Iterate over self.axes."""
+        yield from self.axes.ravel()
+
+    def __refersed__(self):
+        """Iterate over reversed self.axes."""
+        yield from reversed(self.axes.ravel())
 
 
 if __name__ == "__main__":

@@ -249,3 +249,13 @@ The :py:class:`stonerplots.StackVertical` context manager can be used for this.
 .. image:: ../../examples/figures/fig7b.png
   :alt: 3-panel vertically stacked plot
   :align: center
+
+  MultiPanel Sub-plots
+  ~~~~~~~~~~~~~~~~~~~~
+
+Where a figure just needs to show a collection of related datasets, a multi-panel figure with sub-plots is a good
+option. The :py:class:`stonerplots.MultiPanel` context manager makes this a bit easier.
+
+.. image:: ../../examples/figures/fig7c.png
+  :alt: 2x2 multi-panel plot.
+  :align: center

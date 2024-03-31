@@ -35,4 +35,5 @@ __all__ = [
     # 7 Context Managers
     "inset_plot",
     "stacked_plot",
+    "multi_panel_plot",
 ]

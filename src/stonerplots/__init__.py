@@ -2,11 +2,11 @@
 from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.colors import _colors_full_map
-from .context import SavedFigure, InsetPlot, StackVertical
+from .context import SavedFigure, InsetPlot, StackVertical, MultiPanel
 from .colours import tube_colours, tube_colours_90, tube_colours_70, tube_colours_50, tube_colours_10
 
-__all__ = ["context", "SavedFigure", "InsetPlot","StackVertical"]
-__version__ = "1.2.0"
+__all__ = ["context", "SavedFigure", "InsetPlot", "StackVertical", "MultiPanel"]
+__version__ = "1.3.0"
 
 # register the included stylesheet in the matplotlib style library
 stonerplots_path = Path(__file__).parent
@@ -25,18 +25,8 @@ for inode in styles_path.rglob("*"):
 plt.style.core.update_nested_dict(plt.style.library, stylesheets)
 plt.style.core.available[:] = sorted(plt.style.library.keys())
 
-_colors_full_map.update(
-    tube_colours
-)
-_colors_full_map.update(
-    tube_colours_90
-)
-_colors_full_map.update(
-    tube_colours_70
-)
-_colors_full_map.update(
-    tube_colours_50
-)
-_colors_full_map.update(
-    tube_colours_10
-)
+_colors_full_map.update(tube_colours)
+_colors_full_map.update(tube_colours_90)
+_colors_full_map.update(tube_colours_70)
+_colors_full_map.update(tube_colours_50)
+_colors_full_map.update(tube_colours_10)
