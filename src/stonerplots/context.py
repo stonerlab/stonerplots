@@ -2,7 +2,6 @@
 """Context Managers to help with plotting and saving figures."""
 from pathlib import Path
 import weakref
-import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, InsetPosition
@@ -10,6 +9,71 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes, InsetPosition
 import stonerplots
 
 __all__ = ["SavedFigure", "InsetPlot", "StackVertical"]
+
+_fontargs = ["font", "fontfamily", "fontname", "fontsize", "fontstretch", "fontstyle", "fontvariant", "fontweight"]
+
+
+def _filter_dict(dic, keys):
+    """Return a dictionary derived from dic that only contains the keys in keys."""
+    ret = {}
+    for key in set(dic, keys()) & set(keys):
+        ret[key] = dic[key]
+    return ret
+
+
+def _roman(ix):
+    numerals = {
+        1000: "M",
+        900: "CM",
+        500: "D",
+        400: "CD",
+        100: "C",
+        90: "XC",
+        50: "L",
+        40: "XL",
+        10: "X",
+        9: "IX",
+        5: "V",
+        4: "IV",
+        1: "I",
+    }
+    output = ""
+    for val, numeral in numerals.items():
+        if count := ix // val:
+            ix -= count * val
+            output += numeral * count
+    return output
+
+
+def _counter(ix, pattern="({alpha})"):
+    """Return a representation of an integer according to a pattern.
+
+    Args:
+        ux (int):
+            The integer to convert to a string.
+
+    Keyword Argyments:
+        pattern (str):
+            The pattern to be used to format the conversion. Defaykt is '({alpha})'. See Notes for details.
+
+    Returns:
+        *(str):
+            *ix* converted to a string according to pattern.
+
+        Notes:
+            *pattern* is a standard format string with place holders in {}. It is formatted with preset representations
+            of the integer *ix*
+            - int - ix as an integer
+            - alpha - ix as a,b,c...
+            - Alpha - ix as A,B,C...
+            - roman - ix as i,ii,iii,iv...
+            - Roman - ix as I,II,III,IV....
+    """
+    alpha = chr(ord("a") + int(ix))
+    Roman = _roman(int(ix + 1))
+    return pattern.format(
+        **{"alpha": alpha, "Alpha": alpha.upper(), "roman": Roman.lower(), "Roman": Roman, "int": int(ix)}
+    )
 
 
 class SavedFigure(object):
@@ -26,25 +90,29 @@ class SavedFigure(object):
             started,
         formats (list of str, default ["png"]):
             List of file extensions (and hence formats) to use when saving the file.
+        include_open (bool):
+            If set to True (default is False), then existing figures will be included when saving.
 
     This wraps the mpl.style.context() context manager and also determines what new figures have been created and
     saves them with a soecified filename.
     """
 
-    def __init__(self, filename=None, style=None, autoclose=False, formats=None):
+    def __init__(self, filename=None, style=None, autoclose=False, formats=None, include_open=False):
         """Create the context manager.
 
         Keyword Arguments:
             filename (str, Path, default=None):
                 The filename to use for saving the figure created. If None then the figure's label is used as a
                 filename.
-            style (str, List[str], default is ['stoner','aps','aps1.5']):
-                The mnatplotlib syslesheet(s) to use for plotting.
+            style (str, List[str, False], default is ['stoner']):
+                The mnatplotlib syslesheet(s) to use for plotting. If False, then the current styling is unchanged.
             autoclose (bool, default=False):
                 Automatically close figures after they are saved. This leaves open figures that were open before we
                 started.
             formats (list of str, default ["png"]):
                 List of file extensions (and hence formats) to use when saving the file.
+            include_open (bool):
+                If set to True (default is False), then existing figures will be included when saving.
 
         """
         if filename is not None:
@@ -57,13 +125,16 @@ class SavedFigure(object):
         self.filename = filename
 
         if style is None:
-            self.style = ["stoner", "aps", "aps1.5"]
+            self.style = ["stoner"]
         else:
             self.style = style
         self.autoclose = autoclose
         self.style_context = None
+        if isinstance(formats, str):
+            formats = [formats]
         self.formats = ["png"] if formats is None else formats
         self.open_figs = []
+        self.include_open = include_open
 
     def __enter__(self):
         """Record the open figures and start the style context manager.
@@ -73,9 +144,11 @@ class SavedFigure(object):
         without blocking.
         """
         for num in plt.get_fignums():
-            self.open_figs.append(weakref.ref(plt.figure(num)))
-        self.style_context = mpl.style.context(self.style)
-        self.style_context.__enter__()
+            if not self.include_open:
+                self.open_figs.append(weakref.ref(plt.figure(num)))
+        if self.style:
+            self.style_context = mpl.style.context(self.style)
+            self.style_context.__enter__()
 
     def __exit__(self, type, value, traceback):
         """Cleanup context manager and save figures created.
@@ -84,19 +157,26 @@ class SavedFigure(object):
         cjeck all the open figures and if they were not in our list of figures open before, save them with a filename
         from the keyword parameter to __init__ or the plot label.
         """
-        self.style_context.__exit__(type, value, traceback)
+        if self.style:
+            self.style_context.__exit__(type, value, traceback)
         self.open_figs = [x() for x in self.open_figs if x() is not None]
         processed = -1
         for num in plt.get_fignums():
-            if (fig := plt.figure(num)) not in self.open_figs:  # new figure
-                processed += 1
-                filename = self.filename if self.filename is not None else Path(fig.get_label())
-                for fmt in self.formats:
-                    new_file = filename.parent / (filename.stem + f".{fmt.lower()}")
-                    new_file = str(new_file).format(fighum=num, ix=processed, fmt=fmt)
-                    fig.savefig(new_file)
-                if self.autoclose:
-                    plt.close(num)
+            if (fig := plt.figure(num)) in self.open_figs:  # old  figure
+                continue
+            processed += 1
+            filename = self.filename if self.filename is not None else Path(fig.get_label())
+            for fmt in self.formats:
+                new_file = filename.parent / (filename.stem + f".{fmt.lower()}")
+                _tmp_file = new_file
+                new_file = _counter(processed, str(new_file))
+                if new_file == _tmp_file and processed > 0:  # Filename didn't have a counter and we are on file 2
+                    parts = new_file.split(".")
+                    parts[-2] += f"-{processed}"
+                    new_file = ".".join(parts)  # Add -# to the figure()end of the file before the extension.
+                fig.savefig(new_file)
+            if self.autoclose:
+                plt.close(num)
 
 
 class InsetPlot(object):
@@ -111,8 +191,11 @@ class InsetPlot(object):
             Dimension of the width and height of the inset. The units are in inches unless *dimension* is "fraction" -
             which is the default.
         dimension (str, default 'fraction'):
-            IF 'fraction' then the width and height are a fraction of the parent axes, otherwise the dimensions are
+            If 'fraction' then the width and height are a fraction of the parent axes, otherwise the dimensions are
             in inches.
+        switch_to_inset (bool):
+            If True (default), then within the context mananager, pyplot's current axes are set to the inset and the
+            previous axes are restored as the 'current axes' on exit.
 
     The InsetPlot conext manager will adjust the placement of the inset as it exists to ensure the inset axes labels
     don't collide with the parent axes.
@@ -131,13 +214,14 @@ class InsetPlot(object):
         "center": 10,
     }
 
-    def __init__(self, ax=None, loc="upper left", width=0.25, height=0.25, dimension="fraction"):
+    def __init__(self, ax=None, loc="upper left", width=0.25, height=0.25, dimension="fraction", switch_to_inset=True):
         """Set the location for the axes."""
         if ax is None:  # Use current axes if not passed explicitly
             ax = plt.gca()
+        self.save_ax = plt.gca()
         self.ax = ax
         if not isinstance(loc, int):
-            loc = self.locations.get(loc.lower(), 1)
+            loc = self.locations.get(str(loc).lower().replace("-", " "), 1)
         self.loc = loc
         if dimension == "fraction":
             if isinstance(height, float) and 0.0 < height <= 1.0:
@@ -152,6 +236,8 @@ class InsetPlot(object):
         """Create the inset axes using the axes_grid toolkit."""
         axins = inset_axes(self.ax, width=self.width, height=self.height, loc=self.loc)
         self.axins = axins
+        if self.switch_to_inset:
+            plt.sca(self.axins)
         return self.axins
 
     def __exit__(self, type, value, traceback):
@@ -194,6 +280,8 @@ class InsetPlot(object):
         newpos = InsetPosition(self.ax, [x0, y0, rw, rh])
         self.axins.set_axes_locator(newpos)
         self.ax.figure.canvas.draw()
+        if self.switch_to_inset:
+            plt.sca(self.save_ax)
 
 
 class StackVertical(object):
@@ -215,9 +303,17 @@ class StackVertical(object):
             Whether to increase the figure height to accomodate the extra plots. If True, the figure is
             increased by 0.6 of the original height for each additional sub-plot after the first. If a float
             is given, then the additional height factor is the adjust_figsize value. The default is True, or 0.6
-        label_panels (book):
+        label_panels (str or bool):
             Whether to add (a), (b) etc. to the sub-plots. Default of True positions labels in the top right corner of
-            the sub-plots. The top sub-plot is the first one.
+            the sub-plots. The top sub-plot is the first one. If a string, then use this as a the pattern to determine
+            how to format the plot number to a string. The default value of True corresponds to '({alpha})', other
+            supported counters are
+            - int - simpe numeral
+            - alpha / Alpha - lower / uppper case letters
+            - roman / Roman - lower / upper case Roman numerals.
+
+        kwargs:
+            Other keyword arguments can be used to set the label fonts and are passed into ac.set_title.
 
     Returns:
         (List[matplotlib.Axes]):
@@ -231,18 +327,35 @@ class StackVertical(object):
     """
 
     def __init__(
-        self, number, figure=None, joined=True, sharex=True, sharey=False, adjust_figsize=True, label_panels=True
+        self,
+        number,
+        figure=None,
+        joined=True,
+        sharex=True,
+        sharey=False,
+        adjust_figsize=True,
+        label_panels=True,
+        **kwargs,
     ):
         """Set up for the stack of plots."""
         self.number = number
         self.joined = joined
+
         self.figure = figure if figure else plt.gcf()
+        self._save_fig = plt.gcf()
+        if isinstance(self.figure, int) and self.figure in plt.get_fignums:  # If we specified a figure as a number
+            self.figure = plt.figure(self.fignum)
+        if isinstance(self.figure, str) and self.figure in plt.get_figlabels:  # If we specified a figure as a label
+            self.figure = plt.figure(self.fignum)
+
+        plt.scf(self.figure)
         self.gs = None
         self.sharex = sharex
         self.sharey = sharey
         self.adjust_figsize = adjust_figsize if isinstance(adjust_figsize, float) else float(int(adjust_figsize)) * 0.6
-        self.label_panels = label_panels
+        self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
         self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
+        self.kwargs = kwargs
 
     def __enter__(self):
         """Create the grid of axes."""
@@ -254,7 +367,9 @@ class StackVertical(object):
             self.figure.set_figheight(extra_h)
         if self.label_panels:
             for ix, ax in enumerate(self.axes):
-                ax.set_title(f" ({chr(ix+ord('a'))})", loc="left", y=0.85)
+                ax.set_title(
+                    f" ({_counter(ix,self.label_panels)}", loc="left", y=0.85, **_filter_dict(self.kwargs, _fontargs)
+                )
         return self.axes
 
     def __exit__(self, type, value, traceback):
@@ -274,20 +389,9 @@ class StackVertical(object):
                 ax.set_ylim(ylim)
 
             self.figure.get_layout_engine().set(h_pad=0.0, hspace=0.0)
-        # breakpoint()
         self.figure.canvas.draw()
-        pass
+        plt.scf(self._save_fig)
 
 
 if __name__ == "__main__":
-    with SavedFigure("test-{ix}.pdf", autoclose=True):
-        plt.figure()
-        x = np.linspace(0, 6, 200)
-        y = np.sinc(x) ** 2
-        plt.plot(x, y, "+")
-        plt.xlabel("Test")
-        plt.figure()
-        plt.plot(x, y**2, "+")
-        plt.yscale("log")
-        plt.ylim(1e-9, 1)
-        plt.xlabel("Test")
+    pass

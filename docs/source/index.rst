@@ -65,6 +65,7 @@ Sections
 .. toctree::
    :maxdepth: 2
 
+   User Guide <userguide>
    Style Gallery <style-gallery>
    Colours <colours>
    API <api>

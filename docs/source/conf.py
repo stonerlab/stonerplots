@@ -45,3 +45,4 @@ intersphinx_mapping = {
 
 html_theme = "alabaster"
 html_static_path = ["_static"]
+html_logo = "figures/StonerLogo2.png"
