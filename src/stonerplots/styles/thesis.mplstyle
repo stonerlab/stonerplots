@@ -1,0 +1,35 @@
+# A matplotlib style sheet designed to work with the Condensed Matter Group thesis template
+# https://github.com/stonerlab/Thesis-template
+
+figure.figsize : 5.7, 3.53
+figure.dpi: 100
+
+# Font sizes
+axes.labelsize: 10
+xtick.labelsize: 9
+ytick.labelsize: 9
+legend.fontsize: 9
+figure.labelsize: small
+figure.titlesize: 10
+axes.titlesize: 10
+font.size: 10
+
+# Font Family
+font.family: Garamond
+font.weight: light
+font.serif: Garamond
+mathtext.fontset : dejavuserif
+
+# Set line widths
+axes.linewidth : 0.75
+grid.linewidth : 0.5
+lines.linewidth : 0.8
+lines.markersize: 2.6
+
+# Legend setting
+legend.labelspacing: 0.2
+legend.borderaxespad: 1.0
+
+# LaTeX packages
+text.usetex : False
+text.latex.preamble : ""

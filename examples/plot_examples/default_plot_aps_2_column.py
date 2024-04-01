@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from stonerplots import SavedFigure
 
-from .common import x, model, pparam, figures
+from common import x, model, pparam, figures
 
 with SavedFigure(figures / "fig02g.png", style=["stoner", "aps", "aps2"], autoclose=True):
     fig, ax = plt.subplots()

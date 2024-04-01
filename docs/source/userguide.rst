@@ -1,6 +1,8 @@
 Stoner Plots User Guide
 =======================
 
+.. currentmodule:: stonerplots.context
+
 Although you can make use of the style sheets directly in matplotlib after impriting stonerplots, it is anticipated
 that using the :doc:`stonerplots<api>` context managers will be the main way of using the package.
 
@@ -14,320 +16,256 @@ initialisiation and cleanup code are executed around the enclosed block of state
 exited (e.g. due to an Exception or due to normal termination). This is generally used to ensure resources, such as
 open network conenctions, open files etc. are opened and cleaned up properly.
 
+For example, to open a file we might use something like::
+
+    with open(filename,"r") as data_file:
+        for line in data_file:
+            ...
+
+In this case, the :py:func:`open` function is being used not only to open the file for reading, but to create a
+*context manager* that will also mak sure to close the file for you when executing moves out of the enclosed block.
+
 The other reason a context manager might be used, is to temporarily change something in the environment the code is
-running in for the duration of the enclosed lines of code. Matplotlib offers context managers that operate in this way
-to temporarily set default parameters (:py:func:`matplotlib.pyplot.rc_context`) or to temporarily apply stylesheets
-(py:func:`matplotlib.style.context`).
+running in for the duration of the enclosed lines of code. `Matplotlib <https://matplotlib.org/>`_ offers
+context managers that operate in this way to temporarily set default parameters
+(:py:func:`matplotlib.pyplot.rc_context`) or to temporarily apply stylesheets (py:func:`matplotlib.style.context`).
 
-.. currentmodule:: stonerplots.context
 
-SavedFigure Context Manager
----------------------------
+Using Stoner Plots to make thesis figures
+-----------------------------------------
 
-The  :py:class:`SavedFigure` is used to bpth apply style sheets and capture the current figure and save it to disk.
-It applies stylesheets by wrapping a :py:func:`matplotlib.style.context` context manager. On entry, the context manager
-will note the open matplotlib figures, and on exit it will compare the list of copen figures with those that existed at
-entry, and save all the new figures. Therefore, it is very important that figure creation is done **inside** the
-:py:class:`SavedFigure` context manager.
+A common task that this package is aimed towards is to prepare figures for a project report, dissertation or thesis.
+The task here is to try and make the figures look as consistent as possible so that your report/dissertation/thesis
+looks profressional. You want to make all the plots have a similar format in tems of size, fonts, colous and for the
+textual elelemtns of the plot to match the main text in size and style. Matplotlib's stylesheets help you do this, but
+they still need some work to setup. The other thing you will need to do is to save your resulting figures to disk,
+preferably in a vector format that can be easily imported into your document preparation system.
 
-Simple Example
-~~~~~~~~~~~~~~
+We'll assume that you areleady have a script that uses `matplotlib <https://matplotlib.org/>`_ to make your figures. First
+you probably want to colate all the lines involved in plotting the same figure together so they can be inserted into
+a block.
 
-In its simplest form, :py:class:`SavedFigure` just needs to know a filename to save the figure as::
+First of all we need to import the things we're going to need::
 
-    with SavedFigure("example.png"):
-        fig, ax = plt.subplots()
-        ax.plot(x_data, y_data)
+    import matplotlib.pyplot as plt
+    import numpy as np
+    ...
+    from stonerplots import SavedFigure
 
-In this case, the stylesheet is switched to the default "stoner" style, the format to save the file in is determined
-from the filename to be a PNG file, and the open figure will be saved to the current working directory as
-"example.png". The figure that was created will be left open at the end of the run.
+The important line here is the final one. This willgive you access to the :py:class:`SavedFigure` context manager that
+we'll be using, but also importing anything from **stonerplots** will also add some stylesheets and colours to
+matplotlib.
 
-If you don't specify a filename, then :py:class:`SavedFigure` will look for a label for your figures (set with
-:py:meth:`matplotlib.figure.Figure.set_label`).
+You will probably also want to set up a variable with where your figures are supposed to go::
 
-Applying Styles
-~~~~~~~~~~~~~~~
+    from pathlib import Path
+    figures = Path("/some/path/to/your/thesis/Chapters/Chapter_1/Chapter_1_figs")
 
-To apply one or more stylesheets to the :py:class:`SavedFigure`, just pass them as the keyword parameter *stle*::
+(here we are using the layout of directories that we use in our standard LaTeX thesis teplate.)
 
-    with SavedFigure("example.png", style=["stoner","nature"]):
-        fig, ax = plt.subplots()
-        ax.plot(x_data, y_data)
+To now make your thesis figures, you can do something like::
 
-Alternatively, if you want to stop :py:class:`SavedFigure` from messing with the existing style parameters, pass False to *style*::
+    with SavedFigure(figures/"fig_01", style=["stoner","thesis"],
+                                formats=["png","eps"], autoclose=True):
+        fig.ax = plt.subplots()
+        ... # all your plotting commands
+        ... # But don't plt.close() your figure!
 
-    with SavedFigure("example.png", style=False):
-        fig, ax = plt.subplots()
-        ax.plot(x_data, y_data)
+When this executes you will find two files in your figures directory - `fig_01.png` and `fig_01.eps`. (If you are using
+pdflatex, you might prefer to have `pdf` rather than `eps` figures). Let's breakdown what that call to
+:py:class:`SavedFigure` is doing.
 
-This will suppress the encapsulated :py:func:`matplotlib.style.context` context manager being used.
+The first parameter is just the filename - minus the extension as we'll be adding that by specifying the formats.
 
-Automatically Closing the Plot Figures
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The next parameter is the matplotlib stylesheets to use. The two sheeets here, `stoner` and `thesis` are included with
+Stoner Plots and were made available as soon as we imported :py:class:`SavedFigure` above. Matplotlib stylesheets are
+ummulative - so what you get here is the settings from the `stoner` style sheet and then any changed settings from
+the `thesis` stylesheet. These two style sheets together are designed to make a figure that fits in well with the
+`Condensed Matter Group's thesis template <https://github.com/stonerlab/Thesis-template>`_.
 
-Once you have saved your figures to disk, you probably don't want to leave them open as eventually matplotlib will
-complain about the number of open figures. :py:class:`SavedFigure` has an *autoclose* parameter that will close all the figures
-that it has saved for you::
+After specifying the *style* to use, we specify the *formats* to save the figure files in. Here we are asking for both
+`png` and `eps` formats. Finally we ask SavedFigure to close any figures opened after it has saved them with the
+*autoclose* parameter.
 
-    with SavedFigure("example.png", autoclose=True):
-        fig, ax = plt.subplots()
-        ax.plot(x_data, y_data)
 
-Setting the Format of the Saved Figure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. image:: ../../examples/figures/fig02h_0.png
+  :alt: Thesis style figure
+  :align: center
 
-Matplotlib has the ability to save figures in a variety of different formats. For scientific writing, one often wants
-to save in a vector format, such as encapsulated postscript (eps), scalable vector graphics (svg), or portable document
-format (pdf). However, when the graphics are to be used in a PowerPoint presentation (or poster), a bitmapped image
-format such as Portable Network Graphics (png) is easiest to work with.
+This is an example of a figure produces with a combination of `stoner` and `thesis` stylesheets.
 
-.. warning::
-    JPEG encoding is not a good choice to use due to the image artefacts it introduces. JPEG uses a wavelet encoding
-    algorithm to achieve high levels of image compression. Whilst this often works well for photographs, it handles
-    sharp changes in contrast rather poorly and produces often very visible artefacts at such features. Unfortunately,
-    scientic plots have lots of such features - axes lines, data lins, axes labels etc. and as a result JPEG encoded
-    plots do not reproduce well and should be avoided.
+For the full details see the :doc:`SavedFigure Guide<savedfigure>`.
 
-The :py:class:`SavedFigure` context manager lets you specify the figure format(s) to use via the the *formats* parameter. This can
-be either a single string representing the desired file extension, or a list of such file extensions.  In this latter
-case, :py:class:`SavedFigure` will save multiple copies of the same figure in the different format. This can be helpful if, e.g.
-you need eps formats for a LaTeX document, but also want png images to check the figures look ok.::
+Preparing a Figure for a Paper
+------------------------------
 
-    with SavedFigure("example", formats=["png","pdf"]):
-        fig, ax = plt.subplots()
-        ax.plot(x_data, y_data)
+Suppose that having gotten your python code to make a nice figure for your thesis or report, you now want to use it in
+a paper submission. The general advice from scientifc journals is to prepare your figures as vector format files at as
+close to the final size as you can. Unfortunately, different journals have different house styles (in terms of exact
+figure sizes, font size and choice and so on) - so potentially there could be a lot of work sorting out the formatting
+details that could be better spent writing good text.
 
+Stoner Plots comes with stylesheets that are set up for the common Physics journal families such as APS, AIP, IEEE etc.
+This makes switching from a figure for your thesis to a digure for a paper a matter of changing one line.::
 
-If you don't specify a format and the figure's filename has an extension, that is used for the format. Otherwise it
-defaults to 'png'. If the figure filename has an extension *and* you sepcify a format, then the extension is strippled
-and the correct extension for the format is used.
+    with SavedFigure(figures/"fig_01", style=["stoner","ieee"],
+                                formats=["png","eps"], autoclose=True):
+        fig.ax = plt.subplots()
+        ... # all your plotting commands
+        ... # But don't plt.close() your figure!
 
-The choice of formats is determined by :py:func:`matplotlib.pyplot.savefig`.
+Here, by simply changing the style from `thesis` to `aps` we reset the figure size, all of the fonts, and other details
+of the formatting.
 
-Multiple Figures and SavedFigure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. image:: ../../examples/figures/fig02a.png
+  :alt: IEEE format figure
+  :align: center
 
-If you create multiple figures within a :py:class:`SavedFigure` context manager, it will attempt to save all of yor figures. In
-this case it is rpobably desirable to set how each figure should be named. You can do this by providing a pattern
-within the figure filename. The number of the figure being saved is substituted into a placeholder in the filename
-string like so::
+This is what the figure looks like in IEEE format.
 
-    with SavedFigure("example_{int}", formats=["png","pdf"]):
-        fig, ax = plt.subplots()
-        ax.plot(x_data, y_data)
-       fig, ax = plt.subplots()
-       ax.plot(x_data2, y_data2)
-
-This will then result in example_0.png and example_1.png, with the "{int}" placeholder being replaced with 0,1,2...
-
-As well as the `int` placehold you can also use:
-
-    - `alpha` or `Alpha` for lower and upper case letters (starting from `a`|)
-    - `roman` or `Roman` for lower or upper case Roman numberals (starting from 'i'!)
-
-Including Already Open Figures
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-By default :py:class:`SavedFigure` will ignore all already open figures. If you want to use the :py:class:`SavedFigure` machinery to save
-figures with adjsuted filenames and in different formats, then you can pass it the *include_open* parameter set to True
-and if will not ignore the already opened figures when saving. Note, however, it is **not** possible to retrospectively
-style figures, so already open figures will be saved with their existing formatting.::
-
-    with SavedFigure("Figure-{int}", formats=["eps","png"],
-                                            include_open=True):
-        pass
-
-Will save all of your figures as Figure-0.eps, Figure-0.png, Figure-1.eps, Figure-1.png... in one go.
-
-
-InsetPlot Context Manager
--------------------------
-
-Inset plots, where a second set of axes are included within the main axes of a figure, are often used to show either a
-detail of the main figure, or possibly an overview or a related dataset. Unfortunately, generating insets with
-matplotlib can be a little tricky as the stadnard tools to setup and position the inset plot can need a bit of work to
-avoid the inset axes clashing with the primary axes.
-
-Stonerplot's :py:class:`InsetPlot` context manager is designed to make this easier by tweakign the placement of the
-inset. It is a wrapper around :py:func:`mpl_toolkits.axes_grid1.inset_locator.inset_axes` with additional logic to
-adjust the position of the inset.::
-
-    with InsetPlot() as inset:
-        inset.plot(x, y)
-
-will create an inset that is placed int he upper-left corner of te current axes and occupies 25% of the axes
-horizontally and vertically. By default the context manager also manipulates the :py:mod:`matplotlib.pyplot`'s
-current axes so that inside the context manager the current axes are the inset plot and afterwards they are restored to
-the originally active axes.
-
-Controlling Inset Location
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The context anager takes a *loc* parameter that defines the location of the inset. These take the same value as for
-:py:func:`matplotlib.pyplot.legend` - except there is no 'auto' setting. (For convenience any hyphens in the location
-string are replaced with spaces and everything is lower-cased).::
-
-    with InsetPlot(loc="lower right") as inset:
-        inset.plot(x, y)
-
-Setting the Inset Size
-~~~~~~~~~~~~~~~~~~~~~~
-
-The *width*, *height* and *dimension* parameters control the size of the inset axes (not this does not include any axes
-labels, tick markers etc.). *width* and *height* are floating point numbers, if *dimension* is "fraction" (the default)
-then these floating point numbers represent the fraction of the parent axes size to take up with the inset axes. Thus,
-the default values are 0.25, or 25%.  If *dimension* is not "fraction" then the units for *width* and *height* are
-inches.::
-
-    with InsetPlot(width=1.1, height=0.7, dimension="inches") as inset:
-        inset.plot(x, y)
-
-
-Control of Axes
-~~~~~~~~~~~~~~~
-
-By default, the parent axes are taken to be the current axes from the current figure, but the *ax* parameter to the
-Context Manager can override this.::
-
-    with InsetPlot(ax=plt.foigure(2).gca()) as inset:
-        inset.plot(x, y)
-
-As noted above, be default the context manager switches the current axes around so that pyplot functions will work on
-the inset inside the context manager.::
-
-    plt.plot(x_main,y_main)
-    with InsetPlot():  # Ignore the context manager's return value
-        plt.plot(x_inset,y_inset)  # On the inset axes
-    plt.xlabel("Main X") # Back on the main axes again
-    plt.ylabel("Main Y")
-
-
-StackVertical Context Manager
------------------------------
-
-When comparing several quantities that have a common independent variable, using a sequence of vertically stacked plots
-can be effective. Typically each sub-plot is positioned so that the top x-axis of one panel is the bottom x-axis of the
-one above, and only the bottom x-axis of the whole stack is labelled and.
-
-Although matplotlib's builtin features to make multiple plots on a grid have been improved in recent releases, it is
-still quite complex and getting the plots to be adjacent, whilst also not having the labels etc clash is challenging.
-:py:class:`StackVertical` is a context manager designed to make this a bit easier.::
-
-    with StackVertical(3) as axes:
-        for ax,y in zip(axes, [y_data1, y_data2, y_data3]):
-            ax.plot(x, y)
-
-The only required parameter to :py:class:`StackVertical` is the number of plots to stack vertically. It then returns a list of the
-:py:class:`matplotlib.axes.Axes` for each subplot - the first set of axes being the top plot and the last being the
-bottom.
-
-When the context manager exits, it adjusts the y-axis limits to ensure the tick markers do not interfere and reduces
-the spacing between the plots to zero so that they are adjacent.
-
-Adjusting the Figure Size for the Stack
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-BY default :py:class:`StackVertical` will look at the current figure to work out its dimensions and will then assume that this is
-the correct size for a single plot. It will then adjust the figure height to accommodate the additional stacked plots.
-The equation used for this is:
-
-.. math::
-   h_{new} = h_{old} (f h_{old} (N_{plots}-1)+1)
-
-with :math:`f` being a fraction of the old plot size set by the *adjust_figsize* parameter to :py:class:`StackVertical`.
-If this is left at the default value of `True`, then :math:`f` is set to 0.6 and to 0 if *adjust_figsize* is `False`.
-
-Typically stacked plots have a bigger aspect ratio (width:height) than a single plot.::
-
-    with StackVertical(3, adjust_figsize=0.5) as axes:
-        for ax,y in zip(axes, [y_data1, y_data2, y_data3]):
-            ax.plot(x, y)
-
-Setting Common (Shared) axes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-By default :py:class:`StackVertical` will set the x-axis to be shared between all the plots and the y-axis of each plot to be
-independent. The *sharex* and *sharey* parameters control this. When the plots are adjacent it probably doesn't make
-sense to not share the x-axis though!::
-
-    with StackVertical(3, sharey=True) as axes:
-        for ax,y in zip(axes, [y_data1, y_data2, y_data3]):
-            ax.plot(x, y)
-
-Labelling the Panels
-~~~~~~~~~~~~~~~~~~~~
-
-A common requirement of a multi-panel figure is to label the individual sets of axes (a), (b)... or similar. This is
-supported by the *label_panels* parameter. If this takes the value `True` then each set of axes is labelled '(a)',
-'(b)' and so on. For added control, the parameter can also take a string with a similar format to that used in
-:py:class:`SavedFigure` above. Placeholders such as {Alpha} or {roman} can be used and will give the axes number.::
-
-    with StackVertical(3, label_panels=True) as axes:
-        for ax,y in zip(axes, [y_data1, y_data2, y_data3]):
-            ax.plot(x, y)
-
-Some journals, e.g. Science, also want the label to be in bold font, and :py:class:`StackVertical` supports passing the font...
-jeyword arguments to control the font size and appearance.::
-
-    with StackVertical(3, label_panels='{Alpha}', fontweight='bold') as axes:
-        for ax,y in zip(axes, [y_data1, y_data2, y_data3]):
-            ax.plot(x, y)
-
-
-Specifying a Figure
-~~~~~~~~~~~~~~~~~~~
-
-The default is to use the current matplotlib figure, but by passing the *figure* parameter into the :py:class:`StackVertical`
-context manager it will use that figure instead.::
-
-    with StackVertical(3, figure=2) as axes:
-        for ax,y in zip(axes, [y_data1, y_data2, y_data3]):
-            ax.plot(x, y)
-
-The *figure* parameter can be either a :py:class:`matplotlib.figure.Figure` or a figure number or figure label. Within
-the context manager, the current figure is set to be figure specified by the *figure* parameter. The previously active
-figure is reset as active when the context manager exits.
-
-Not Joining the Plots
+Double Column Figures
 ~~~~~~~~~~~~~~~~~~~~~
 
-Although it is envisaged that the main use of the :py:class:`StackVertical` context manager is to make plots with shared x-axes and
-sitting adjacent to each other, setting the *joined* parameter to `False` will stop the post-plotting re-sizing and
-adjustment of the y-limits and therefore set the plots as separate enties.::
+Sometimes a figure won't work wehen fitted into a single column of a two column journal. The Stoner Plots stylesheets
+include some that change the figure sizes to be suitable for 1 1/2 or 2 column formats.::
 
-    with StackVertical(3, joined=False) as axes:
-        for ax,y in zip(axes, [y_data1, y_data2, y_data3]):
-            ax.plot(x, y)
+    with SavedFigure(figures/"fig_01", style=["stoner","aps", "aps2"],
+                                formats=["png","eps"], autoclose=True):
+        fig.ax = plt.subplots()
+        ... # all your plotting commands
+        ... # But don't plt.close() your figure!
 
-MultiPanel Context Manager
---------------------------
+Note that the extra `aps2` stylesheet is used **in conjunction** to the `stoner` and `aps` stylesheets.
 
-Another common requirement when writing papers and theses is to create a figure with several distinct panels shwing
-different (related) datasets. In this case, the :py:class:`MultiPanel` context manager works in a very analogous way to the
-:py:class:`StackVertical` context manager.::
+Preparing Poster or Presentation Figures
+----------------------------------------
 
-    with MultiPanel((2,2)) as axes:
-    for ax,x,y in zip (axes,[x1,x2,x3,x4],[y1,y2,y3,y4]):
-        ax.plot(x,y)
+Having made your nice figures for your thesis and possibly a paper, you are likley to also want to use them for a talk
+or poster. Again, the use of stylesheets lets you quickly swiotch formatting settings to be appropriate. For posters
+and presentations, the main features are that you need to increase the size of all of the plot elements (lines, symbols
+, fonts etc.). Generally we use something like PowerPoint to make posters and presentation (you can use LaTeX if you
+have particularly masochistic tendencies!) and the easiest way to import the figures is as `.png` files.::
 
-The only required parameter is the number of panels to show. This can be either a tuple of (n_rows,n_cols) or an
-integer specifying a number of columns (number of rows is assumed to be one in this case.)
+    with SavedFigure(figures/"fig_01.png", style=["stoner","[poster"], autoclose=True):
+        fig.ax = plt.subplots()
+        ... # all your plotting commands
+        ... # But don't plt.close() your figure!
 
-Optional Parameters
-~~~~~~~~~~~~~~~~~~~
+The `poster` stylesheet also increases the dpi of the image so that it will look good when printed on A0, albeit at the
+expense of rather large images!
 
-The *figure*, *sharex*, *sharey* and *label_panels* work exactly as for the :py:class:`StackVertical` Context manager
-described above, except that the default is not to share any axes.
+Similarly to the `poster` style there is a `presentation` style that makes figures suitable for placing into a standard
+presentation. The defautl is make a plot that occupies the whole slide, but there is a `presentation_sm` style that
+keeps the font sizes, lines etc) but reduces the size so you can fit two such plots on a slide.::
 
-The *adjust_figsize* parameter lets you specify a tuple to give different expansion factors for width and height. The
-default value is to expand the width by exactly the number of columns and the height by the height of one row + 80% of
-additional rows. Since full-page width figures are more than double a single column, it may be useful to do something
-like:
+    with SavedFigure(figures/"fig_01.png",
+                style=["stoner","presentation", "presentation_sm"], autoclose=True):
+        fig.ax = plt.subplots()
+        ... # all your plotting commands
+        ... # But don't plt.close() your figure!
 
-    with SavedFigure("example.png",stle=["stoner","aip","aip2"]):
-        with MultiPanel((2,2),adjust_figsize=(0,0.12)) as axes:
-            for ax,x,y in zip (axes,[x1,x2,x3,x4],[y1,y2,y3,y4]):
-                ax.plot(x,y)
+If you want to have a dark background to your presentation, then there is a `stoner_dark` stylesheet that sets colours
+appropriately. One feature of dark plots in presentations is that the light-on-dark elements look heavier or bolder
+than dark-on-light and so `presentation_dark` adjusts elements to make the overal weight look similar.::
 
-To make a genuinely full width x 2 single plots high figure.
+    with SavedFigure(figures/"fig_01.png",
+        style=["stoner","stoner_dark", "presentation", "presentation_dark"], autoclose=True):
+        fig.ax = plt.subplots()
+        ... # all your plotting commands
+        ... # But don't plt.close() your figure!
+
+Double and Multi-Panel Figures
+------------------------------
+
+When you want your reader/examiner to compare several related datasets, a multi-panel figure of some description can
+be a useful way to show the data.
+
+If you have several quantities that all functions of the same independent variable, and plotting them all on a single
+set of axes would be overly complex, a stack of plots with a common x-axis can be a good choice. This can be a bit
+awkward to achieve in matplotlib and so StonerPlots offers another context manager that makes this considerably easier.
+
+StackVertical Context Manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this scenario you have several sets of plotting lines for each quantity ad just need to arrange the plots in a stack
+with the top of one plot being the bottom of the next.::
+
+    with SavedFigure("stacked.pong",style="stoner"):
+        plt.figure() # Create the figure in the stoner style
+        with StackVertical(3) as axes:  # create a stack of three plots
+            ax1,ax2,ax3=axes # Unpack them to separae variables
+            ax1.plot(...)
+            ax2.plot(...)
+            ax3.plot(...)
+
+The :py:class:`SavedFigure` context manager is doing its usual thing here (note the style can be given as a simple
+string). The :py:class:`StackVertical` context manager does the magic. When it is initially called, by default it will
+adjust the figure height to make space for multiple plots. All you need to do is to tell it the number of plots that
+should be stacked in the figure. Again, by default, Lpy:class:`StackVertical` will also label each plot (a), (b).. to
+help identify each subplot in the figure caption. The return value from :py:class:`StackVertical` is a list of the plot
+axes, starting from the top of the figure.
+
+.. image:: ../../examples/figures/fig7b.png
+  :alt: Stacked Plot
+  :align: center
+
+See :doc:`Stacked Plots<stackvertical>` for full details of :py:class:`StackVertical`.
+
+.. note::
+    :py:class:`StackVertical` will only adjust the plot positions togther when it exits - the reason for this is that
+    it is only when plotting is finished that it can work out how to move the plots together for the stack. In
+    particular, it will adjut the y-limits so that y-axis tick labels do not extend beyond the frame of the axes. A0
+    However, if the y-axis label is longer than the axis then the plots will never be properly adjacent and manual
+    addition of line breaks in the axis label may be required.
+
+Side-bu-side Multi-panel Figures
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Another common requirement is to show several related sets of data together that do not share a common variable, and in
+this case a multi-panel figure can be a good option. For this, Stoner Plots ships with a :py:class:`MulitPanel`
+context manager.::
+
+    with SavedFigure("multi_panel.pong",style="stoner"):
+        plt.figure() # Create the figure in the stoner style
+        with MultiPanel(2) as axes:  # create 2 figures next to each other
+            ax1,ax2=axes # Unpack them to separae variables
+            ax1.plot(...)
+            ax2.plot(...)
+
+As with the previous example, :py:class:`SavedFigure` handles the stylesheets and figure capture, whilst
+:py:class:`MiltiPanel` creates and labels the sub-plot axes. The parameters for this are closely related to that for
+:py:class:`StackVertical`, except the initial parameter can either be a single integer (representing the number of
+plots to place beside each other), or a tuple of rows,columns of sub-plats.
+
+.. image:: ../../examples/figures/fig02h_1.png
+  :alt: A single row of 2 sub-plats created from MultiPanel
+  :align: center
+
+See `Multi Panel Plots<multipanel>` for full details of the :py:class:`MultiPanel` context manager.
+
+
+Inset Plots
+-----------
+
+The final scenario where you might need to show related datasets is where an inset is required to show a detail, or
+perhaps an overview of the main plot axes. This again can be a fiddle with matplotlib to get insets that are placed
+correctly without overlapping the parent axes. :py:class:`InsetPlot` can be used here.::
+
+    with SavedFigure("multi_panel.pong",style="stoner"):
+        fig,ax = plt.subplots()
+        ax.plot(x_main,y_main)
+        ...
+        with InsetPlot() as inset:
+            inset.plot(x_inset,y_inset)
+            ...
+
+:py:class:`InsetPlot` doesn't need any parameters, but it is possible to control where the inset gets placed, and its
+size relative to the parent axes. See `Inset Plots<insetplot>` for the full explanation.
+
+.. toctree::
+   :maxdepth: 2
+
+   Saving Figures <savedfigure>
+   Stacked Plots <stackvertical>
+   Multi-Panel Plots <multipanel>
+   Inset Plots <insetplot>

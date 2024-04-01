@@ -374,7 +374,7 @@ class StackVertical(object):
             for ix, ax in enumerate(self.axes):
                 title_pts = ax.title.get_fontsize()
                 ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
-                y = (ax_height - title_pts * 1.25) / ax_height
+                y = (ax_height - title_pts * 1.5) / ax_height
 
                 ax.set_title(
                     f" {_counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs)
@@ -489,16 +489,24 @@ class MultiPanel(object):
         self.gs = self.figure.add_gridspec(*self.panels, **self.kwargs)
         self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
         if self.adjust_figsize:
-            extra_h = self.figsize[1] * self.adjust_figsize[1] * (self.panels[1] - 1) + self.figsize[1]
-            self.figure.set_figheight(extra_h)
-            extra_w = self.figsize[0] * self.adjust_figsize[0] * (self.panels[0] - 1) + self.figsize[0]
+            f = self.adjust_figsize[0]
+            if f < 0:
+                extra_w = self.figsize[0] * (1 + f)
+            else:
+                extra_w = self.figsize[0] * f * (self.panels[1] - 1) + self.figsize[0]
+            f = self.adjust_figsize[1]
+            if f < 0:
+                extra_h = self.figsize[1] * (1 + f)
+            else:
+                extra_h = self.figsize[1] * f * (self.panels[0] - 1) + self.figsize[1]
             self.figure.set_figwidth(extra_w)
+            self.figure.set_figheight(extra_h)
         if self.label_panels:
             fig = self.figure
             for ix, ax in enumerate(self):
                 title_pts = ax.title.get_fontsize()
                 ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
-                y = (ax_height - title_pts * 1.25) / ax_height
+                y = (ax_height - title_pts * 1.5) / ax_height
 
                 ax.set_title(
                     f" {_counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs)

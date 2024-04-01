@@ -89,6 +89,22 @@ There are specific stylesheets for producing plots at the correct size and style
 | Using styles ["stoner", "aps","aps2"]                                                                   |
 |                                                                                                         |
 +-----------------------------------------------------+---------------------------------------------------+
+|                                                                                                         |
+| .. image:: ../../examples/figures/fig02h_0.png                                                          |
+|    :alt: Example plot in thesis template format                                                         |
+|    :align: center                                                                                       |
+|                                                                                                         |
+| Using styles ["stoner", "thesis"]                                                                       |
+|                                                                                                         |
++-----------------------------------------------------+---------------------------------------------------+
+|                                                                                                         |
+| .. image:: ../../examples/figures/fig02h_1.png                                                          |
+|    :alt: Example twin plot in thesis template format                                                    |
+|    :align: center                                                                                       |
+|                                                                                                         |
+| Using styles ["stoner", "thesis"] and MultiPanel with manual adjust_figsize=(0,-0.25)                   |
+|                                                                                                         |
++-----------------------------------------------------+---------------------------------------------------+
 
 3. Different Plot Types
 -----------------------

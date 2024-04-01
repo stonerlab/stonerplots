@@ -5,7 +5,7 @@ import numpy as np
 
 from stonerplots import SavedFigure
 
-from .common import figures
+from common import figures
 
 with SavedFigure(figures / "fig03.png", style=["stoner", "scatter", "latex"], autoclose=True):
     fig, ax = plt.subplots(figsize=(4, 4))
