@@ -13,6 +13,8 @@ __all__ = ["SavedFigure", "InsetPlot", "StackVertical", "MultiPanel"]
 
 _fontargs = ["font", "fontfamily", "fontname", "fontsize", "fontstretch", "fontstyle", "fontvariant", "fontweight"]
 
+_gsargs = ["left", "bottom", "right", "top", "width_ratios", "height_ratios", "hspace", "wspace", "h_pad", "w_pad"]
+
 
 def _filter_dict(dic, keys):
     """Return a dictionary derived from dic that only contains the keys in keys."""
@@ -315,7 +317,8 @@ class StackVertical(object):
             - roman / Roman - lower / upper case Roman numerals.
 
         kwargs:
-            Other keyword arguments can be used to set the label fonts and are passed into ac.set_title.
+            Other keyword arguments can be used to set the label fonts and are passed into ac.set_title and gridspec
+            arguments are passed to fig.add_gridspec.
 
     Returns:
         (List[matplotlib.Axes]):
@@ -359,12 +362,15 @@ class StackVertical(object):
         self.adjust_figsize = adjust_figsize if isinstance(adjust_figsize, float) else float(int(adjust_figsize)) * 0.8
         self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
         self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
+        self.align_labels = kwargs.pop("align__labels", True)
         self.kwargs = kwargs
 
     def __enter__(self):
         """Create the grid of axes."""
-        hspace = 0 if self.joined else 0.1
-        self.gs = self.figure.add_gridspec(self.number, hspace=hspace)
+        hspace = 0 if self.joined else self.kwargs.get("hspace", 0.1)
+        self.kwargs.pop("hspace",None)
+        gs_kwargs = _filter_dict(self.kwargs, _gsargs)
+        self.gs = self.figure.add_gridspec(self.number, hspace=hspace, **gs_kwargs)
         self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
         if self.adjust_figsize:
             extra_h = self.figsize[1] * self.adjust_figsize * (self.number - 1) + self.figsize[1]
@@ -387,25 +393,50 @@ class StackVertical(object):
             for ax in self.axes:
                 ax.label_outer()
             plt.draw()
-            fig = self.figure
             for ix, ax in enumerate(self.axes):
-                fnt_pts = ax.yaxis.get_ticklabels()[0].get_fontsize()
-                ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
-                ylim = list(ax.get_ylim())
-                dy = 0.65 * fnt_pts / ax_height * (ylim[1] - ylim[0])  # How much axes space the labels take up
-                yticks = ax.get_yticks()
-                if yticks[1] - ylim[0] < dy and ix != len(self.axes) - 1:  # Adjust range of plots excepty bottom one
-                    ylim[0] -= dy
-                if ylim[1] - yticks[-2] < dy and ix != 0:  # Adjust range of plots except top one.
-                    ylim[1] += dy
-                ax.set_ylim(ylim)
-
-            self.figure.get_layout_engine().set(h_pad=0.0, hspace=0.0)
+                self._fix_limits(ix, ax)
+            eng = self.figure.get_layout_engine()
+            rect = list(eng.get()["rect"])
+            h = self.figure.get_figheight()
+            boundary = 0.05 / h
+            rect[1] = boundary if rect[1] == 0 else rect[1]
+            rect[3] = 1 - 2 * boundary if rect[3] == 1 else rect[3]
+            self.figure.get_layout_engine().set(h_pad=0.0, hspace=0.0, rect=rect)
+        self.figure.canvas.draw()
+        self._align_labels()
         self.figure.canvas.draw()
         plt.figure(self._save_fig)
 
+    def _align_labels(self):
+        """Align y-axist labels."""
+        if not self.align_labels:
+            return
+        label_pos = []
+        for ax in self.axes:
+            tr = ax.transAxes.inverted() + ax.yaxis.label.get_transform()
+            label_pos.append(tr.transform(ax.yaxis.label.get_position())[0])
+        label_pos = min(label_pos)
+        for ax in self.axes:
+            ax.yaxis.set_label_coords(label_pos, 0.5)
 
-class MultiPanel(object):
+    def _fix_limits(self, ix, ax):
+        """Adjust ylimits so labels are inside the axes frame."""
+        fig = self.figure
+        fnt_pts = ax.yaxis.get_ticklabels()[0].get_fontsize()
+        ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
+        dy = fnt_pts / ax_height  # Soace beeded in axes units for label.
+        ylim = list(ax.get_ylim())
+        tr = ax.transData + ax.transAxes.inverted()  # Transform Data to Axes
+        yticks = [tr.transform((0, x))[1] for x in ax.get_yticks()]  # Tick locators in axes units.
+
+        if yticks[1] < dy and ix != len(self.axes) - 1:  # Adjust range of plots excepty bottom one
+            ylim[0] = tr.inverted().transform((0, -dy))[1]  # convert -dy back to data spoace
+        if yticks[-2] < 1.0 - dy and ix != 0:  # Adjust range of plots except top one.
+            ylim[1] = tr.inverted().transform((0, 1 + dy))[1]  # Convert 1+dy to data space
+        ax.set_ylim(ylim)
+
+
+class MultiPanel(Sequence):
 
     """A context manager for sorting out multi-panel plots in matplotlib.
 
@@ -435,7 +466,8 @@ class MultiPanel(object):
             - roman / Roman - lower / upper case Roman numerals.
 
         kwargs:
-            Other keyword arguments can be used to set the label fonts and are passed into ac.set_title.
+            Other keyword arguments can be used to set the label fonts and are passed into ax.set_title, arguments
+            for GridSpec are passed to fig.add_gridspec.
 
     Returns:
         (List[matplotlib.Axes]):
@@ -458,7 +490,7 @@ class MultiPanel(object):
         label_panels=True,
         **kwargs,
     ):
-        """Setup a figure and a gridspec for multi-panel plotting."""
+        """Configure figure and a gridspec for multi-panel plotting."""
         if isinstance(panels, int):  # Assume 1 x panels
             panels = (1, panels)
         self.panels = panels
@@ -486,7 +518,8 @@ class MultiPanel(object):
 
     def __enter__(self):
         """Create the grid of axes."""
-        self.gs = self.figure.add_gridspec(*self.panels, **self.kwargs)
+        gs_kwargs = _filter_dict(self.kwargs, _gsargs)
+        self.gs = self.figure.add_gridspec(*self.panels, **gs_kwargs)
         self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
         if self.adjust_figsize:
             f = self.adjust_figsize[0]

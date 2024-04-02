@@ -19,9 +19,11 @@ requirements:
     - python >=3.10
     - setuptools >=65.0
     - setuptools-scm >=8.0
+    - numpy
     - pip
   run:
     - matplotlib >=3.6
+    - numpy
     - python >=3.10
 
 test:

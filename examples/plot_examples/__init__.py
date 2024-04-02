@@ -37,4 +37,6 @@ __all__ = [
     "inset_plot",
     "stacked_plot",
     "multi_panel_plot",
+    # Extra
+    "xrr_example",
 ]

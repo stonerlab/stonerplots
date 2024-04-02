@@ -201,7 +201,7 @@ with the top of one plot being the bottom of the next.::
 The :py:class:`SavedFigure` context manager is doing its usual thing here (note the style can be given as a simple
 string). The :py:class:`StackVertical` context manager does the magic. When it is initially called, by default it will
 adjust the figure height to make space for multiple plots. All you need to do is to tell it the number of plots that
-should be stacked in the figure. Again, by default, Lpy:class:`StackVertical` will also label each plot (a), (b).. to
+should be stacked in the figure. Again, by default, :py:class:`StackVertical` will also label each plot (a), (b).. to
 help identify each subplot in the figure caption. The return value from :py:class:`StackVertical` is a list of the plot
 axes, starting from the top of the figure.
 

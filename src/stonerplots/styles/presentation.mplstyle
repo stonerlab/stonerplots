@@ -6,28 +6,28 @@ figure.dpi: 200
 
 # Set x axis
 xtick.major.size : 8
-xtick.major.width : 1.2
+xtick.major.width : 1.1
 xtick.minor.size : 5
-xtick.minor.width : 1.2
+xtick.minor.width : 1.1
 
 # Set y axis
 ytick.major.size : 8
-ytick.major.width : 1.2
+ytick.major.width : 1.1
 ytick.minor.size : 5
-ytick.minor.width : 1.2
+ytick.minor.width : 1.1
 
 # Fontsizes
-xtick.labelsize : 18
-ytick.labelsize : 18
+xtick.labelsize : 16
+ytick.labelsize : 16
 legend.fontsize : 16
 legend.title_fontsize : 16
-axes.titlesize : 24
-axes.labelsize : 20
+axes.titlesize : 20
+axes.labelsize : 18
 
 # Set line widths
-axes.linewidth : 1.5
+axes.linewidth : 1.2
 grid.linewidth : 1
-lines.linewidth : 2.
+lines.linewidth : 1.5
 
 # Use sans-serif fonts
 font.family : sans-serif

@@ -96,3 +96,44 @@ adjustment of the y-limits and therefore set the plots as separate enties.::
     with StackVertical(3, joined=False) as axes:
         for ax,y in zip(axes, [y_data1, y_data2, y_data3]):
             ax.plot(x, y)
+
+Advanced Usage
+~~~~~~~~~~~~~~
+
+You can also pass a *heights_ratio* into the :py:class:`StackVertical` to control the relative heights of the plots.
+A use for this is when you have a primary set of data and a related subsiduary data set. For example, in fitting a set
+of data one might show the data and fit on the main panel and the residuals or a figure of merit in  a secondary panel.::
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from stonerplots import SavedFigure, StackVertical
+
+    # Prepare data assuming a data format of x,y_fit,y_obs
+    data = np.genfromtxt(Path(__file__).parent.parent / "data" / "xrr.dat")
+    x = data[:, 0]
+    fit = data[:, 1]
+    measured = data[:, 2]
+    fom = np.log10(measured) - np.log10(fit)
+
+    # Set up the scales, labels etc for the two panels.
+    main_props = {"ylabel": "Counts", "yscale": "log","ylim":(10,5E6)}
+    residual_poprs = {"xlabel": r"2$\theta (^\circ)$", "ylabel": "FOM"}
+
+    # This is stonerplots context managers at work
+    with SavedFigure(figures / "genx_plot.png", style=["stoner", "presentation"], autoclose=True):
+        plt.figure()
+        with StackVertical(2, adjust_figsize=False, height_ratios=[3, 1]) as axes:
+            main, residual = axes
+            main.plot(x, measured, linestyle="", marker=".", label="Data", c="victoria")
+            main.plot(x, fit, marker="", label="Fit", c="central")
+            main.set(**main_props)
+            main.legend()
+            residual.plot(x, fom, marker="", c="central")
+            residual.set(**residual_poprs)
+
+(The data in the example is a rather poor fit to some X-ray reflectiveity data with the GenX software). It produces the
+following outptut:
+
+.. image:: ../../examples/figures/genx_plot.png
+  :alt: Two panel fit of XRR data
+  :align: center
