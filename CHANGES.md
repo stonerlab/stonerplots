@@ -1,9 +1,11 @@
-﻿Development
-===========
+v1.3.2 Release
+==============
 
 - Improve StackVertical to allow asymmetric stacked plots and make an example for plotting
 GenX fits.
-Further tweaks to other stylesheets.
+- Add AAAS-Science stylesheet with 2 and 3 column variants.
+- Improve SavedFigure to make it reusable and also adjustable after creation via call method.
+- Improvements to StackVertical and MultiPanel to do more calculations with plot transforms.
 
 v1.3.1 Thesis Style
 ===================
