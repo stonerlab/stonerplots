@@ -63,6 +63,7 @@ Journal Styles
 --------------
 
  * nature - for Nature group journals - from the original scienceplots package
+ * aaas-science - Science single columne style.
  * ieee - for IEEE Transactions journals - from the original scienceplots package
  * aps - for American Physical Society Journals (like Phys Rev Lett etc.)
  * aip - for AIP journals such as Applied Physics Letters - labels in Serif Fonts
@@ -78,6 +79,7 @@ Modifiers
  * hi-res - Switches to 600dpi plotting (but using eps, pdf or svg is generally a better option)
  * presentation_sm - a style for making 1/2 width graphs.
  * presentation_dark - tweak the weight of elements for dark presnetations.
+ * science-2col, science-3col - Science 2 and 3 column width figures
 
 Colour Cycles
 -------------
