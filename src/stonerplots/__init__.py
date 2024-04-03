@@ -6,7 +6,7 @@ from .context import SavedFigure, InsetPlot, StackVertical, MultiPanel
 from .colours import tube_colours, tube_colours_90, tube_colours_70, tube_colours_50, tube_colours_10
 
 __all__ = ["context", "SavedFigure", "InsetPlot", "StackVertical", "MultiPanel"]
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 
 # register the included stylesheet in the matplotlib style library
 stonerplots_path = Path(__file__).parent

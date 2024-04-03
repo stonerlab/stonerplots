@@ -12,6 +12,7 @@ __all__ = [
     "default_plot_aps_1_5_column",
     "default_plot_aps_2_column",
     "default_plot_thesis",
+    "default_plot_science",
     # 3 Formats
     "scatter_plot",
     # 4 Colour Schemes

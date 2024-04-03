@@ -1,0 +1,48 @@
+axes.prop_cycle : (cycler('color', ['000000', 'DC241F', '0019A8', '9B0058', 'B26300', '838D93', 'FA7B05', '039BE5', '60399E', 'FFC80A']) + cycler('marker', ['o', 'd', 's', '*', '<', '>', 'P', 'X', '^', 'v']))
+
+
+# Set default figure size
+figure.figsize : 2.24, 2.0
+figure.constrained_layout.use: True
+figure.dpi: 100
+
+# Font sizes
+axes.labelsize: 9
+xtick.labelsize: 7
+ytick.labelsize: 7
+legend.fontsize: 7
+figure.labelsize: x-small
+figure.titlesize: 9
+axes.titlesize: 9
+font.size: 7
+
+
+# Set x axis
+xtick.direction : in
+xtick.major.size : 2
+xtick.major.width : 0.4
+xtick.minor.size : 1.25
+xtick.minor.width : 0.4
+xtick.minor.visible : True
+xtick.top : True
+
+# Set y axis
+ytick.direction : in
+ytick.major.size : 2
+ytick.major.width : 0.4
+ytick.minor.size : 1.25
+ytick.minor.width : 0.4
+ytick.minor.visible : True
+ytick.right : True
+
+# Set line widths
+axes.linewidth : 0.4
+grid.linewidth : 0.3
+lines.linewidth : 0.75
+
+# Marker settings
+lines.markeredgewidth: 0.3
+lines.markersize: 6
+
+# Always save as 'tight'
+savefig.pad_inches : 0.05

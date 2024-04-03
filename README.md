@@ -1,4 +1,4 @@
-[![GitHub version](https://badge.fury.io/gh/stonerlab%2Fstonerplots.svg)](https://badge.fury.io/gh/stonerlab%2Fstonerplots)
+﻿[![GitHub version](https://badge.fury.io/gh/stonerlab%2Fstonerplots.svg)](https://badge.fury.io/gh/stonerlab%2Fstonerplots)
 [![PyPI version](https://badge.fury.io/py/StonerPlots.svg)](https://badge.fury.io/py/StonerPlots)
 [![Build Docs](https://github.com/stonerlab/stonerplots/actions/workflows/publish_sphinx.yaml/badge.svg)](https://stonerlab.github.io/stonerplots/)
 [![Conda](https://github.com/stonerlab/stonerplots/actions/workflows/build_conda.yaml/badge.svg)](https://github.com/stonerlab/stonerplots/actions/workflows/build_conda.yaml)
@@ -43,6 +43,8 @@ labels don't escape over the edge of the surrounding figure.
             inset.plot(x, model(x, 200), linestyle="--")
 
 
+See below for the full list of styles and context managers.
+
 Documentation
 -------------
 
@@ -55,6 +57,7 @@ Available Styles
  * poster - makes everything bigger for printing on a poster
  * notebook - makes things a little bigger for a Jupyter notebook - from the original scienceplots package
  * presentation - a style suitable for the main graph on a powerpoint slide
+ * thesis - a style that tries to look like the CM Physics group LaTeX thesis template
 
 Journal Styles
 --------------
@@ -95,6 +98,16 @@ The default colour cycle is based on the London Underground map colour scheme (w
 
 The package adds these as named colours in matplotlib, along with 90,50,70 and 10% shade variants of some of them. See
 the [documentation page on colours](https://stonerlab.github.io/stonerplots/colours.html) for a full list.
+
+Context Managers
+----------------
+
+The package is designed to work by using python context managers to aid plotting. These include:
+
+ * SavedFigure - apply style sheets and then save any resulting figures to disc in one or more formats
+ * StackVertical - make a multi-panel plot where the panels are arranged in a vertical stack and pushed together so that
+   the top-x-axis on one frame is the bottom of the next.
+ * MultiPanel - a general; purpose miulti-panel plotting helper.
 
 This package draws heavily on [scienceplots](https://github.com/garrettj403/SciencePlots), so it seems only fair to cite the original work....
 

@@ -2,7 +2,7 @@
 """Context Managers to help with plotting and saving figures."""
 from pathlib import Path
 import weakref
-from collections.abc import Sequence
+from collections.abc import Sequence, Iterable
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, InsetPosition
@@ -48,7 +48,7 @@ def _roman(ix):
     return output
 
 
-def _counter(ix, pattern="({alpha})"):
+def _counter(ix, pattern="({alpha})", **kargs):
     """Return a representation of an integer according to a pattern.
 
     Args:
@@ -58,6 +58,8 @@ def _counter(ix, pattern="({alpha})"):
     Keyword Argyments:
         pattern (str):
             The pattern to be used to format the conversion. Defaykt is '({alpha})'. See Notes for details.
+        **kargs:
+            Other data to replace pattern with.
 
     Returns:
         *(str):
@@ -74,9 +76,11 @@ def _counter(ix, pattern="({alpha})"):
     """
     alpha = chr(ord("a") + int(ix))
     Roman = _roman(int(ix + 1))
-    return pattern.format(
-        **{"alpha": alpha, "Alpha": alpha.upper(), "roman": Roman.lower(), "Roman": Roman, "int": int(ix)}
+    replacements = kargs.copy()
+    replacements.update(
+        {"alpha": alpha, "Alpha": alpha.upper(), "roman": Roman.lower(), "Roman": Roman, "int": int(ix)}
     )
+    return pattern.format(**replacements)
 
 
 class SavedFigure(object):
@@ -96,9 +100,42 @@ class SavedFigure(object):
         include_open (bool):
             If set to True (default is False), then existing figures will be included when saving.
 
-    This wraps the mpl.style.context() context manager and also determines what new figures have been created and
-    saves them with a soecified filename.
+    Notes:
+        This wraps the mpl.style.context() context manager and also determines what new figures have been created and
+        saves them with a soecified filename.
+        
+        *Filename* can be a directory - in which case the fiogure label will be used as the final part of the filename.
+        *Filename* can also include placeholders:
+            - number - the figure plot number
+            - label - the fogire label
+            - alpha/Alpha/roman/Roman/int - a counter that increases for each saved file in the current with:... block.
+            
+        SavedFigure supports reise - so can do somethingf like::
+            
+            cm = SavedFigure(filename="figures/fig_{label}.png", style=["stoiner","thesis"], autoclose=True)
+            with cm:
+                plt.figure("one")
+                ....
+                
+            with cm:
+                plt.figure("two")
+                
+        and get `figures/fig_one.png` and `figures/fig_two.png` with a consistent styling.
+        
+        SavedFigure objects can be called with the same parameters as the consuctor to upadte their settings.::
+            
+            cm = SavedFigure(filename="figures/fig_{label}.png", style=["stoiner","thesis"], autoclose=True)
+            with cm:
+                plt.figure("one")
+                ....
+                
+            with cm(fprmats=["pdf","png"!]):
+                plt.figure("two")
+                
+        Would do the same as above, but also creater `figures/fig_two.pdf`.    
     """
+
+    _keys = ["filename", "style", "autoclose", "formats", "include_open"]
 
     def __init__(self, filename=None, style=None, autoclose=False, formats=None, include_open=False):
         """Create the context manager.
@@ -118,26 +155,77 @@ class SavedFigure(object):
                 If set to True (default is False), then existing figures will be included when saving.
 
         """
-        if filename is not None:
-            filename = Path(filename)
-            ext = filename.suffix
-            if formats is None and len(ext) > 1:  # Use filename extension as format ifd not set
-                formats = [ext[1:]]
-            # Store filename with extension stripped
-            filename = filename.parent / filename.stem
+        # Set internal state
+        self._filename = None
+        self._formats = []
+        self._style=[]
+        self._open_figs = []
+        # Copy constrictor parameters
         self.filename = filename
-
-        if style is None:
-            self.style = ["stoner"]
-        else:
-            self.style = style
+        self.style = style
         self.autoclose = autoclose
         self.style_context = None
-        if isinstance(formats, str):
-            formats = [formats]
-        self.formats = ["png"] if formats is None else formats
-        self.open_figs = []
+        self.formats = formats
         self.include_open = include_open
+  
+    @property
+    def filename(self):
+        """Store the filename as a Path object without an extension."""
+        return self._filename
+    
+    @filename.setter
+    def filename(self,value):
+        if value is not None:
+            value = Path(value)
+            ext = value.suffix[1:]
+            if ext not in self.formats:
+                self.formats.append(ext)
+            value = value.parent / value.stem
+        self._filename = value
+           
+        
+    @property
+    def formats(self):
+        """Store the output formats as a list of strings"""
+        return self._formats
+    
+    @formats.setter
+    def formats(self, value):
+        """Ensure formats is a list of strings."""
+        if isinstance(value,str):
+            self._formatrs=[x.strip() for x in value.split(",") if x.strip()!=""]
+        elif isinstance(value,Iterable):
+            self._formats=list(value)
+        elif value is None:
+            if len(self._formats)==0:
+                self._formats=["png"]
+        else:
+            raise TypeError("Cannot workout format type")
+            
+    @property
+    def style(self):
+        """Store the stylesheets as a list of strings."""
+        return self._style
+    
+    @style.setter
+    def style(self, value):
+        """Ensure style is a list of strings."""
+        if isinstance(value,str):
+            self._style=[x.strip() for x in value.split(",") if x.strip()!=""]
+        elif isinstance(value,Iterable):
+            self._style=list(value)
+        elif value is None:
+            self._style=["stoner"]
+        else:
+            raise TypeError("Cannot workout style type")
+        
+        
+    def __cal__(self, **kwargs):
+        """Update the settings and return ourself."""
+        settings=_filter_dict(kwargs, self.keys)
+        for key,val in settings.items():
+            setattr(self,key,val)
+        return self
 
     def __enter__(self):
         """Record the open figures and start the style context manager.
@@ -148,7 +236,7 @@ class SavedFigure(object):
         """
         for num in plt.get_fignums():
             if not self.include_open:
-                self.open_figs.append(weakref.ref(plt.figure(num)))
+                self._open_figs.append(weakref.ref(plt.figure(num)))
         if self.style:
             self.style_context = mpl.style.context(self.style)
             self.style_context.__enter__()
@@ -162,17 +250,21 @@ class SavedFigure(object):
         """
         if self.style:
             self.style_context.__exit__(type, value, traceback)
-        self.open_figs = [x() for x in self.open_figs if x() is not None]
+        self._open_figs = [x() for x in self._open_figs if x() is not None]
         processed = -1
         for num in plt.get_fignums():
-            if (fig := plt.figure(num)) in self.open_figs:  # old  figure
+            if (fig := plt.figure(num)) in self._open_figs:  # old  figure
                 continue
             processed += 1
-            filename = self.filename if self.filename is not None else Path(fig.get_label())
+            label = fig.get_label()
+            if self.filename.is_dir():
+                fillename = self.filename / "{label}"
+            else:
+                filename = self.filename if self.filename is not None else Path("{label}")
             for fmt in self.formats:
                 new_file = filename.parent / (filename.stem + f".{fmt.lower()}")
                 _tmp_file = new_file
-                new_file = _counter(processed, str(new_file))
+                new_file = _counter(processed, str(new_file), number=num, label=label)
                 if new_file == _tmp_file and processed > 0:  # Filename didn't have a counter and we are on file 2
                     parts = new_file.split(".")
                     parts[-2] += f"-{processed}"
@@ -180,6 +272,8 @@ class SavedFigure(object):
                 fig.savefig(new_file)
             if self.autoclose:
                 plt.close(num)
+        self._open_figs = []  # Reset the open figs so we can reiuse this context managber
+        self.style_context = None
 
 
 class InsetPlot(object):
@@ -289,7 +383,6 @@ class InsetPlot(object):
 
 
 class StackVertical(object):
-
     """A context manager that will generate a stack of subplots with common x axes.
 
     Args:
@@ -368,7 +461,7 @@ class StackVertical(object):
     def __enter__(self):
         """Create the grid of axes."""
         hspace = 0 if self.joined else self.kwargs.get("hspace", 0.1)
-        self.kwargs.pop("hspace",None)
+        self.kwargs.pop("hspace", None)
         gs_kwargs = _filter_dict(self.kwargs, _gsargs)
         self.gs = self.figure.add_gridspec(self.number, hspace=hspace, **gs_kwargs)
         self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
@@ -437,7 +530,6 @@ class StackVertical(object):
 
 
 class MultiPanel(Sequence):
-
     """A context manager for sorting out multi-panel plots in matplotlib.
 
     Args:

@@ -1,8 +1,7 @@
-.. currentmodule:: stonerplots
 Stoner Plots Style Gallery
 ==========================
 
-1. Default Styles
+1.Default Styles
 -----------------
 
 Basic *stoner* style:
@@ -18,6 +17,7 @@ The basic stylesheet is the *stoner* stylesheet.::
         ax.autoscale(tight=True)
         ax.set(**pparam)
 
+.. currentmodule:: stonerplots
 
 .. image:: ../../examples/figures/fig01a.png
   :alt: Example figure formatted with the 'stoner' style sheet.
@@ -66,11 +66,11 @@ There are specific stylesheets for producing plots at the correct size and style
 |                                                     |                                                   |
 +-----------------------------------------------------+---------------------------------------------------+
 |                                                     |                                                   |
-| .. image:: ../../examples/figures/fig02e.png        |                                                   |
-|    :alt: Example fogure in nature format            |                                                   |
-|    :align: center                                   |                                                   |
+| .. image:: ../../examples/figures/fig02e.png        | .. image:: ../../examples/figures/fig02i_1.png    |
+|    :alt: Example fogure in nature format            |   :alt: Example fogure in aaas-science format     |
+|    :align: center                                   |   :align: center                                  |
 |                                                     |                                                   |
-| Using styles ["stoner", "nature"]                   |                                                   |
+| Using styles ["stoner", "nature"]                   | Using styles ["stoner", "aaas-science"]           |
 |                                                     |                                                   |
 +-----------------------------------------------------+---------------------------------------------------+
 |                                                                                                         |
