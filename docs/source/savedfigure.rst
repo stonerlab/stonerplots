@@ -119,3 +119,43 @@ style figures, so already open figures will be saved with their existing formatt
         pass
 
 Will save all of your figures as Figure-0.eps, Figure-0.png, Figure-1.eps, Figure-1.png... in one go.
+
+Reusing the Context Manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you are using the same settings in SavedFigure context managers over and over again, then you might want to reuse
+the context manager.::
+
+    cm=SavedFigure(figures/"fig_{label}.png", style=["stoner"])
+
+    with cm: # first figure
+        plt.figure("one")
+        ...
+
+    # figures/fig_one.png saved.
+    with cm: # second figure
+        plt.figure("two")
+        ...
+
+    # figures/fig_two.png saved
+
+One trick being used here is to use a placeholder for the filename - 'fig_{label}.png' - when it comes time to save the
+figure, the figure label is stored in the variable *label* (and the figure number is stored in *number*) and can then
+be substituted into the filename. The other end of the process is that when we create the figure with `plt.figure()` we
+give the figure a label or name.
+
+Doin this allows you to change, for example, the style in one place and have all of your figures change over. The
+downside is that once you set the context manager up, that's it. Exc ept, it isn't.... you can also call the context
+manager to adjust the settings.::
+
+    cm=SavedFigure(figures/"fig_{label}.png", style=["stoner"])
+
+    with cm: # first figure
+        plt.figure("one")
+        ...
+    # figures/fig_one.png saved.
+    cm(filename=figures/"new_{label}", formats="pdf")
+    with cm: # second figure
+        plt.figure("two")
+        ...
+    # figures/new_two.pdf saved
