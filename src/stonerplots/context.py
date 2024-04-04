@@ -3,6 +3,7 @@
 from pathlib import Path
 import weakref
 from collections.abc import Sequence, Iterable
+import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, InsetPosition
@@ -15,6 +16,30 @@ _fontargs = ["font", "fontfamily", "fontname", "fontsize", "fontstretch", "fonts
 
 _gsargs = ["left", "bottom", "right", "top", "width_ratios", "height_ratios", "hspace", "wspace", "h_pad", "w_pad"]
 
+class _ravel_list(list):
+    
+    """A list with a rabel.method."""
+    
+    def ravel(self):
+        """Implement a sort of ravel for a list."""
+        ret=[]
+        for x in self:
+            if isinstance(x,list):
+                ret.extend(x)
+            else:
+                ret.append(x)
+        return ret
+    
+    def __getitem__(self,index):
+        """Fake 2D indexing with a tuple."""
+        if not isinstance(index,tuple):
+            return super().__getitem__(index)
+        r=self
+        for ix in index:
+            r=r[ix]
+        return r
+    
+        
 
 def _filter_dict(dic, keys):
     """Return a dictionary derived from dic that only contains the keys in keys."""
@@ -556,6 +581,12 @@ class MultiPanel(Sequence):
             - int - simpe numeral
             - alpha / Alpha - lower / uppper case letters
             - roman / Roman - lower / upper case Roman numerals.
+        nplots (List[int], None):
+            If given, specifies how many subplots to create on each row of the figure. The lengtrh of nplots must be
+            the same as the number of rows and each entry must be between 1 and the number of columns.
+        same_aspect (bool):
+            If *nnplots* is in use then the aspect ratio of each plot will be adjusted to be the same unless you
+            set this to be False, or unless you pass *width_ratios* or *height_ratios* to control the aspect ratios.
 
         kwargs:
             Other keyword arguments can be used to set the label fonts and are passed into ax.set_title, arguments
@@ -580,6 +611,8 @@ class MultiPanel(Sequence):
         sharey=False,
         adjust_figsize=True,
         label_panels=True,
+        nplots=None,
+        same_aspect=True,
         **kwargs,
     ):
         """Configure figure and a gridspec for multi-panel plotting."""
@@ -607,12 +640,27 @@ class MultiPanel(Sequence):
         self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
         self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
         self.kwargs = kwargs
+        self.nplots=nplots
+        self.same_aspect = "height_ratios" not in kwargs and "wdith_ratios" not in kwargs and same_aspect
 
     def __enter__(self):
         """Create the grid of axes."""
         gs_kwargs = _filter_dict(self.kwargs, _gsargs)
         self.gs = self.figure.add_gridspec(*self.panels, **gs_kwargs)
-        self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
+        if self.nplots is not None:
+            used=np.zeros(self.panels, dtype=bool)
+            self.axes=_ravel_list([])
+            for r in range(self.panels[0]):
+                row_axes=[]
+                for c in range(self.panels[1]):
+                    if used[r,c]:
+                        continue # already taken this subplot
+                    extent=self.panels[1]//self.nplots[r]
+                    used[r,c:c+extent]=True
+                    row_axes.append(self.figure.add_subplot(self.gs[r,c:c+extent]))
+                self.axes.append(row_axes)
+        else:
+            self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
         if self.adjust_figsize:
             f = self.adjust_figsize[0]
             if f < 0:
@@ -635,12 +683,17 @@ class MultiPanel(Sequence):
 
                 ax.set_title(
                     f" {_counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs)
-                )
+                )            
         return self
 
     def __exit__(self, type, value, traceback):
         """Clean up the axes."""
         self.figure.canvas.draw()
+        if self.same_aspect: # Force the aspect ratios to be the same
+            asp=np.array([ax.bbox.width/ax.bbox.height for ax in self.axes.ravel()]).min()
+            for ax in self.axes.ravel():
+                ax.set_box_aspect(1/asp)
+
         plt.figure(self._save_fig)
 
     def __len__(self):
@@ -653,7 +706,7 @@ class MultiPanel(Sequence):
 
     def __getitem__(self, index):
         """Pass through to self.axes."""
-        return self.axex[index]
+        return self.axes[index]
 
     def __iter__(self):
         """Iterate over self.axes."""

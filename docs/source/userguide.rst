@@ -241,7 +241,7 @@ plots to place beside each other), or a tuple of rows,columns of sub-plats.
   :alt: A single row of 2 sub-plats created from MultiPanel
   :align: center
 
-See `Multi Panel Plots<multipanel>` for full details of the :py:class:`MultiPanel` context manager.
+See :doc:`Multi Panel Plots<multipanel>` for full details of the :py:class:`MultiPanel` context manager.
 
 
 Inset Plots

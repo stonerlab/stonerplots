@@ -41,3 +41,31 @@ shrink the original figure size is when the final aspect ratio will be higher th
 .. image:: ../../examples/figures/fig02h_1.png
   :alt: A single row of 2 sub-plats created from MultiPanel
   :align: center
+
+
+Different Numbers of Plots on Each Row
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:py:class:`MultiPanel` can also be used to create arrangements where there are different numbers of
+subplots on different rows on the figure. For example, if you want to have three subplots and they don't
+conveniently fit on a single row, you might have 1 and then 2 plots, or 2 and then 1 plot. This can be
+achieved by using the *nplots* argument in conunction with an optional *same_aspect*.::
+
+    with SavedFigure("3-plot.png",style="stoner,thesis", autoclose=True):
+        fig=plt.figure("tri-plot")
+        with MultiPanel((2,2), nplots=[2,1], adjust_figsize=False) as axes:
+            for ix,ax in enumerate(axes):
+                ax.plot(x_data[ix], y_data[ix], marker="")
+                ...
+  
+*nplots* gives the number of plots on each row of the layout (so the length of *nplots* must be the same
+as the first number in the numnber of panels and each entry must be between 1 and the second number
+in the number of panels). By default, Lpy:class:`MultiPanel` will adjust the aspect
+ratio of all the subplots after the plotting is done to make them the same as the narrowerst figure unless
+you specify *same_aspect* to be False, or give *width_ratios* or *height_ratios* to manually change the
+aspect ratios of the plots.
+
+.. image:: ../../examples/figures/trriplot.png
+  :alt: A triple panel sub-plot in 2 rows.
+  :align: center
+            
