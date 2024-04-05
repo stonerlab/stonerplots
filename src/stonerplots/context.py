@@ -16,30 +16,29 @@ _fontargs = ["font", "fontfamily", "fontname", "fontsize", "fontstretch", "fonts
 
 _gsargs = ["left", "bottom", "right", "top", "width_ratios", "height_ratios", "hspace", "wspace", "h_pad", "w_pad"]
 
+
 class _ravel_list(list):
-    
     """A list with a rabel.method."""
-    
+
     def ravel(self):
         """Implement a sort of ravel for a list."""
-        ret=[]
+        ret = []
         for x in self:
-            if isinstance(x,list):
+            if isinstance(x, list):
                 ret.extend(x)
             else:
                 ret.append(x)
         return ret
-    
-    def __getitem__(self,index):
+
+    def __getitem__(self, index):
         """Fake 2D indexing with a tuple."""
-        if not isinstance(index,tuple):
+        if not isinstance(index, tuple):
             return super().__getitem__(index)
-        r=self
+        r = self
         for ix in index:
-            r=r[ix]
+            r = r[ix]
         return r
-    
-        
+
 
 def _filter_dict(dic, keys):
     """Return a dictionary derived from dic that only contains the keys in keys."""
@@ -128,36 +127,36 @@ class SavedFigure(object):
     Notes:
         This wraps the mpl.style.context() context manager and also determines what new figures have been created and
         saves them with a soecified filename.
-        
+
         *Filename* can be a directory - in which case the fiogure label will be used as the final part of the filename.
         *Filename* can also include placeholders:
             - number - the figure plot number
             - label - the fogire label
             - alpha/Alpha/roman/Roman/int - a counter that increases for each saved file in the current with:... block.
-            
+
         SavedFigure supports reise - so can do somethingf like::
-            
+
             cm = SavedFigure(filename="figures/fig_{label}.png", style=["stoiner","thesis"], autoclose=True)
             with cm:
                 plt.figure("one")
                 ....
-                
+
             with cm:
                 plt.figure("two")
-                
+
         and get `figures/fig_one.png` and `figures/fig_two.png` with a consistent styling.
-        
+
         SavedFigure objects can be called with the same parameters as the consuctor to upadte their settings.::
-            
+
             cm = SavedFigure(filename="figures/fig_{label}.png", style=["stoiner","thesis"], autoclose=True)
             with cm:
                 plt.figure("one")
                 ....
-                
+
             with cm(fprmats=["pdf","png"!]):
                 plt.figure("two")
-                
-        Would do the same as above, but also creater `figures/fig_two.pdf`.    
+
+        Would do the same as above, but also creater `figures/fig_two.pdf`.
     """
 
     _keys = ["filename", "style", "autoclose", "formats", "include_open"]
@@ -183,7 +182,7 @@ class SavedFigure(object):
         # Set internal state
         self._filename = None
         self._formats = []
-        self._style=[]
+        self._style = []
         self._open_figs = []
         # Copy constrictor parameters
         self.filename = filename
@@ -192,14 +191,14 @@ class SavedFigure(object):
         self.style_context = None
         self.formats = formats
         self.include_open = include_open
-  
+
     @property
     def filename(self):
         """Store the filename as a Path object without an extension."""
         return self._filename
-    
+
     @filename.setter
-    def filename(self,value):
+    def filename(self, value):
         if value is not None:
             value = Path(value)
             ext = value.suffix[1:]
@@ -207,49 +206,47 @@ class SavedFigure(object):
                 self.formats.append(ext)
             value = value.parent / value.stem
         self._filename = value
-           
-        
+
     @property
     def formats(self):
         """Store the output formats as a list of strings"""
         return self._formats
-    
+
     @formats.setter
     def formats(self, value):
         """Ensure formats is a list of strings."""
-        if isinstance(value,str):
-            self._formatrs=[x.strip() for x in value.split(",") if x.strip()!=""]
-        elif isinstance(value,Iterable):
-            self._formats=list(value)
+        if isinstance(value, str):
+            self._formatrs = [x.strip() for x in value.split(",") if x.strip() != ""]
+        elif isinstance(value, Iterable):
+            self._formats = list(value)
         elif value is None:
-            if len(self._formats)==0:
-                self._formats=["png"]
+            if len(self._formats) == 0:
+                self._formats = ["png"]
         else:
             raise TypeError("Cannot workout format type")
-            
+
     @property
     def style(self):
         """Store the stylesheets as a list of strings."""
         return self._style
-    
+
     @style.setter
     def style(self, value):
         """Ensure style is a list of strings."""
-        if isinstance(value,str):
-            self._style=[x.strip() for x in value.split(",") if x.strip()!=""]
-        elif isinstance(value,Iterable):
-            self._style=list(value)
+        if isinstance(value, str):
+            self._style = [x.strip() for x in value.split(",") if x.strip() != ""]
+        elif isinstance(value, Iterable):
+            self._style = list(value)
         elif value is None:
-            self._style=["stoner"]
+            self._style = ["stoner"]
         else:
             raise TypeError("Cannot workout style type")
-        
-        
+
     def __cal__(self, **kwargs):
         """Update the settings and return ourself."""
-        settings=_filter_dict(kwargs, self.keys)
-        for key,val in settings.items():
-            setattr(self,key,val)
+        settings = _filter_dict(kwargs, self.keys)
+        for key, val in settings.items():
+            setattr(self, key, val)
         return self
 
     def __enter__(self):
@@ -407,7 +404,90 @@ class InsetPlot(object):
             plt.sca(self.save_ax)
 
 
-class StackVertical(object):
+class _PlotContextSequence(Sequence):
+    """Base class for Plot Context Managers that deals with Sequence Like Behaviour."""
+
+    def __init__(self):
+        """Ensure private  attributes exist."""
+        self.axes = _ravel_list()
+        self._save_fig = None
+        self._save_axes = None
+
+    def __len__(self):
+        """Pass through to self.axes.
+        
+        Note:
+            self.axes may be a _ravel_list - so unravel the list first.
+        """
+        return len(self.axes.ravel())
+
+    def __contains__(self, value):
+        """Pass through to self.axes.
+        
+        Note:
+            self.axes may be a _ravel_list - so unravel the list first.        
+        """
+        return value in self.axes.ravel()
+
+    def __getitem__(self, index):
+        """Pass through to self.axes.
+        
+        Notes:
+            If the result is a single axes instance, then call :py:func:`matplotlib.pyplot.sca`
+            with it.
+        """
+        ret = self.axes[index]
+        if isinstance(ret, mpl.axes.Axes):
+            plt.sca(ret)
+        return ret
+
+    def __iter__(self):
+        """Iterate over self.axes.
+                
+        Note:
+            self.axes may be a _ravel_list - so unravel the list first.
+        """
+        yield from self.axes.ravel()
+
+    def __reversed__(self):
+        """Iterate over reversed self.axes.
+                
+        Note:
+            self.axes may be a _ravel_list - so unravel the list first.
+        """
+        yield from reversed(self.axes.ravel())
+
+    def _get_gcfa(self):
+        """Safely get the currenbt figure and axes without creating new ones.
+        
+        Notes:
+            Checks if plt.get_fignums() is empty and if so, leaves the figure and axes unset
+            Otherwise, getsa the current figure and then checks whether that has axes or not
+            and if so, stores the current axes.
+            
+            The problem with naively calling plt.gcf() and plt.gca() is that they will create
+            new figures and axes if they don't exist.
+        """
+        self._save_fig = None
+        self._save_axes = None
+        if not plt.get_fignums():  # No current figures
+            return
+        self._save_fig = plt.gcf()
+        if self._save_fig.axes:
+            self._save_axes = plt.gca()
+
+    def _set_gcfa(self):
+        """Set the current figure and axes from state if not None.
+        
+        This safely revets the effect of the _get_gcfa() method.
+        """
+        if self._save_axes:
+            plt.gca(self._save_axes)
+        elif self._save_fig:
+            plt.figure(self._save_fig)
+
+
+class StackVertical(_PlotContextSequence):
     """A context manager that will generate a stack of subplots with common x axes.
 
     Args:
@@ -465,31 +545,31 @@ class StackVertical(object):
         """Set up for the stack of plots."""
         self.number = number
         self.joined = joined
-
-        self.figure = figure if figure else plt.gcf()
-        self._save_fig = plt.gcf()
-        if isinstance(self.figure, int) and self.figure in plt.get_fignums:  # If we specified a figure as a number
-            self.figure = plt.figure(self.fignum)
-        if isinstance(self.figure, str) and self.figure in plt.get_figlabels:  # If we specified a figure as a label
-            self.figure = plt.figure(self.fignum)
-
-        plt.figure(self.figure)
+        self._fig_tmp = figure
         self.gs = None
         self.sharex = sharex
         self.sharey = sharey
+        self.hspace = 0 if self.joined else self.kwargs.pop("hspace", 0.1)
         self.adjust_figsize = adjust_figsize if isinstance(adjust_figsize, float) else float(int(adjust_figsize)) * 0.8
         self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
-        self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
         self.align_labels = kwargs.pop("align__labels", True)
         self.kwargs = kwargs
 
     def __enter__(self):
         """Create the grid of axes."""
-        hspace = 0 if self.joined else self.kwargs.get("hspace", 0.1)
-        self.kwargs.pop("hspace", None)
+        super().__init__()
+        self._get_gcfa()  # Preserve out current axes
+        # Work out what to do about our figure
+        self.figure = self._fig_tmp if self._fig_tmp else plt.gcf()
+        if isinstance(self.figure, int) and self.figure in plt.get_fignums:  # If we specified a figure as a number
+            self.figure = plt.figure(self.fignum)
+        if isinstance(self.figure, str) and self.figure in plt.get_figlabels:  # If we specified a figure as a label
+            self.figure = plt.figure(self.fignum)
+        plt.figure(self.figure)
+        self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
         gs_kwargs = _filter_dict(self.kwargs, _gsargs)
-        self.gs = self.figure.add_gridspec(self.number, hspace=hspace, **gs_kwargs)
-        self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
+        self.gs = self.figure.add_gridspec(self.number, hspace=self.hspace, **gs_kwargs)
+        self.axes = _ravel_list(self.gs.subplots(sharex=self.sharex, sharey=self.sharey))
         if self.adjust_figsize:
             extra_h = self.figsize[1] * self.adjust_figsize * (self.number - 1) + self.figsize[1]
             self.figure.set_figheight(extra_h)
@@ -503,7 +583,7 @@ class StackVertical(object):
                 ax.set_title(
                     f" {_counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs)
                 )
-        return self.axes
+        return self
 
     def __exit__(self, type, value, traceback):
         """Clean up the axes."""
@@ -523,7 +603,7 @@ class StackVertical(object):
         self.figure.canvas.draw()
         self._align_labels()
         self.figure.canvas.draw()
-        plt.figure(self._save_fig)
+        self._set_gcfa()
 
     def _align_labels(self):
         """Align y-axist labels."""
@@ -554,7 +634,7 @@ class StackVertical(object):
         ax.set_ylim(ylim)
 
 
-class MultiPanel(Sequence):
+class MultiPanel(_PlotContextSequence):
     """A context manager for sorting out multi-panel plots in matplotlib.
 
     Args:
@@ -616,48 +696,53 @@ class MultiPanel(Sequence):
         **kwargs,
     ):
         """Configure figure and a gridspec for multi-panel plotting."""
+        super().__init__()
         if isinstance(panels, int):  # Assume 1 x panels
             panels = (1, panels)
         self.panels = panels
+        self._fig_arg = figure
+        self.gs = None
+        self.sharex = sharex
+        self.sharey = sharey
+        self._adjust_figsize_arg = adjust_figsize
+        # Adjust fig size can be a tuple
+        self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
+        self.kwargs = kwargs
+        self.nplots = nplots
+        self.same_aspect = "height_ratios" not in kwargs and "wdith_ratios" not in kwargs and same_aspect
 
-        self.figure = figure if figure else plt.gcf()
-        self._save_fig = plt.gcf()
+    def __enter__(self):
+        """Create the grid of axes."""
+        # Preserve current figure and axes and sort figure argument
+        self._get_gcfa()
+        self.figure = self._fig_arg if self._fig_arg else plt.gcf()
         if isinstance(self.figure, int) and self.figure in plt.get_fignums:  # If we specified a figure as a number
             self.figure = plt.figure(self.fignum)
         if isinstance(self.figure, str) and self.figure in plt.get_figlabels:  # If we specified a figure as a label
             self.figure = plt.figure(self.fignum)
-
         plt.figure(self.figure)
-        self.gs = None
-        self.sharex = sharex
-        self.sharey = sharey
-        # Adjust fig size can be a tuple
+        # Sort out figurre size adjustment
+        adjust_figsize = self._adjust_figsize_arg
         if isinstance(adjust_figsize, bool):
             adjust_figsize = (int(adjust_figsize), int(adjust_figsize) * 0.8)
         if isinstance(adjust_figsize, float):
             adjust_figsize = (adjust_figsize, adjust_figsize)
         self.adjust_figsize = adjust_figsize
-        self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
         self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
-        self.kwargs = kwargs
-        self.nplots=nplots
-        self.same_aspect = "height_ratios" not in kwargs and "wdith_ratios" not in kwargs and same_aspect
-
-    def __enter__(self):
-        """Create the grid of axes."""
+        # Create gridspec
         gs_kwargs = _filter_dict(self.kwargs, _gsargs)
         self.gs = self.figure.add_gridspec(*self.panels, **gs_kwargs)
         if self.nplots is not None:
-            used=np.zeros(self.panels, dtype=bool)
-            self.axes=_ravel_list([])
+            used = np.zeros(self.panels, dtype=bool)
+            self.axes = _ravel_list([])
             for r in range(self.panels[0]):
-                row_axes=[]
+                row_axes = []
                 for c in range(self.panels[1]):
-                    if used[r,c]:
-                        continue # already taken this subplot
-                    extent=self.panels[1]//self.nplots[r]
-                    used[r,c:c+extent]=True
-                    row_axes.append(self.figure.add_subplot(self.gs[r,c:c+extent]))
+                    if used[r, c]:
+                        continue  # already taken this subplot
+                    extent = self.panels[1] // self.nplots[r]
+                    used[r, c : c + extent] = True
+                    row_axes.append(self.figure.add_subplot(self.gs[r, c : c + extent]))
                 self.axes.append(row_axes)
         else:
             self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
@@ -683,38 +768,18 @@ class MultiPanel(Sequence):
 
                 ax.set_title(
                     f" {_counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs)
-                )            
+                )
         return self
 
     def __exit__(self, type, value, traceback):
         """Clean up the axes."""
         self.figure.canvas.draw()
-        if self.same_aspect: # Force the aspect ratios to be the same
-            asp=np.array([ax.bbox.width/ax.bbox.height for ax in self.axes.ravel()]).min()
+        if self.same_aspect:  # Force the aspect ratios to be the same
+            asp = np.array([ax.bbox.width / ax.bbox.height for ax in self.axes.ravel()]).min()
             for ax in self.axes.ravel():
-                ax.set_box_aspect(1/asp)
+                ax.set_box_aspect(1 / asp)
 
-        plt.figure(self._save_fig)
-
-    def __len__(self):
-        """Pass through to self.axes."""
-        return self.panels[0] * self.panels[1]
-
-    def __contains__(self, value):
-        """Pass through to self.axes."""
-        return value in self.axes
-
-    def __getitem__(self, index):
-        """Pass through to self.axes."""
-        return self.axes[index]
-
-    def __iter__(self):
-        """Iterate over self.axes."""
-        yield from self.axes.ravel()
-
-    def __refersed__(self):
-        """Iterate over reversed self.axes."""
-        yield from reversed(self.axes.ravel())
+        self._set_gcfa()
 
 
 if __name__ == "__main__":

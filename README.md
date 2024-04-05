@@ -80,6 +80,7 @@ Modifiers
  * presentation_sm - a style for making 1/2 width graphs.
  * presentation_dark - tweak the weight of elements for dark presnetations.
  * science-2col, science-3col - Science 2 and 3 column width figures
+ * thesis-sm - reduces the figure width to make the axes closer to 4/3 aspect ratio.
 
 Colour Cycles
 -------------
@@ -110,6 +111,7 @@ The package is designed to work by using python context managers to aid plotting
  * StackVertical - make a multi-panel plot where the panels are arranged in a vertical stack and pushed together so that
    the top-x-axis on one frame is the bottom of the next.
  * MultiPanel - a general; purpose miulti-panel plotting helper.
+ * InsetPlot - create an inset set of axes.
 
 This package draws heavily on [scienceplots](https://github.com/garrettj403/SciencePlots), so it seems only fair to cite the original work....
 
