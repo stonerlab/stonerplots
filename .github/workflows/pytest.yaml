@@ -30,8 +30,8 @@ jobs:
             pytest-md
             pytest-emoji
             matplotlib
-    - name: Run pytest
-      uses: pavelzw/pytest-action@v2
+      - name: Run pytest
+        uses: pavelzw/pytest-action@v2
         with:
           verbose: true
           emoji: true
