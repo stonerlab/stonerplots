@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Setup TeX Live
-        run: sudo apt-get install -y texlive-full
+        run: sudo apt-get install -y texlive-latex-extra texlive-latex-recommended texlive-fonts-recommended
       - name: Checkout
         uses: actions/checkout@v2
       - uses: mamba-org/setup-micromamba@v1
