@@ -20,17 +20,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Conda environment creation and activation
-        uses: conda-incubator/setup-miniconda@v2
+      - uses: mamba-org/setup-micromamba@v1
         with:
-          python-version: ${{ matrix.python-version }}
-          environment-file: tests/pytest-env.yaml    # Path to the build conda environment
-          activate-environment: test-environment
-          auto-update-conda: true
-          auto-activate-base: false
-          show-channel-urls: true
-      - name: Run pytest
-        uses: pavelzw/pytest-action@v2
+          environment-name: myenv
+          create-args: >-
+            python=3.10
+            pytest
+            numpy
+            pytest-md
+            pytest-emoji
+            matplotlib
+    - name: Run pytest
+      uses: pavelzw/pytest-action@v2
         with:
           verbose: true
           emoji: true
