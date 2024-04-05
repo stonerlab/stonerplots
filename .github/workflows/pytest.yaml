@@ -18,6 +18,10 @@ jobs:
         python-version: ["3.10"]
 
     steps:
+      - name: Setup TeX Live
+        uses: teatimeguest/setup-texlive-action@v3
+        with:
+          packages: revtex4 ams*
       - name: Checkout
         uses: actions/checkout@v2
       - uses: mamba-org/setup-micromamba@v1
