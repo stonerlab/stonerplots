@@ -31,7 +31,9 @@ jobs:
           auto-activate-base: false
           show-channel-urls: true
       - name: Set VERSION environment variable
-        run: export VERSION=`python setup.py --version`
+        run: |
+          export VERSION=`python setup.py --version`
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
       - name: Build and upload the conda packages
         uses: uibcdf/action-build-and-upload-conda-packages@v1.1-beta.1
         with:
