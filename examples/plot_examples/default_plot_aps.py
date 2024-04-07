@@ -6,7 +6,7 @@ from stonerplots import SavedFigure
 
 from common import x, model, pparam, figures
 
-with SavedFigure(figures / "fig02b.png", style=["stoner", "aps"], autoclose=True, formats=["png", "pdf"]):
+with SavedFigure(figures / "fig02b.png", style="stoner,aps", autoclose=True, formats=["png", "pdf"]):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:
         ax.plot(x, model(x, p), label=p, marker="")

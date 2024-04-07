@@ -13,4 +13,4 @@ with SavedFigure(figures / "fig07a.png", style=["stoner"], autoclose=True):
     ax.legend(title="Order", fontsize=7)
     ax.set(**pparam)
     with InsetPlot(loc="lower right") as inset:
-        inset.plot(x, model(x, 200), linestyle="--")
+        inset.plot(x[::10], model(x[::10], 200), linestyle="", marker=".")

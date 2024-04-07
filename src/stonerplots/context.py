@@ -10,7 +10,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes, InsetPosition
 
 import stonerplots
 
-__all__ = ["SavedFigure", "InsetPlot", "StackVertical", "MultiPanel"]
+__all__ = ["SavedFigure", "InsetPlot", "StackVertical", "MultiPanel", "counter", "roman"]
 
 _fontargs = ["font", "fontfamily", "fontname", "fontsize", "fontstretch", "fontstyle", "fontvariant", "fontweight"]
 
@@ -18,7 +18,7 @@ _gsargs = ["left", "bottom", "right", "top", "width_ratios", "height_ratios", "h
 
 
 class _ravel_list(list):
-    """A list with a rabel.method."""
+    """A list with a ravel.method."""
 
     def ravel(self):
         """Implement a sort of ravel for a list."""
@@ -48,9 +48,41 @@ def _filter_dict(dic, keys):
     return ret
 
 
-def _roman(ix):
+def roman(ix):
+    """Return a roman numeral representation of a positive integer.
+
+    Args:
+        ix (int):
+            A positive integer to be represetned as roman numerals.
+
+    Returns:
+        (str):
+            *ix* in an upper case Roman numeral representation.
+
+    Raises:
+        - ValueError if *ix* is not a positive integer.
+
+    Notes:
+        The conversion routine uses the Vinculum notation (overlines) for numerals from 4000 up to a million. This
+        is implemented as LaTeX codes (since the routine assumes mathtext of similar rendering is available.
+
+        The Vinculum standard multiplies digits by 1000 above M, by adding an overline over the digit. There doesn't
+        seem to be a standard way to deal with numbers bigger than 1 000 000 - presumeably Romans didn't need to do
+        this very often!"""
     numerals = {
-        1000: "M",
+        1_000_000: "$\\overline{\\mathrm{M}}$",
+        900_000: "$\\overline{\\mathrm{CM}}$",
+        500_000: "$\\overline{\\mathrm{D}}$",
+        400_000: "$\\pverline{\\mathrm{CD}}$",
+        100_000: "$\\overline{\\mathrm{C}}$",
+        90_000: "$\\overline{\\mathrm{XC}}$",
+        50_000: "$\\overline{\\mathrm{L}}$",
+        40_000: "$\\overbar{\\mathrm{XL}}$",
+        10_000: "$\\overline{\\mathrm{X}}$",
+        9_000: "$\\overline{\\mathrm{IX}}$",
+        5_000: "$\\overline{\\mathrm{V}}$",
+        4_000: "$\\overline{\\mathrm{IV}}$",
+        1_000: "M",
         900: "CM",
         500: "D",
         400: "CD",
@@ -64,6 +96,8 @@ def _roman(ix):
         4: "IV",
         1: "I",
     }
+    if not isinstance(ix, int) or ix <= 0:
+        raise ValueError("Only positive integers can be represented as Roman numerals.")
     output = ""
     for val, numeral in numerals.items():
         if count := ix // val:
@@ -72,7 +106,7 @@ def _roman(ix):
     return output
 
 
-def _counter(ix, pattern="({alpha})", **kargs):
+def counter(ix, pattern="({alpha})", **kargs):
     """Return a representation of an integer according to a pattern.
 
     Args:
@@ -82,11 +116,11 @@ def _counter(ix, pattern="({alpha})", **kargs):
     Keyword Argyments:
         pattern (str):
             The pattern to be used to format the conversion. Defaykt is '({alpha})'. See Notes for details.
-        **kargs:
+        \*\*kargs:
             Other data to replace pattern with.
 
     Returns:
-        *(str):
+        (str):
             *ix* converted to a string according to pattern.
 
         Notes:
@@ -99,7 +133,7 @@ def _counter(ix, pattern="({alpha})", **kargs):
             - Roman - ix as I,II,III,IV....
     """
     alpha = chr(ord("a") + int(ix))
-    Roman = _roman(int(ix + 1))
+    Roman = roman(int(ix + 1))
     replacements = kargs.copy()
     replacements.update(
         {"alpha": alpha, "Alpha": alpha.upper(), "roman": Roman.lower(), "Roman": Roman, "int": int(ix)}
@@ -114,13 +148,15 @@ class SavedFigure(object):
         filename (str, Path, default=None):
             The filename to use for saving the figure created. If None then the figure's label is used as a
             filename.
-        style (str, List[str], default is ['science','nature','vibrant']):
-            The mnatplotlib syslesheet(s) to use for plotting.
+        style (str, List[str], default is `stoner`):
+            The mnatplotlib syslesheet(s) to use for plotting. Multiple stylesheets can be specified either as a list
+            of strings, or as a comman separated values string.
         autoclose (bool, default=False):
             Automatically close figures after they are saved. This leaves open figures that were open before we
             started,
-        formats (list of str, default ["png"]):
-            List of file extensions (and hence formats) to use when saving the file.
+        formats (str, list of str, default "png"):
+            String or list of strings for file extensions (and hence formats) to use when saving the file. As with
+            style, a comma separated values string or  a list of strings can be used to specify multiple formats.
         include_open (bool):
             If set to True (default is False), then existing figures will be included when saving.
 
@@ -134,9 +170,10 @@ class SavedFigure(object):
             - label - the fogire label
             - alpha/Alpha/roman/Roman/int - a counter that increases for each saved file in the current with:... block.
 
-        SavedFigure supports reise - so can do somethingf like::
+        SavedFigure supports reuse - so can do somethingf like.::
 
-            cm = SavedFigure(filename="figures/fig_{label}.png", style=["stoiner","thesis"], autoclose=True)
+            cm = SavedFigure(filename="figures/fig_{label}.png",
+                             style="stoiner,thesis", autoclose=True)
             with cm:
                 plt.figure("one")
                 ....
@@ -148,7 +185,8 @@ class SavedFigure(object):
 
         SavedFigure objects can be called with the same parameters as the consuctor to upadte their settings.::
 
-            cm = SavedFigure(filename="figures/fig_{label}.png", style=["stoiner","thesis"], autoclose=True)
+            cm = SavedFigure(filename="figures/fig_{label}.png",
+                             style="stoiner,thesis", autoclose=True)
             with cm:
                 plt.figure("one")
                 ....
@@ -286,7 +324,7 @@ class SavedFigure(object):
             for fmt in self.formats:
                 new_file = filename.parent / (filename.stem + f".{fmt.lower()}")
                 _tmp_file = new_file
-                new_file = _counter(processed, str(new_file), number=num, label=label)
+                new_file = counter(processed, str(new_file), number=num, label=label)
                 if new_file == _tmp_file and processed > 0:  # Filename didn't have a counter and we are on file 2
                     parts = new_file.split(".")
                     parts[-2] += f"-{processed}"
@@ -333,15 +371,21 @@ class InsetPlot(object):
         "center": 10,
     }
 
-    def __init__(self, ax=None, loc="upper left", width=0.25, height=0.25, dimension="fraction", switch_to_inset=True):
+    def __init__(
+        self,
+        ax=None,
+        loc="upper left",
+        width=0.25,
+        height=0.25,
+        dimension="fraction",
+        switch_to_inset=True,
+        padding=0.05,
+    ):
         """Set the location for the axes."""
-        if ax is None:  # Use current axes if not passed explicitly
-            ax = plt.gca()
-        self.save_ax = plt.gca()
-        self.ax = ax
-        if not isinstance(loc, int):
-            loc = self.locations.get(str(loc).lower().replace("-", " "), 1)
-        self.loc = loc
+        self._save_fig = None
+        self._save_axes = None
+        self._ax = ax
+        self._loc = loc
         if dimension == "fraction":
             if isinstance(height, float) and 0.0 < height <= 1.0:
                 height = f"{height*100:.0f}%"
@@ -349,15 +393,24 @@ class InsetPlot(object):
                 width = f"{width*100:.0f}%"
         self.height = height
         self.width = width
-        self.padding = 0.05
+        self.padding = padding
         self.switch_to_inset = switch_to_inset
 
     def __enter__(self):
         """Create the inset axes using the axes_grid toolkit."""
+        self._get_gcfa()  # Note the current figure and axes safely
+        if self._ax is None:  # Use current axes if not passed explicitly
+            self.ax = plt.gca()
+        else:
+            self.ax = self.ax
+        if not isinstance(self._loc, int):
+            self.loc = self.locations.get(str(self._loc).lower().replace("-", " "), 1)
+        else:
+            self.loc = self._loc
         axins = inset_axes(self.ax, width=self.width, height=self.height, loc=self.loc)
         self.axins = axins
         if self.switch_to_inset:
-            plt.sca(self.axins)
+            plt.sca(axins)
         return self.axins
 
     def __exit__(self, type, value, traceback):
@@ -401,70 +454,16 @@ class InsetPlot(object):
         self.axins.set_axes_locator(newpos)
         self.ax.figure.canvas.draw()
         if self.switch_to_inset:
-            plt.sca(self.save_ax)
-
-
-class _PlotContextSequence(Sequence):
-    """Base class for Plot Context Managers that deals with Sequence Like Behaviour."""
-
-    def __init__(self):
-        """Ensure private  attributes exist."""
-        self.axes = _ravel_list()
-        self._save_fig = None
-        self._save_axes = None
-
-    def __len__(self):
-        """Pass through to self.axes.
-        
-        Note:
-            self.axes may be a _ravel_list - so unravel the list first.
-        """
-        return len(self.axes.ravel())
-
-    def __contains__(self, value):
-        """Pass through to self.axes.
-        
-        Note:
-            self.axes may be a _ravel_list - so unravel the list first.        
-        """
-        return value in self.axes.ravel()
-
-    def __getitem__(self, index):
-        """Pass through to self.axes.
-        
-        Notes:
-            If the result is a single axes instance, then call :py:func:`matplotlib.pyplot.sca`
-            with it.
-        """
-        ret = self.axes[index]
-        if isinstance(ret, mpl.axes.Axes):
-            plt.sca(ret)
-        return ret
-
-    def __iter__(self):
-        """Iterate over self.axes.
-                
-        Note:
-            self.axes may be a _ravel_list - so unravel the list first.
-        """
-        yield from self.axes.ravel()
-
-    def __reversed__(self):
-        """Iterate over reversed self.axes.
-                
-        Note:
-            self.axes may be a _ravel_list - so unravel the list first.
-        """
-        yield from reversed(self.axes.ravel())
+            self._set_gcfa()
 
     def _get_gcfa(self):
         """Safely get the currenbt figure and axes without creating new ones.
-        
+
         Notes:
             Checks if plt.get_fignums() is empty and if so, leaves the figure and axes unset
             Otherwise, getsa the current figure and then checks whether that has axes or not
             and if so, stores the current axes.
-            
+
             The problem with naively calling plt.gcf() and plt.gca() is that they will create
             new figures and axes if they don't exist.
         """
@@ -478,11 +477,96 @@ class _PlotContextSequence(Sequence):
 
     def _set_gcfa(self):
         """Set the current figure and axes from state if not None.
-        
+
         This safely revets the effect of the _get_gcfa() method.
         """
         if self._save_axes:
-            plt.gca(self._save_axes)
+            plt.sca(self._save_axes)
+        elif self._save_fig:
+            plt.figure(self._save_fig)
+
+
+class _PlotContextSequence(Sequence):
+    """Base class for Plot Context Managers that deals with Sequence Like Behaviour."""
+
+    def __init__(self):
+        """Ensure private  attributes exist."""
+        self.axes = _ravel_list()
+        self._save_fig = None
+        self._save_axes = None
+
+    def __len__(self):
+        """Pass through to self.axes.
+
+        Note:
+            self.axes may be a _ravel_list - so unravel the list first.
+        """
+        return len(self.axes.ravel())
+
+    def __contains__(self, value):
+        """Pass through to self.axes.
+
+        Note:
+            self.axes may be a _ravel_list - so unravel the list first.
+        """
+        return value in self.axes.ravel()
+
+    def __getitem__(self, index):
+        """Pass through to self.axes.
+
+        Notes:
+            If the result is a single axes instance, then call :py:func:`matplotlib.pyplot.sca`
+            with it.
+        """
+        ret = self.axes[index]
+        if isinstance(ret, mpl.axes.Axes):
+            plt.sca(ret)
+        return ret
+
+    def __iter__(self):
+        """Iterate over self.axes.
+
+        Note:
+            self.axes may be a _ravel_list - so unravel the list first.
+        """
+        for ax in self.axes.ravel():
+            plt.sca(ax)
+            yield ax
+
+    def __reversed__(self):
+        """Iterate over reversed self.axes.
+
+        Note:
+            self.axes may be a _ravel_list - so unravel the list first.
+        """
+        yield from reversed(self.axes.ravel())
+
+    def _get_gcfa(self):
+        """Safely get the currenbt figure and axes without creating new ones.
+
+        Notes:
+            Checks if plt.get_fignums() is empty and if so, leaves the figure and axes unset
+            Otherwise, getsa the current figure and then checks whether that has axes or not
+            and if so, stores the current axes.
+
+            The problem with naively calling plt.gcf() and plt.gca() is that they will create
+            new figures and axes if they don't exist.
+        """
+        self._save_fig = None
+        self._save_axes = None
+        if not plt.get_fignums():  # No current figures
+            return
+        self._save_fig = plt.gcf()
+        if self._save_fig.axes:
+            self._save_axes = plt.gca()
+
+    def _set_gcfa(self):
+        """Set the current figure and axes from state if not None.
+
+        This safely revets the effect of the _get_gcfa() method.
+        """
+        if self._save_axes:
+            plt.sca(self._save_axes)
         elif self._save_fig:
             plt.figure(self._save_fig)
 
@@ -581,7 +665,7 @@ class StackVertical(_PlotContextSequence):
                 y = (ax_height - title_pts * 1.5) / ax_height
 
                 ax.set_title(
-                    f" {_counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs)
+                    f" {counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs)
                 )
         return self
 
@@ -767,7 +851,7 @@ class MultiPanel(_PlotContextSequence):
                 y = (ax_height - title_pts * 1.5) / ax_height
 
                 ax.set_title(
-                    f" {_counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs)
+                    f" {counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs)
                 )
         return self
 

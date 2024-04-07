@@ -16,9 +16,17 @@ axes.titlesize: 10
 font.size: 10
 
 # Font Family
-font.family: sans-serif
-font.sans-serif: Helvetica, Arial, DejaVu Sans, Lucida Grande, Verdana, Geneva, Lucid, Avant Garde, sans-serif
-mathtext.fontset : dejavusans
+font.family: Times New Roman
+font.serif:      Times New Roman, Times, Palatino, Charter, DejaVu Serif, Bitstream Vera Serif, New Century Schoolbook, Century Schoolbook L, Utopia, ITC Bookman, Bookman, Nimbus Roman No9 L,  serif
+mathtext.fontset : custom
+mathtext.bf:  Times New Roman:bold
+mathtext.bfit: Times New Roman:italic:bold
+mathtext.cal: cursive
+mathtext.it:  Times New Roman:italic
+mathtext.rm:  Times New Roman
+mathtext.sf:  Times New Roman
+mathtext.tt:  monospace
+
 
 # Set line widths
 axes.linewidth : 0.75
@@ -31,4 +39,5 @@ lines.markersize: 2.6
 # savefig.pad_inches : 0.01  # Use virtually all space when we specify figure dimensions
 
 # LaTeX packages
-text.latex.preamble : \usepackage{amsmath} \usepackage{amssymb} \usepackage{sfmath}
+text.usetex : False
+text.latex.preamble :\usepackage{amsmath,amsbsy,amsfonts,amssymb,amsxtra,mathptmx, times}
