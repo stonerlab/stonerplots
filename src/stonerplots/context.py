@@ -571,7 +571,178 @@ class _PlotContextSequence(Sequence):
             plt.figure(self._save_fig)
 
 
-class StackVertical(_PlotContextSequence):
+class MultiPanel(_PlotContextSequence):
+    """A context manager for sorting out multi-panel plots in matplotlib.
+
+    Args:
+        panels (tuple[int.int],int, List[int]):
+            Nunber of sub-plots to produce.
+            - tuple(rows, columns) - regular grid of rows and coluimns
+            - int - Make a grid of 1 row and n columns
+            - list(columns per row) - make an irregular grid of different numbers of plots on each row.
+
+    Keyword Args:
+        figure (matplotlib.Figure):
+            Figure to use to contain the sub-plots in. If None (default) then the current figure is used.
+        sharex, sharey (bool):
+            Wherther the sub-plots have common x or y axes. Default is neither.
+        adjust_figsize (tuple[float,float], float,bool):
+            Whether to increase the figure height to accomodate the extra plots. If True, the figure is
+            increased by 0.6 of the original height and 1 times the original width  for each additional sub-plot
+            row or column after the first. If a float is given, then the additional height ad width factor is the
+            adjust_figsize value. If a tuple, them separate expansion factors can be given for each dimenion
+            (width, height). The default is True, or 0.8
+        label_panels (str or bool):
+            Whether to add (a), (b) etc. to the sub-plots. Default of True positions labels in the top right corner of
+            the sub-plots. The top sub-plot is the first one. If a string, then use this as a the pattern to determine
+            how to format the plot number to a string. The default value of True corresponds to '({alpha})', other
+            supported counters are
+            - int - simpe numeral
+            - alpha / Alpha - lower / uppper case letters
+            - roman / Roman - lower / upper case Roman numerals.
+        same_aspect (bool):
+            If *nnplots* is in use then the aspect ratio of each plot will be adjusted to be the same unless you
+            set this to be False, or unless you pass *width_ratios* or *height_ratios* to control the aspect ratios.
+
+        kwargs:
+            Other keyword arguments can be used to set the label fonts and are passed into ax.set_title, arguments
+            for GridSpec are passed to fig.add_gridspec.
+
+    Returns:
+        (List[matplotlib.Axes]):
+            The context manager bariable is the list of axes created.
+
+    Notes:
+        Since double-column figures in journals are more than twice the single figure dimension, it might be useful to
+        use the double width figure stylesheet, and then specify an *adjust_figsize* of (0,<something>) to keep the
+        full width figure setting and expand the height as required (bearing in mind the double column figures often
+        already have more height.)
+    """
+
+    def __init__(
+        self,
+        panels,
+        figure=None,
+        sharex=False,
+        sharey=False,
+        adjust_figsize=True,
+        label_panels=True,
+        same_aspect=True,
+        **kwargs,
+    ):
+        """Configure figure and a gridspec for multi-panel plotting."""
+        super().__init__()
+        if isinstance(panels, int):  # Assume 1 x panels
+            panels = (1, panels)
+        self.panels = panels
+        self._fig_arg = figure
+        self.gs = None
+        self.sharex = sharex
+        self.sharey = sharey
+        self._adjust_figsize_arg = adjust_figsize
+        # Adjust fig size can be a tuple
+        self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
+        self.kwargs = kwargs
+        self.same_aspect = "height_ratios" not in kwargs and "wdith_ratios" not in kwargs and same_aspect
+        if "nplots" in self.kwargs:
+            raise DeprecationWarning(
+                "nplots aregument is depricated. Pass the same value directly as the number of panels now."
+            )
+            self.panels = self.kwargs.pop("nplots")
+
+    def __enter__(self):
+        """Create the grid of axes."""
+        # Preserve current figure and axes and sort figure argument
+        self._get_gcfa()
+        self.figure = self._fig_arg if self._fig_arg else plt.gcf()
+        if isinstance(self.figure, int) and self.figure in plt.get_fignums:  # If we specified a figure as a number
+            self.figure = plt.figure(self.fignum)
+        if isinstance(self.figure, str) and self.figure in plt.get_figlabels:  # If we specified a figure as a label
+            self.figure = plt.figure(self.fignum)
+        plt.figure(self.figure)
+
+        # Sort out figurre size adjustment
+        adjust_figsize = self._adjust_figsize_arg
+        if isinstance(adjust_figsize, bool):
+            adjust_figsize = (int(adjust_figsize), int(adjust_figsize) * 0.8)
+        if isinstance(adjust_figsize, float):
+            adjust_figsize = (adjust_figsize, adjust_figsize)
+        self.adjust_figsize = adjust_figsize
+        self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
+
+        # Create gridspec
+        if isinstance(self.panels, int):
+            self._Create_subplots((1, self.panels))
+        elif isinstance(self.panels, list):
+            self._Create_subplots((len(self.panels), np.prod(self.panels)), self.panels)
+        elif isinstance(self.panels, tuple):
+            self._Create_subplots(self.panels)
+        else:
+            raise TypeError(f"Unable to interpret the number of panels to create: {self.panels}")
+
+        if self.adjust_figsize:
+            self._do_figure_adjuement()
+
+        if self.label_panels:
+            self._label_figure()
+        return self
+
+    def __exit__(self, type, value, traceback):
+        """Clean up the axes."""
+        self.figure.canvas.draw()
+        if self.same_aspect:  # Force the aspect ratios to be the same
+            asp = np.array([ax.bbox.width / ax.bbox.height for ax in self.axes.ravel()]).min()
+            for ax in self.axes.ravel():
+                ax.set_box_aspect(1 / asp)
+
+        self._set_gcfa()
+
+    def _Create_subplots(self, panels, nplots=None):
+        """Create the subplots for the given panels."""
+        gs_kwargs = _filter_dict(self.kwargs, _gsargs)
+        self.gs = self.figure.add_gridspec(*panels, **gs_kwargs)
+        if nplots is not None:
+            used = np.zeros(panels, dtype=bool)
+            self.axes = _ravel_list([])
+            for r in range(panels[0]):
+                row_axes = []
+                for c in range(panels[1]):
+                    if used[r, c]:
+                        continue  # already taken this subplot
+                    extent = panels[1] // nplots[r]
+                    used[r, c : c + extent] = True
+                    row_axes.append(self.figure.add_subplot(self.gs[r, c : c + extent]))
+                self.axes.append(row_axes)
+        else:
+            self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
+
+    def _do_figure_adjuement(self):
+        """Work out how to adjust figure size."""
+        f = self.adjust_figsize[0]
+        if f < 0:
+            extra_w = self.figsize[0] * (1 + f)
+        else:
+            extra_w = self.figsize[0] * f * (self.panels[1] - 1) + self.figsize[0]
+        f = self.adjust_figsize[1]
+        if f < 0:
+            extra_h = self.figsize[1] * (1 + f)
+        else:
+            extra_h = self.figsize[1] * f * (self.panels[0] - 1) + self.figsize[1]
+        self.figure.set_figwidth(extra_w)
+        self.figure.set_figheight(extra_h)
+
+    def _label_figure(self):
+        """Do the subplot figure labelling."""
+        fig = self.figure
+        for ix, ax in enumerate(self):
+            title_pts = ax.title.get_fontsize()
+            ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
+            y = (ax_height - title_pts * 1.5) / ax_height
+
+            ax.set_title(f" {counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs))
+
+
+class StackVertical(MultiPanel):
     """A context manager that will generate a stack of subplots with common x axes.
 
     Args:
@@ -641,33 +812,20 @@ class StackVertical(_PlotContextSequence):
 
     def __enter__(self):
         """Create the grid of axes."""
-        super().__init__()
-        self._get_gcfa()  # Preserve out current axes
-        # Work out what to do about our figure
-        self.figure = self._fig_tmp if self._fig_tmp else plt.gcf()
-        if isinstance(self.figure, int) and self.figure in plt.get_fignums:  # If we specified a figure as a number
-            self.figure = plt.figure(self.fignum)
-        if isinstance(self.figure, str) and self.figure in plt.get_figlabels:  # If we specified a figure as a label
-            self.figure = plt.figure(self.fignum)
-        plt.figure(self.figure)
-        self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
-        gs_kwargs = _filter_dict(self.kwargs, _gsargs)
-        self.gs = self.figure.add_gridspec(self.number, hspace=self.hspace, **gs_kwargs)
-        self.axes = _ravel_list(self.gs.subplots(sharex=self.sharex, sharey=self.sharey))
-        if self.adjust_figsize:
-            extra_h = self.figsize[1] * self.adjust_figsize * (self.number - 1) + self.figsize[1]
-            self.figure.set_figheight(extra_h)
-        if self.label_panels:
-            fig = self.figure
-            for ix, ax in enumerate(self.axes):
-                title_pts = ax.title.get_fontsize()
-                ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
-                y = (ax_height - title_pts * 1.5) / ax_height
 
-                ax.set_title(
-                    f" {counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs)
-                )
-        return self
+        panels = (self.number, 1)
+        super().__init__(
+            panels,
+            figure=self._fig_tmp,
+            sharex=self.sharex,
+            sharey=self.sharey,
+            adjust_figsize=self.adjust_figsize,
+            label_panels=self.label_panels,
+            same_aspect=False,
+            **self.kwargs,
+        )
+
+        return super().__enter__()
 
     def __exit__(self, type, value, traceback):
         """Clean up the axes."""
@@ -684,7 +842,6 @@ class StackVertical(_PlotContextSequence):
             rect[1] = boundary if rect[1] == 0 else rect[1]
             rect[3] = 1 - 2 * boundary if rect[3] == 1 else rect[3]
             self.figure.get_layout_engine().set(h_pad=0.0, hspace=0.0, rect=rect)
-        self.figure.canvas.draw()
         self._align_labels()
         self.figure.canvas.draw()
         self._set_gcfa()
@@ -716,154 +873,7 @@ class StackVertical(_PlotContextSequence):
         if yticks[-2] < 1.0 - dy and ix != 0:  # Adjust range of plots except top one.
             ylim[1] = tr.inverted().transform((0, 1 + dy))[1]  # Convert 1+dy to data space
         ax.set_ylim(ylim)
-
-
-class MultiPanel(_PlotContextSequence):
-    """A context manager for sorting out multi-panel plots in matplotlib.
-
-    Args:
-        panels (tuple[int.int] or int):
-            Nunber of sub-plots to produce. If a tuple then it spewcifies rows, columns. If a integer then it
-            specifies (1, columns)
-
-    Keyword Args:
-        figure (matplotlib.Figure):
-            Figure to use to contain the sub-plots in. If None (default) then the current figure is used.
-        sharex, sharey (bool):
-            Wherther the sub-plots have common x or y axes. Default is neither.
-        adjust_figsize (tuple[float,float], float,bool):
-            Whether to increase the figure height to accomodate the extra plots. If True, the figure is
-            increased by 0.6 of the original height and 1 times the original width  for each additional sub-plot
-            row or column after the first. If a float is given, then the additional height ad width factor is the
-            adjust_figsize value. If a tuple, them separate expansion factors can be given for each dimenion
-            (width, height). The default is True, or 0.8
-        label_panels (str or bool):
-            Whether to add (a), (b) etc. to the sub-plots. Default of True positions labels in the top right corner of
-            the sub-plots. The top sub-plot is the first one. If a string, then use this as a the pattern to determine
-            how to format the plot number to a string. The default value of True corresponds to '({alpha})', other
-            supported counters are
-            - int - simpe numeral
-            - alpha / Alpha - lower / uppper case letters
-            - roman / Roman - lower / upper case Roman numerals.
-        nplots (List[int], None):
-            If given, specifies how many subplots to create on each row of the figure. The lengtrh of nplots must be
-            the same as the number of rows and each entry must be between 1 and the number of columns.
-        same_aspect (bool):
-            If *nnplots* is in use then the aspect ratio of each plot will be adjusted to be the same unless you
-            set this to be False, or unless you pass *width_ratios* or *height_ratios* to control the aspect ratios.
-
-        kwargs:
-            Other keyword arguments can be used to set the label fonts and are passed into ax.set_title, arguments
-            for GridSpec are passed to fig.add_gridspec.
-
-    Returns:
-        (List[matplotlib.Axes]):
-            The context manager bariable is the list of axes created.
-
-    Notes:
-        Since double-column figures in journals are more than twice the single figure dimension, it might be useful to
-        use the double width figure stylesheet, and then specify an *adjust_figsize* of (0,<something>) to keep the
-        full width figure setting and expand the height as required (bearing in mind the double column figures often
-        already have more height.)
-    """
-
-    def __init__(
-        self,
-        panels,
-        figure=None,
-        sharex=False,
-        sharey=False,
-        adjust_figsize=True,
-        label_panels=True,
-        nplots=None,
-        same_aspect=True,
-        **kwargs,
-    ):
-        """Configure figure and a gridspec for multi-panel plotting."""
-        super().__init__()
-        if isinstance(panels, int):  # Assume 1 x panels
-            panels = (1, panels)
-        self.panels = panels
-        self._fig_arg = figure
-        self.gs = None
-        self.sharex = sharex
-        self.sharey = sharey
-        self._adjust_figsize_arg = adjust_figsize
-        # Adjust fig size can be a tuple
-        self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
-        self.kwargs = kwargs
-        self.nplots = nplots
-        self.same_aspect = "height_ratios" not in kwargs and "wdith_ratios" not in kwargs and same_aspect
-
-    def __enter__(self):
-        """Create the grid of axes."""
-        # Preserve current figure and axes and sort figure argument
-        self._get_gcfa()
-        self.figure = self._fig_arg if self._fig_arg else plt.gcf()
-        if isinstance(self.figure, int) and self.figure in plt.get_fignums:  # If we specified a figure as a number
-            self.figure = plt.figure(self.fignum)
-        if isinstance(self.figure, str) and self.figure in plt.get_figlabels:  # If we specified a figure as a label
-            self.figure = plt.figure(self.fignum)
-        plt.figure(self.figure)
-        # Sort out figurre size adjustment
-        adjust_figsize = self._adjust_figsize_arg
-        if isinstance(adjust_figsize, bool):
-            adjust_figsize = (int(adjust_figsize), int(adjust_figsize) * 0.8)
-        if isinstance(adjust_figsize, float):
-            adjust_figsize = (adjust_figsize, adjust_figsize)
-        self.adjust_figsize = adjust_figsize
-        self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
-        # Create gridspec
-        gs_kwargs = _filter_dict(self.kwargs, _gsargs)
-        self.gs = self.figure.add_gridspec(*self.panels, **gs_kwargs)
-        if self.nplots is not None:
-            used = np.zeros(self.panels, dtype=bool)
-            self.axes = _ravel_list([])
-            for r in range(self.panels[0]):
-                row_axes = []
-                for c in range(self.panels[1]):
-                    if used[r, c]:
-                        continue  # already taken this subplot
-                    extent = self.panels[1] // self.nplots[r]
-                    used[r, c : c + extent] = True
-                    row_axes.append(self.figure.add_subplot(self.gs[r, c : c + extent]))
-                self.axes.append(row_axes)
-        else:
-            self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
-        if self.adjust_figsize:
-            f = self.adjust_figsize[0]
-            if f < 0:
-                extra_w = self.figsize[0] * (1 + f)
-            else:
-                extra_w = self.figsize[0] * f * (self.panels[1] - 1) + self.figsize[0]
-            f = self.adjust_figsize[1]
-            if f < 0:
-                extra_h = self.figsize[1] * (1 + f)
-            else:
-                extra_h = self.figsize[1] * f * (self.panels[0] - 1) + self.figsize[1]
-            self.figure.set_figwidth(extra_w)
-            self.figure.set_figheight(extra_h)
-        if self.label_panels:
-            fig = self.figure
-            for ix, ax in enumerate(self):
-                title_pts = ax.title.get_fontsize()
-                ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
-                y = (ax_height - title_pts * 1.5) / ax_height
-
-                ax.set_title(
-                    f" {counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs)
-                )
-        return self
-
-    def __exit__(self, type, value, traceback):
-        """Clean up the axes."""
         self.figure.canvas.draw()
-        if self.same_aspect:  # Force the aspect ratios to be the same
-            asp = np.array([ax.bbox.width / ax.bbox.height for ax in self.axes.ravel()]).min()
-            for ax in self.axes.ravel():
-                ax.set_box_aspect(1 / asp)
-
-        self._set_gcfa()
 
 
 if __name__ == "__main__":

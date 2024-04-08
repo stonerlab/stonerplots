@@ -40,5 +40,6 @@ __all__ = [
     "multi_panel_plot",
     # Extra
     "xrr_example",
-    "tri_plot"
-]
+    "tri_plot",
+    "penta_plot",
+    ]

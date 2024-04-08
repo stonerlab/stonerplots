@@ -8,6 +8,9 @@ from stonerplots import SavedFigure, StackVertical
 
 from common import figures  # Just for the figures path
 
+autoclose=__name__!="__main__"
+
+
 # Prepare data assuming a GenX data export format of x,I_s,I_m,e
 data = np.genfromtxt(Path(__file__).parent.parent / "data" / "xrr.dat")
 x = data[:, 0]
@@ -20,7 +23,7 @@ main_props = {"ylabel": "Counts", "yscale": "log","ylim":(10,5E6)}
 residual_poprs = {"xlabel": r"2$\theta (^\circ)$", "ylabel": "FOM"}
 
 # This is stonerplots context managers at work
-with SavedFigure(figures / "genx_plot.png", style=["stoner", "presentation"], autoclose=True):
+with SavedFigure(figures / "genx_plot.png", style=["stoner", "presentation"], autoclose=autoclose):
     plt.figure()
     with StackVertical(2, adjust_figsize=False, height_ratios=[3, 1]) as axes:
         main, residual = axes

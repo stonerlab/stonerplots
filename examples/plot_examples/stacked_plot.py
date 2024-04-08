@@ -6,7 +6,7 @@ from stonerplots import SavedFigure, StackVertical
 
 from common import x, model, pparam, figures
 
-with SavedFigure(figures / "fig7b.png", style=["stoner"], autoclose=True):
+with SavedFigure(figures / "fig7b.png", style=["stoner"], autoclose=__name__!="__main__"):
     fig = plt.figure()
     fig.set_figheight(fig.get_figheight() * 0.6)
     with StackVertical(3) as axes:

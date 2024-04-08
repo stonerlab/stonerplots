@@ -11,8 +11,10 @@ different (related) datasets. In this case, the :py:class:`MultiPanel` context m
     for ax,x,y in zip (axes,[x1,x2,x3,x4],[y1,y2,y3,y4]):
         ax.plot(x,y)
 
-The only required parameter is the number of panels to show. This can be either a tuple of (n_rows,n_cols) or an
-integer specifying a number of columns (number of rows is assumed to be one in this case.)
+The only required parameter is the number of panels to show. This can be either 
+ - a tuple of (n_rows,n_cols), or
+ - an integer specifying a number of columns (number of rows is assumed to be one in this case.), or
+ - a list of [row_1_plots, row_2_plots....] to specify a different number of plots on each row
 
 Optional Parameters
 -------------------
@@ -49,18 +51,17 @@ Different Numbers of Plots on Each Row
 :py:class:`MultiPanel` can also be used to create arrangements where there are different numbers of
 subplots on different rows on the figure. For example, if you want to have three subplots and they don't
 conveniently fit on a single row, you might have 1 and then 2 plots, or 2 and then 1 plot. This can be
-achieved by using the *nplots* argument in conunction with an optional *same_aspect*.::
+achieved by using a list of plots per row as the first argument in conunction with an optional
+ *same_aspect*.::
 
     with SavedFigure("3-plot.png",style="stoner,thesis", autoclose=True):
         fig=plt.figure("tri-plot")
-        with MultiPanel((2,2), nplots=[2,1], adjust_figsize=False) as axes:
+        with MultiPanel([2,1], adjust_figsize=False) as axes:
             for ix,ax in enumerate(axes):
                 ax.plot(x_data[ix], y_data[ix], marker="")
                 ...
 
-*nplots* gives the number of plots on each row of the layout (so the length of *nplots* must be the same
-as the first number in the numnber of panels and each entry must be between 1 and the second number
-in the number of panels). By default, Lpy:class:`MultiPanel` will adjust the aspect
+By default, Lpy:class:`MultiPanel` will adjust the aspect
 ratio of all the subplots after the plotting is done to make them the same as the narrowerst figure unless
 you specify *same_aspect* to be False, or give *width_ratios* or *height_ratios* to manually change the
 aspect ratios of the plots.
@@ -77,7 +78,7 @@ over the object it will return the individual polot axes - but it will also set 
 :py:mod:`matplotlib.pyplot` interactive interface will work and switch between the plots as it iterates.::
 
     fig=plt.figure("tri-plot-b")
-    with MultiPanel((2,2), nplots=[2,1], adjust_figsize=False) as panels:
+    with MultiPanel([2,1], adjust_figsize=False) as panels:
         for ix,_ in enumerate(panels):
             plt.plot(x_data[ix], y_data[ix], marker="")
             plt.xlable("Voltage (mV)")
@@ -91,6 +92,6 @@ indexing the context manager variable is a :py:class:`matplotlib.axes.Axes` inst
 :py:mod:`matplotlib.pyplot` currewnt axes is also updated.::
 
     fig=plt.figure("tri-plot-c")
-    with MultiPanel((2,2), nplots=[2,1], adjust_figsize=False) as panels:
+    with MultiPanel([2,1], adjust_figsize=False) as panels:
         ax=panels[0,0] # Also set ax to be current axes
         plt.plot(x,y,...)
