@@ -29,7 +29,7 @@ additional rows. Since full-page width figures are more than double a single col
 like::
 
     with SavedFigure("example.png",stle=["stoner","aip","aip2"]):
-        with MultiPanel((2,2),adjust_figsize=(0,0.12)) as axes:
+        with MultiPanel((1,2),adjust_figsize=(0,0.12)) as axes:
             for ax,x,y in zip (axes,[x1,x2,x3,x4],[y1,y2,y3,y4]):
                 ax.plot(x,y)
 
