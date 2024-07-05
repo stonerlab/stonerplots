@@ -11,7 +11,7 @@ different (related) datasets. In this case, the :py:class:`MultiPanel` context m
     for ax,x,y in zip (axes,[x1,x2,x3,x4],[y1,y2,y3,y4]):
         ax.plot(x,y)
 
-The only required parameter is the number of panels to show. This can be either 
+The only required parameter is the number of panels to show. This can be either
  - a tuple of (n_rows,n_cols), or
  - an integer specifying a number of columns (number of rows is assumed to be one in this case.), or
  - a list of [row_1_plots, row_2_plots....] to specify a different number of plots on each row
@@ -69,6 +69,21 @@ aspect ratios of the plots.
 .. image:: ../../examples/figures/trriplot.png
   :alt: A triple panel sub-plot in 2 rows.
   :align: center
+
+With the optional *transpose* argument, the :py:class:`MultiPanel` will produce a grid of plots where the number
+of rows is different for each column::
+
+    with SavedFigure("3-plot.png",style="stoner,thesis", autoclose=True):
+        fig=plt.figure("tri-plot-transpose")
+        with MultiPanel([1,2], transpose=True, adjust_figsize=(0,-0.25)) as axes:
+            for ix,ax in enumerate(axes):
+                ax.plot(x_data[ix], y_data[ix], marker="")
+                ...
+
+.. image:: ../../examples/figures/trriplot2.png
+  :alt: A triple panel sub-plot in 2 columns.
+  :align: center
+
 
 Using the context manager variable
 ----------------------------------

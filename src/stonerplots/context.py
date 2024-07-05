@@ -141,6 +141,46 @@ def counter(ix, pattern="({alpha})", **kargs):
     return pattern.format(**replacements)
 
 
+class _Preserve_Fig(object):
+
+    """Mixin for preserving figure and current axes."""
+
+    def __init__(self):
+        """Set instance variables."""
+        self._save_fig = None
+        self._save_axes = None
+        super().__init__()
+
+    def _get_gcfa(self):
+        """Safely get the currenbt figure and axes without creating new ones.
+
+        Notes:
+            Checks if plt.get_fignums() is empty and if so, leaves the figure and axes unset
+            Otherwise, getsa the current figure and then checks whether that has axes or not
+            and if so, stores the current axes.
+
+            The problem with naively calling plt.gcf() and plt.gca() is that they will create
+            new figures and axes if they don't exist.
+        """
+        self._save_fig = None
+        self._save_axes = None
+        if not plt.get_fignums():  # No current figures
+            return
+        self._save_fig = plt.gcf()
+        if self._save_fig.axes:
+            self._save_axes = plt.gca()
+
+    def _set_gcfa(self):
+        """Set the current figure and axes from state if not None.
+
+        This safely revets the effect of the _get_gcfa() method.
+        """
+        if self._save_axes:
+            plt.sca(self._save_axes)
+        elif self._save_fig:
+            plt.figure(self._save_fig)
+
+
 class SavedFigure(object):
     """Context manager that applies a style and saves figures.
 
@@ -336,7 +376,7 @@ class SavedFigure(object):
         self.style_context = None
 
 
-class InsetPlot(object):
+class InsetPlot(_Preserve_Fig):
     """A context manager to help make inset plopts a bit less painful.
 
     Keyword Arguments:
@@ -382,8 +422,7 @@ class InsetPlot(object):
         padding=0.05,
     ):
         """Set the location for the axes."""
-        self._save_fig = None
-        self._save_axes = None
+        super().__init__()
         self._ax = ax
         self._loc = loc
         if dimension == "fraction":
@@ -455,35 +494,6 @@ class InsetPlot(object):
         self.ax.figure.canvas.draw()
         if self.switch_to_inset:
             self._set_gcfa()
-
-    def _get_gcfa(self):
-        """Safely get the currenbt figure and axes without creating new ones.
-
-        Notes:
-            Checks if plt.get_fignums() is empty and if so, leaves the figure and axes unset
-            Otherwise, getsa the current figure and then checks whether that has axes or not
-            and if so, stores the current axes.
-
-            The problem with naively calling plt.gcf() and plt.gca() is that they will create
-            new figures and axes if they don't exist.
-        """
-        self._save_fig = None
-        self._save_axes = None
-        if not plt.get_fignums():  # No current figures
-            return
-        self._save_fig = plt.gcf()
-        if self._save_fig.axes:
-            self._save_axes = plt.gca()
-
-    def _set_gcfa(self):
-        """Set the current figure and axes from state if not None.
-
-        This safely revets the effect of the _get_gcfa() method.
-        """
-        if self._save_axes:
-            plt.sca(self._save_axes)
-        elif self._save_fig:
-            plt.figure(self._save_fig)
 
 
 class _PlotContextSequence(Sequence):
@@ -571,7 +581,7 @@ class _PlotContextSequence(Sequence):
             plt.figure(self._save_fig)
 
 
-class MultiPanel(_PlotContextSequence):
+class MultiPanel(_PlotContextSequence, _Preserve_Fig):
     """A context manager for sorting out multi-panel plots in matplotlib.
 
     Args:
@@ -603,6 +613,10 @@ class MultiPanel(_PlotContextSequence):
         same_aspect (bool):
             If *nnplots* is in use then the aspect ratio of each plot will be adjusted to be the same unless you
             set this to be False, or unless you pass *width_ratios* or *height_ratios* to control the aspect ratios.
+        transpose (bool):
+            If True, then transpose the rows and columns if panels is a tuple. If panels is a list, then assume that
+            the list specifies the number of rows in each column rather than the default of assuming if is the number
+            of columns in each row.
 
         kwargs:
             Other keyword arguments can be used to set the label fonts and are passed into ax.set_title, arguments
@@ -628,6 +642,7 @@ class MultiPanel(_PlotContextSequence):
         adjust_figsize=True,
         label_panels=True,
         same_aspect=True,
+        transpose=False,
         **kwargs,
     ):
         """Configure figure and a gridspec for multi-panel plotting."""
@@ -640,6 +655,7 @@ class MultiPanel(_PlotContextSequence):
         self.sharex = sharex
         self.sharey = sharey
         self._adjust_figsize_arg = adjust_figsize
+        self.transpose = transpose
         # Adjust fig size can be a tuple
         self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
         self.kwargs = kwargs
@@ -672,9 +688,15 @@ class MultiPanel(_PlotContextSequence):
 
         # Create gridspec
         if isinstance(self.panels, int):
-            self._Create_subplots((1, self.panels))
+            if self.transpose:
+                self._Create_subplots((self.panels, 1))
+            else:
+                self._Create_subplots((1, self.panels))
         elif isinstance(self.panels, list):
-            self._Create_subplots((len(self.panels), np.prod(self.panels)), self.panels)
+            if self.transpose:
+                self._Create_subplots((np.prod(np.unique(self.panels)),len(self.panels)), self.panels)
+            else:
+                self._Create_subplots((len(self.panels), np.prod(np.unique(self.panels))), self.panels)
         elif isinstance(self.panels, tuple):
             self._Create_subplots(self.panels)
         else:
@@ -709,9 +731,16 @@ class MultiPanel(_PlotContextSequence):
                 for c in range(panels[1]):
                     if used[r, c]:
                         continue  # already taken this subplot
-                    extent = panels[1] // nplots[r]
-                    used[r, c : c + extent] = True
-                    row_axes.append(self.figure.add_subplot(self.gs[r, c : c + extent]))
+                    if self.transpose:
+                        extent = panels[0] // nplots[c]
+                        used[r : r + extent, c] = True
+                    else:
+                        extent = panels[1] // nplots[r]
+                        used[r, c : c + extent] = True
+                    if self.transpose:
+                        row_axes.append(self.figure.add_subplot(self.gs[r : r + extent, c]))
+                    else:
+                        row_axes.append(self.figure.add_subplot(self.gs[r, c : c + extent]))
                 self.axes.append(row_axes)
         else:
             self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)

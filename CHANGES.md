@@ -1,3 +1,12 @@
+v1.5.0 Release
+
+- Iregular grids in MultuPanel now can also do different numbers of rows in each column with the *transpose* parameter.
+
+v1.4.0 Release
+==============
+
+- Iregullar grids in MultiPanel that support different numbers of plots in each row.
+
 v1.3.2 Release
 ==============
 
