@@ -237,7 +237,7 @@ As with the previous example, :py:class:`SavedFigure` handles the stylesheets an
 :py:class:`StackVertical`, except the initial parameter can either be a single integer (representing the number of
 plots to place beside each other), or a tuple of rows,columns of sub-plats.
 
-.. image:: ../../examples/figures/fig07c.png
+.. image:: ../../examples/figures/fig7c.png
   :alt: A single row of 2 sub-plats created from MultiPanel
   :align: center
 
