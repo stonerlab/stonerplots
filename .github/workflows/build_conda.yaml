@@ -20,9 +20,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Conda environment creation and activation
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@a4260408e20b96e80095f42ff7f1a15b27dd94ca
         with:
           python-version: ${{ matrix.python-version }}
           environment-file: recipe/build-env.yml    # Path to the build conda environment
@@ -35,7 +35,7 @@ jobs:
           export VERSION=`python setup.py --version`
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
       - name: Build and upload the conda packages
-        uses: uibcdf/action-build-and-upload-conda-packages@v1.1-beta.1
+        uses: uibcdf/action-build-and-upload-conda-packages@d72a2d950af55243bbc385185dd68b824211192d
         with:
           meta_yaml_dir: recipe
           python-version: ${{ matrix.python-version }} # Values previously defined in `matrix`

@@ -21,8 +21,8 @@ jobs:
       - name: Setup TeX Live
         run: sudo apt-get install -y texlive-latex-extra texlive-latex-recommended texlive-fonts-recommended cm-super dvipng
       - name: Checkout
-        uses: actions/checkout@v2
-      - uses: mamba-org/setup-micromamba@v1
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: mamba-org/setup-micromamba@617811f69075e3fd3ae68ca64220ad065877f246
         with:
           environment-name: myenv
           create-args: >-
@@ -33,7 +33,7 @@ jobs:
             pytest-emoji
             matplotlib
       - name: Run pytest
-        uses: pavelzw/pytest-action@v2
+        uses: pavelzw/pytest-action@510c5e90c360a185039bea56ce8b3e7e51a16507
         with:
           verbose: true
           emoji: true
