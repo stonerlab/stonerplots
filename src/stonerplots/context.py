@@ -338,38 +338,58 @@ class SavedFigure(object):
             self.style_context = mpl.style.context(self.style)
             self.style_context.__enter__()
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, exc_value, traceback):
         """Cleanup context manager and save figures created.
 
-        First call the __exit__ of the style context manager to finish of plotting with the specified stylesheet, then
-        cjeck all the open figures and if they were not in our list of figures open before, save them with a filename
+        First call the __exit__ of the style context manager to finish plotting with the specified stylesheet, then
+        check all the open figures and if they were not in our list of figures open before, save them with a filename
         from the keyword parameter to __init__ or the plot label.
         """
         if self.style:
-            self.style_context.__exit__(type, value, traceback)
-        self._open_figs = [x() for x in self._open_figs if x() is not None]
+            self.style_context.__exit__(exc_type, exc_value, traceback)
+
+        self._open_figs = [fig() for fig in self._open_figs if fig() is not None]
         processed = -1
+
         for num in plt.get_fignums():
-            if (fig := plt.figure(num)) in self._open_figs:  # old  figure
+            fig = plt.figure(num)
+            if fig in self._open_figs:
                 continue
+
             processed += 1
             label = fig.get_label()
-            if self.filename.is_dir():
-                fillename = self.filename / "{label}"
-            else:
-                filename = self.filename if self.filename is not None else Path("{label}")
-            for fmt in self.formats:
-                new_file = filename.parent / (filename.stem + f".{fmt.lower()}")
-                _tmp_file = new_file
-                new_file = counter(processed, str(new_file), number=num, label=label)
-                if new_file == _tmp_file and processed > 0:  # Filename didn't have a counter and we are on file 2
-                    parts = new_file.split(".")
-                    parts[-2] += f"-{processed}"
-                    new_file = ".".join(parts)  # Add -# to the figure()end of the file before the extension.
-                fig.savefig(new_file)
+            filename = self._generate_filename(label, processed)
+            self._save_figure(fig, filename, processed)
             if self.autoclose:
                 plt.close(num)
-        self._open_figs = []  # Reset the open figs so we can reiuse this context managber
+
+        self._reset_state()
+
+    def _generate_filename(self, label, processed):
+        """Generate the filename for the figure."""
+        if self.filename.is_dir():
+            filename = self.filename / "{label}"
+        else:
+            filename = self.filename or Path("{label}")
+
+        return filename
+
+    def _save_figure(self, fig, filename, processed):
+        """Save the figure in the specified formats."""
+        for fmt in self.formats:
+            new_file = filename.parent / f"{filename.stem}.{fmt.lower()}"
+            new_file = counter(processed, str(new_file), number=fig.number, label=fig.get_label())
+
+            if new_file == filename and processed > 0:
+                parts = new_file.split(".")
+                parts[-2] += f"-{processed}"
+                new_file = ".".join(parts)
+
+            fig.savefig(new_file)
+
+    def _reset_state(self):
+        """Reset the internal state of the context manager."""
+        self._open_figs = []
         self.style_context = None
 
 
@@ -454,43 +474,46 @@ class InsetPlot(_Preserve_Fig):
         parent_bbox = self.ax.get_position()
         inset_bbox = self.axins.get_tightbbox().transformed(self.ax.figure.transFigure.inverted())
         inset_axes_bbox = self.axins.get_position()
-        dx0 = (inset_axes_bbox.x0 - inset_bbox.x0) / parent_bbox.width  # X axes label space
-        dy0 = inset_axes_bbox.y0 - inset_bbox.y0 / parent_bbox.height  # yaxis labels space
-        rw = inset_bbox.width / parent_bbox.width
-        rh = inset_bbox.height / parent_bbox.height
 
-        if self.loc == 1:  # Upper right
-            x0 = 1 - rw - self.padding
-            y0 = 1 - rh - self.padding
-        elif self.loc == 2:  # Upper left
-            x0 = dx0 + self.padding
-            y0 = 1 - rh - self.padding
-        elif self.loc == 3:  # Lower left
-            x0 = dx0 + self.padding
-            y0 = dy0 + self.padding
-        elif self.loc == 4:  # lower right
-            x0 = 1 - rw - self.padding
-            y0 = dy0 + self.padding
-        elif self.loc in [5, 7]:  # right
-            x0 = 1 - rw - self.padding
-            y0 = (1 - rh) / 2
-        elif self.loca == 6:  # centre left
-            x0 = dx0 + self.padding
-            y0 = (1 - rh) / 2
-        elif self.loc == 8:  # lower center
-            x0 = (1 - rw) / 2
-            y0 = dy0 + self.padding
-        elif self.loc == 9:  # upper center
-            x0 = dx0 + self.padding
-            y0 = 1 - rh - self.padding
-        elif self.loc == 10:  # center
-            x0 = (1 - rw) / 2
-            y0 = (1 - rh) / 2
+        dx0, dy0, rw, rh = self._calculate_dimensions(parent_bbox, inset_bbox, inset_axes_bbox)
+        x0, y0 = self._calculate_position(dx0, dy0, rw, rh)
+
         newpos = InsetPosition(self.ax, [x0, y0, rw, rh])
         self.axins.set_axes_locator(newpos)
         self.ax.figure.canvas.draw()
+
         if self.switch_to_inset:
             self._set_gcfa()
+
+    def _calculate_dimensions(self, parent_bbox, inset_bbox, inset_axes_bbox):
+        """Calculate the dimensions for inset positioning."""
+        dx0 = (inset_axes_bbox.x0 - inset_bbox.x0) / parent_bbox.width  # X axes label space
+        dy0 = inset_axes_bbox.y0 - inset_bbox.y0 / parent_bbox.height  # Y axes label space
+        rw = inset_bbox.width / parent_bbox.width
+        rh = inset_bbox.height / parent_bbox.height
+        return dx0, dy0, rw, rh
+
+    def _calculate_position(self, dx0, dy0, rw, rh):
+        """Calculate the position based on the location."""
+        if self.loc == 1:  # Upper right
+            return 1 - rw - self.padding, 1 - rh - self.padding
+        elif self.loc == 2:  # Upper left
+            return dx0 + self.padding, 1 - rh - self.padding
+        elif self.loc == 3:  # Lower left
+            return dx0 + self.padding, dy0 + self.padding
+        elif self.loc == 4:  # Lower right
+            return 1 - rw - self.padding, dy0 + self.padding
+        elif self.loc in [5, 7]:  # Right
+            return 1 - rw - self.padding, (1 - rh) / 2
+        elif self.loc == 6:  # Center left
+            return dx0 + self.padding, (1 - rh) / 2
+        elif self.loc == 8:  # Lower center
+            return (1 - rw) / 2, dy0 + self.padding
+        elif self.loc == 9:  # Upper center
+            return dx0 + self.padding, 1 - rh - self.padding
+        elif self.loc == 10:  # Center
+            return (1 - rw) / 2, (1 - rh) / 2
+        return 0, 0  # Default case if location is not matched
 
 
 class _PlotContextSequence(Sequence):
@@ -730,42 +753,54 @@ class MultiPanel(_PlotContextSequence, _Preserve_Fig):
         """Create the subplots for the given panels."""
         gs_kwargs = _filter_dict(self.kwargs, _gsargs)
         self.gs = self.figure.add_gridspec(*panels, **gs_kwargs)
+        self.axes = _ravel_list([])
+
         if nplots is not None:
             used = np.zeros(panels, dtype=bool)
-            self.axes = _ravel_list([])
             for r in range(panels[0]):
                 row_axes = []
                 for c in range(panels[1]):
                     if used[r, c]:
                         continue  # already taken this subplot
-                    if self.transpose:
-                        extent = panels[0] // nplots[c]
-                        used[r : r + extent, c] = True
-                    else:
-                        extent = panels[1] // nplots[r]
-                        used[r, c : c + extent] = True
-                    if self.transpose:
-                        row_axes.append(self.figure.add_subplot(self.gs[r : r + extent, c]))
-                    else:
-                        row_axes.append(self.figure.add_subplot(self.gs[r, c : c + extent]))
+                    extent = self._calculate_extent(panels, nplots, r, c)
+                    self._mark_used(used, r, c, extent)
+                    subplot = self._create_subplot(r, c, extent)
+                    row_axes.append(subplot)
                 self.axes.append(row_axes)
         else:
             self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
 
+    def _calculate_extent(self, panels, nplots, r, c):
+        """Calculate the extent of the subplot."""
+        if self.transpose:
+            return panels[0] // nplots[c]
+        return panels[1] // nplots[r]
+
+    def _mark_used(self, used, r, c, extent):
+        """Mark the used subplots in the grid."""
+        if self.transpose:
+            used[r : r + extent, c] = True
+        else:
+            used[r, c : c + extent] = True
+
+    def _create_subplot(self, r, c, extent):
+        """Create a subplot for the given row, column, and extent."""
+        if self.transpose:
+            return self.figure.add_subplot(self.gs[r : r + extent, c])
+        return self.figure.add_subplot(self.gs[r, c : c + extent])
+
     def _do_figure_adjustment(self):
-        """Work out how to adjust figure size."""
-        f = self.adjust_figsize[0]
-        if f < 0:
-            extra_w = self.figsize[0] * (1 + f)
-        else:
-            extra_w = self.figsize[0] * f * (self.panels[1] - 1) + self.figsize[0]
-        f = self.adjust_figsize[1]
-        if f < 0:
-            extra_h = self.figsize[1] * (1 + f)
-        else:
-            extra_h = self.figsize[1] * f * (self.panels[0] - 1) + self.figsize[1]
-        self.figure.set_figwidth(extra_w)
-        self.figure.set_figheight(extra_h)
+        """Adjust the figure size based on the adjust_figsize setting."""
+        extra_width = self._calculate_dimension(self.figsize[0], self.adjust_figsize[0], self.panels[1])
+        extra_height = self._calculate_dimension(self.figsize[1], self.adjust_figsize[1], self.panels[0])
+        self.figure.set_figwidth(extra_width)
+        self.figure.set_figheight(extra_height)
+
+    def _calculate_dimension(self, base_size, factor, panels_count):
+        """Calculate the extra dimension (width or height) based on the factor and panels count."""
+        if factor < 0:
+            return base_size * (1 + factor)
+        return base_size * factor * (panels_count - 1) + base_size
 
     def _label_figure(self):
         """Do the subplot figure labelling."""
@@ -866,21 +901,34 @@ class StackVertical(MultiPanel):
     def __exit__(self, type, value, traceback):
         """Clean up the axes."""
         if self.joined:
-            for ax in self.axes:
-                ax.label_outer()
+            self._label_outer_axes()
             plt.draw()
-            for ix, ax in enumerate(self.axes):
-                self._fix_limits(ix, ax)
-            eng = self.figure.get_layout_engine()
-            rect = list(eng.get()["rect"])
-            h = self.figure.get_figheight()
-            boundary = 0.05 / h
-            rect[1] = boundary if rect[1] == 0 else rect[1]
-            rect[3] = 1 - 2 * boundary if rect[3] == 1 else rect[3]
-            self.figure.get_layout_engine().set(h_pad=0.0, hspace=0.0, rect=rect)
+            self._adjust_limits_for_axes()
+            self._adjust_layout_engine()
+
         self._align_labels()
         self.figure.canvas.draw()
         self._set_gcfa()
+
+    def _label_outer_axes(self):
+        """Label outer axes."""
+        for ax in self.axes:
+            ax.label_outer()
+
+    def _adjust_limits_for_axes(self):
+        """Adjust y-limits for all axes."""
+        for ix, ax in enumerate(self.axes):
+            self._fix_limits(ix, ax)
+
+    def _adjust_layout_engine(self):
+        """Adjust the layout engine settings."""
+        eng = self.figure.get_layout_engine()
+        rect = list(eng.get()["rect"])
+        h = self.figure.get_figheight()
+        boundary = 0.05 / h
+        rect[1] = boundary if rect[1] == 0 else rect[1]
+        rect[3] = 1 - 2 * boundary if rect[3] == 1 else rect[3]
+        self.figure.get_layout_engine().set(h_pad=0.0, hspace=0.0, rect=rect)
 
     def _align_labels(self):
         """Align y-axist labels."""
@@ -895,21 +943,36 @@ class StackVertical(MultiPanel):
             ax.yaxis.set_label_coords(label_pos, 0.5)
 
     def _fix_limits(self, ix, ax):
-        """Adjust ylimits so labels are inside the axes frame."""
-        fig = self.figure
-        fnt_pts = ax.yaxis.get_ticklabels()[0].get_fontsize()
-        ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
-        dy = fnt_pts / ax_height  # Soace beeded in axes units for label.
+        """Adjust y-limits so labels are inside the axes frame."""
+        dy = self._calculate_dy(ax)
         ylim = list(ax.get_ylim())
         tr = ax.transData + ax.transAxes.inverted()  # Transform Data to Axes
-        yticks = [tr.transform((0, x))[1] for x in ax.get_yticks()]  # Tick locators in axes units.
+        yticks = self._get_yticks_in_axes_units(ax, tr)
 
-        if yticks[1] < dy and ix != len(self.axes) - 1:  # Adjust range of plots excepty bottom one
-            ylim[0] = tr.inverted().transform((0, -dy))[1]  # convert -dy back to data spoace
+        if yticks[1] < dy and ix != len(self.axes) - 1:  # Adjust range of plots except bottom one
+            ylim[0] = self._adjust_ylim_lower(tr, -dy)
         if yticks[-2] < 1.0 - dy and ix != 0:  # Adjust range of plots except top one.
-            ylim[1] = tr.inverted().transform((0, 1 + dy))[1]  # Convert 1+dy to data space
+            ylim[1] = self._adjust_ylim_upper(tr, 1 + dy)
         ax.set_ylim(ylim)
         self.figure.canvas.draw()
+
+    def _calculate_dy(self, ax):
+        """Calculate the space needed in axes units for the label."""
+        fnt_pts = ax.yaxis.get_ticklabels()[0].get_fontsize()
+        ax_height = ax.bbox.transformed(self.figure.transFigure.inverted()).height * self.figure.get_figheight() * 72
+        return fnt_pts / ax_height
+
+    def _get_yticks_in_axes_units(self, ax, tr):
+        """Get y-tick locations in axes units."""
+        return [tr.transform((0, x))[1] for x in ax.get_yticks()]
+
+    def _adjust_ylim_lower(self, tr, dy):
+        """Adjust the lower y-limit."""
+        return tr.inverted().transform((0, dy))[1]
+
+    def _adjust_ylim_upper(self, tr, dy):
+        """Adjust the upper y-limit."""
+        return tr.inverted().transform((0, dy))[1]
 
 
 if __name__ == "__main__":
