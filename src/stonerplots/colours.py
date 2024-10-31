@@ -34,8 +34,8 @@ tube_colours = {
     "tram": "#5FB526",
     "london_coaches": "#FFA600",
     "taxi&private_hire": "#8C88E3",
-    "johnstone_black": '#03071C',
-    "night_service": '#1A1A36',
+    "johnstone_black": "#03071C",
+    "night_service": "#1A1A36",
 }
 
 tube_colours_90 = {

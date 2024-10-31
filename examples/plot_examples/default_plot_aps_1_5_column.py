@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """Demonstrate the SavedFigure context manager and default Stoner plot style in APS format 1.5 columns."""
 import matplotlib.pyplot as plt
+from common import figures, model, pparam, x
 
 from stonerplots import SavedFigure
-
-from common import x, model, pparam, figures
 
 with SavedFigure(figures / "fig02f.png", style=["stoner", "aps", "aps1.5"], autoclose=True):
     fig, ax = plt.subplots()

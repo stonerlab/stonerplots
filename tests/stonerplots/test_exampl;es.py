@@ -2,8 +2,9 @@
 
 import pathlib
 import runpy
-import pytest
 import sys
+
+import pytest
 
 srcpath = pathlib.Path(__file__).parent.parent.parent / "src"
 srcpath = str(srcpath.absolute())

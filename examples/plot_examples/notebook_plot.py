@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """Demonstrate the SavedFigure context manager and notebook format."""
 import matplotlib.pyplot as plt
+from common import figures, model, pparam, x
 
 from stonerplots import SavedFigure
-
-from common import x, model, pparam, figures
 
 with SavedFigure(figures / "fig05a.png", style=["stoner", "notebook"], autoclose=True):
     fig, ax = plt.subplots()

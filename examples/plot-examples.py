@@ -1,7 +1,8 @@
 """Run all the plot examples by importing the plot_examples package."""
-from pathlib import Path
+
 import os
 import sys
+from pathlib import Path
 
 pth = str(Path(__file__).parent)
 if pth not in sys.path:

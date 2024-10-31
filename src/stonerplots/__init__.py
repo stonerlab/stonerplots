@@ -1,11 +1,14 @@
 """Build the list of stylesheets and add to matplotlib."""
+
 from pathlib import Path
+
 import matplotlib.pyplot as plt
 from matplotlib.colors import _colors_full_map
-from .context import SavedFigure, InsetPlot, StackVertical, MultiPanel, counter, roman
-from .colours import tube_colours, tube_colours_90, tube_colours_70, tube_colours_50, tube_colours_10
 
-__all__ = ["context", "SavedFigure", "InsetPlot", "StackVertical", "MultiPanel","counter","roman"]
+from .colours import tube_colours, tube_colours_10, tube_colours_50, tube_colours_70, tube_colours_90
+from .context import InsetPlot, MultiPanel, SavedFigure, StackVertical, counter, roman
+
+__all__ = ["context", "SavedFigure", "InsetPlot", "StackVertical", "MultiPanel", "counter", "roman"]
 __version__ = "1.5.1"
 
 # register the included stylesheet in the matplotlib style library

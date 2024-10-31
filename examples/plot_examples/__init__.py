@@ -1,4 +1,5 @@
 """Package of examples of stonerplots usage."""
+
 __all__ = [
     # 1 Default Plots
     "default_plot",
@@ -42,4 +43,4 @@ __all__ = [
     "xrr_example",
     "tri_plot",
     "penta_plot",
-    ]
+]

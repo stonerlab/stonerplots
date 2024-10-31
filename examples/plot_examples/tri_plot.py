@@ -2,11 +2,11 @@
 """Use stonerplots to create a 3 panel; (1+2) plot."""
 
 import matplotlib.pyplot as plt
-import numpy as np
-from stonerplots import SavedFigure, MultiPanel
-from common import x, figures, model, pparam
+from common import figures, model, pparam, x
 
-autoclose=__name__!="__main__"
+from stonerplots import MultiPanel, SavedFigure
+
+autoclose = __name__ != "__main__"
 
 with SavedFigure(figures / "trriplot.png", style="stoner,thesis", autoclose=autoclose):
     fig = plt.figure("tri-plot")

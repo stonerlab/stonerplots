@@ -2,10 +2,9 @@
 """Demonstrate the SavedFigure context manager and Scatter Plot settings."""
 import matplotlib.pyplot as plt
 import numpy as np
+from common import figures
 
 from stonerplots import SavedFigure
-
-from common import figures
 
 with SavedFigure(figures / "fig03.png", style=["stoner", "scatter", "latex"], autoclose=True):
     fig, ax = plt.subplots(figsize=(4, 4))

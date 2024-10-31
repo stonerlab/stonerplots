@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """Demonstrate the SavedFigure context manager and InsetPlot context manager."""
 import matplotlib.pyplot as plt
+from common import figures, model, pparam, x
 
 from stonerplots import SavedFigure, StackVertical
 
-from common import x, model, pparam, figures
-
-with SavedFigure(figures / "fig7b.png", style=["stoner"], autoclose=__name__!="__main__"):
+with SavedFigure(figures / "fig7b.png", style=["stoner"], autoclose=__name__ != "__main__"):
     fig = plt.figure()
     fig.set_figheight(fig.get_figheight() * 0.6)
     with StackVertical(3) as axes:

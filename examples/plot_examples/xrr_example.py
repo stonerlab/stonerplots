@@ -2,13 +2,13 @@
 """Setting up a StackVertical Context Manager for GenX."""
 from pathlib import Path
 
-import numpy as np
 import matplotlib.pyplot as plt
-from stonerplots import SavedFigure, StackVertical
-
+import numpy as np
 from common import figures  # Just for the figures path
 
-autoclose=__name__!="__main__"
+from stonerplots import SavedFigure, StackVertical
+
+autoclose = __name__ != "__main__"
 
 
 # Prepare data assuming a GenX data export format of x,I_s,I_m,e
@@ -19,7 +19,7 @@ measured = data[:, 2]
 fom = np.log10(measured) - np.log10(simulated)
 
 # Set up the scales, labels etc for the two panels.
-main_props = {"ylabel": "Counts", "yscale": "log","ylim":(10,5E6)}
+main_props = {"ylabel": "Counts", "yscale": "log", "ylim": (10, 5e6)}
 residual_poprs = {"xlabel": r"2$\theta (^\circ)$", "ylabel": "FOM"}
 
 # This is stonerplots context managers at work

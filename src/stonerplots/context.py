@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """Context Managers to help with plotting and saving figures."""
-from pathlib import Path
 import weakref
-from collections.abc import Sequence, Iterable
-import numpy as np
+from collections.abc import Iterable, Sequence
+from pathlib import Path
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes, InsetPosition
+import numpy as np
+from mpl_toolkits.axes_grid1.inset_locator import InsetPosition, inset_axes
 
 import stonerplots
 

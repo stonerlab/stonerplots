@@ -8,16 +8,13 @@
 ![MIT Licensed](https://anaconda.org/phygbu/stonerplots/badges/license.svg)
 [![DOI](https://zenodo.org/badge/776970304.svg)](https://zenodo.org/doi/10.5281/zenodo.10905673)
 
-
-Stoner Plots
-=============
+# Stoner Plots
 
 Stoner Plots is a fork of Science Plots
 
 <img src="https://raw.githubusercontent.com/stonerlab/stonerplots/main/examples/figures/fig05a.png" width=640 alt="Presentation Style Image"/>
 
-Usage
------
+## Usage
 
 Before using the new styles you need to import stonerplots - but it's ok to just import e.g. the SavedFigure context
 manager:
@@ -43,76 +40,69 @@ labels don't escape over the edge of the surrounding figure.
         with InsetPlot(loc="lower right", width=0.25, height=0.25, padding=0.05) as inset:
             inset.plot(x, model(x, 200), linestyle="--")
 
-
 See below for the full list of styles and context managers.
 
-Documentation
--------------
+## Documentation
 
 Documentation can be found on the [github pages for this repository](https://stonerlab.github.io/stonerplots/index.html).
 
-Available Styles
-----------------
+## Available Styles
 
- * stoner - this is the base style sheet
- * poster - makes everything bigger for printing on a poster
- * notebook - makes things a little bigger for a Jupyter notebook - from the original scienceplots package
- * presentation - a style suitable for the main graph on a powerpoint slide
- * thesis - a style that tries to look like the CM Physics group LaTeX thesis template
+- stoner - this is the base style sheet
+- poster - makes everything bigger for printing on a poster
+- notebook - makes things a little bigger for a Jupyter notebook - from the original scienceplots package
+- presentation - a style suitable for the main graph on a powerpoint slide
+- thesis - a style that tries to look like the CM Physics group LaTeX thesis template
 
-Journal Styles
---------------
+## Journal Styles
 
- * nature - for Nature group journals - from the original scienceplots package
- * aaas-science - Science single columne style.
- * ieee - for IEEE Transactions journals - from the original scienceplots package
- * aps - for American Physical Society Journals (like Phys Rev Lett etc.)
- * aip - for AIP journals such as Applied Physics Letters - labels in Serif Fonts
- * iop - for Institute of Physics Journals.
+- nature - for Nature group journals - from the original scienceplots package
+- aaas-science - Science single columne style.
+- ieee - for IEEE Transactions journals - from the original scienceplots package
+- aps - for American Physical Society Journals (like Phys Rev Lett etc.)
+- aip - for AIP journals such as Applied Physics Letters - labels in Serif Fonts
+- iop - for Institute of Physics Journals.
 
-Modifiers
----------
+## Modifiers
 
- * aps1.5 - Switch to 1.5 column wide format
- * aps2.0 - Switch to 2 column wide format
- * aip2 - Switch to 2 column wide format for AIP journals
- * stoner-dark - Switch to a dark background a lighter plotting colours.
- * hi-res - Switches to 600dpi plotting (but using eps, pdf or svg is generally a better option)
- * presentation_sm - a style for making 1/2 width graphs.
- * presentation_dark - tweak the weight of elements for dark presnetations.
- * science-2col, science-3col - Science 2 and 3 column width figures
- * thesis-sm - reduces the figure width to make the axes closer to 4/3 aspect ratio.
+- aps1.5 - Switch to 1.5 column wide format
+- aps2.0 - Switch to 2 column wide format
+- aip2 - Switch to 2 column wide format for AIP journals
+- stoner-dark - Switch to a dark background a lighter plotting colours.
+- hi-res - Switches to 600dpi plotting (but using eps, pdf or svg is generally a better option)
+- presentation_sm - a style for making 1/2 width graphs.
+- presentation_dark - tweak the weight of elements for dark presnetations.
+- science-2col, science-3col - Science 2 and 3 column width figures
+- thesis-sm - reduces the figure width to make the axes closer to 4/3 aspect ratio.
 
-Colour Cycles
--------------
+## Colour Cycles
 
 The default colour cycle is based on the London Underground map colour scheme (why not?) and goes
 
- * Northern
- * Central
- * Picadily
- * District
- * Metropolitan
- * Bakerloo
- * Jubilee
- * Overground
- * Victoria
- * Elizabeth
- * Circle
+- Northern
+- Central
+- Picadily
+- District
+- Metropolitan
+- Bakerloo
+- Jubilee
+- Overground
+- Victoria
+- Elizabeth
+- Circle
 
 The package adds these as named colours in matplotlib, along with 90,50,70 and 10% shade variants of some of them. See
 the [documentation page on colours](https://stonerlab.github.io/stonerplots/colours.html) for a full list.
 
-Context Managers
-----------------
+## Context Managers
 
 The package is designed to work by using python context managers to aid plotting. These include:
 
- * SavedFigure - apply style sheets and then save any resulting figures to disc in one or more formats
- * StackVertical - make a multi-panel plot where the panels are arranged in a vertical stack and pushed together so that
-   the top-x-axis on one frame is the bottom of the next.
- * MultiPanel - a general; purpose miulti-panel plotting helper.
- * InsetPlot - create an inset set of axes.
+- SavedFigure - apply style sheets and then save any resulting figures to disc in one or more formats
+- StackVertical - make a multi-panel plot where the panels are arranged in a vertical stack and pushed together so that
+  the top-x-axis on one frame is the bottom of the next.
+- MultiPanel - a general; purpose miulti-panel plotting helper.
+- InsetPlot - create an inset set of axes.
 
 This package draws heavily on [scienceplots](https://github.com/garrettj403/SciencePlots), so it seems only fair to cite the original work....
 

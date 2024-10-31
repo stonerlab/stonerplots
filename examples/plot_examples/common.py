@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """Variables and functions common to the examples."""
-import numpy as np
 from pathlib import Path
+
+import numpy as np
 
 __all__ = ["figures", "model", "x", "pparam"]
 

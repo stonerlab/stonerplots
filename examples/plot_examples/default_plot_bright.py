@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """Demonstrate the SavedFigure context manager and default Stoner plot style with bright colour scheme."""
 import matplotlib.pyplot as plt
+from common import figures, model, pparam, x
 
 from stonerplots import SavedFigure
-
-from common import x, model, pparam, figures
 
 with SavedFigure(figures / "fig04b.png", style=["stoner", "bright"], autoclose=True):
     fig, ax = plt.subplots()
