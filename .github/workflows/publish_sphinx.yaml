@@ -15,6 +15,6 @@ jobs:
       id-token: write
     steps:
     - id: deployment
-      uses: sphinx-notes/pages@b173ecba074b270b37c64007c1edfd8465892
+      uses: sphinx-notes/pages@3a7b173ecba074b270b37c64007c1edfd8465892
       with:
         documentation_path: ./docs/source
