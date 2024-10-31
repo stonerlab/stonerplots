@@ -98,51 +98,48 @@ def roman(ix):
     }
     if not isinstance(ix, int) or ix <= 0:
         raise ValueError("Only positive integers can be represented as Roman numerals.")
-    output = ""
+    output = []
     for val, numeral in numerals.items():
-        if count := ix // val:
-            ix -= count * val
-            output += numeral * count
-    return output
+        count, ix = divmod(ix, val)
+        output.append(numeral * count)
+    return "".join(output)
 
 
 def counter(ix, pattern="({alpha})", **kargs):
     """Return a representation of an integer according to a pattern.
 
     Args:
-        ux (int):
-            The integer to convert to a string.
+        ix (int): The integer to convert to a string.
 
-    Keyword Argyments:
-        pattern (str):
-            The pattern to be used to format the conversion. Defaykt is '({alpha})'. See Notes for details.
-        \*\*kargs:
-            Other data to replace pattern with.
+    Keyword Arguments:
+        pattern (str): The pattern to be used to format the conversion. Default is '({alpha})'.
+        **kargs: Other data to replace pattern with.
 
     Returns:
-        (str):
-            *ix* converted to a string according to pattern.
+        str: ix converted to a string according to pattern.
 
-        Notes:
-            *pattern* is a standard format string with place holders in {}. It is formatted with preset representations
-            of the integer *ix*
-            - int - ix as an integer
-            - alpha - ix as a,b,c...
-            - Alpha - ix as A,B,C...
-            - roman - ix as i,ii,iii,iv...
-            - Roman - ix as I,II,III,IV....
+    Notes:
+        *pattern* is a standard format string with place holders in {}. It is formatted with preset representations
+        of the integer *ix*
+        - int - ix as an integer
+        - alpha - ix as a,b,c...
+        - Alpha - ix as A,B,C...
+        - roman - ix as i,ii,iii,iv...
+        - Roman - ix as I,II,III,IV....
+
     """
-    alpha = chr(ord("a") + int(ix))
-    Roman = roman(int(ix + 1))
-    replacements = kargs.copy()
-    replacements.update(
-        {"alpha": alpha, "Alpha": alpha.upper(), "roman": Roman.lower(), "Roman": Roman, "int": int(ix)}
-    )
+    if not isinstance(ix, int) or ix < 0:
+        raise ValueError("ix must be a non-negative integer.")
+
+    alpha = chr(ord("a") + ix)
+    Roman = roman(ix + 1)
+    replacements = {"alpha": alpha, "Alpha": alpha.upper(), "roman": Roman.lower(), "Roman": Roman, "int": ix}
+    replacements.update(kargs)
+
     return pattern.format(**replacements)
 
 
 class _Preserve_Fig(object):
-
     """Mixin for preserving figure and current axes."""
 
     def __init__(self):
@@ -668,45 +665,11 @@ class MultiPanel(_PlotContextSequence, _Preserve_Fig):
 
     def __enter__(self):
         """Create the grid of axes."""
-        # Preserve current figure and axes and sort figure argument
         self._get_gcfa()
-        self.figure = self._fig_arg if self._fig_arg else plt.gcf()
-        if isinstance(self.figure, int) and self.figure in plt.get_fignums:  # If we specified a figure as a number
-            self.figure = plt.figure(self.fignum)
-        if isinstance(self.figure, str) and self.figure in plt.get_figlabels:  # If we specified a figure as a label
-            self.figure = plt.figure(self.fignum)
-        plt.figure(self.figure)
-
-        # Sort out figurre size adjustment
-        adjust_figsize = self._adjust_figsize_arg
-        if isinstance(adjust_figsize, bool):
-            adjust_figsize = (int(adjust_figsize), int(adjust_figsize) * 0.8)
-        if isinstance(adjust_figsize, float):
-            adjust_figsize = (adjust_figsize, adjust_figsize)
-        self.adjust_figsize = adjust_figsize
-        self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
-
-        # Create gridspec
-        if isinstance(self.panels, int):
-            if self.transpose:
-                self._Create_subplots((self.panels, 1))
-            else:
-                self._Create_subplots((1, self.panels))
-        elif isinstance(self.panels, list):
-            if self.transpose:
-                self._Create_subplots((np.prod(np.unique(self.panels)),len(self.panels)), self.panels)
-            else:
-                self._Create_subplots((len(self.panels), np.prod(np.unique(self.panels))), self.panels)
-        elif isinstance(self.panels, tuple):
-            self._Create_subplots(self.panels)
-        else:
-            raise TypeError(f"Unable to interpret the number of panels to create: {self.panels}")
-
-        if self.adjust_figsize:
-            self._do_figure_adjuement()
-
-        if self.label_panels:
-            self._label_figure()
+        self._set_figure()
+        self._adjust_figure_size()
+        self._create_gridspec()
+        self._label_subplots()
         return self
 
     def __exit__(self, type, value, traceback):
@@ -719,7 +682,51 @@ class MultiPanel(_PlotContextSequence, _Preserve_Fig):
 
         self._set_gcfa()
 
-    def _Create_subplots(self, panels, nplots=None):
+    def _set_figure(self):
+        """Set the figure based on the provided figure argument or the current figure."""
+        self.figure = self._fig_arg or plt.gcf()
+        if isinstance(self.figure, int):
+            self.figure = plt.figure(self.figure)
+        elif isinstance(self.figure, str):
+            self.figure = plt.figure(self.figure)
+        plt.figure(self.figure)
+
+    def _adjust_figure_size(self):
+        """Adjust the figure size if necessary."""
+        adjust_figsize = self._adjust_figsize_arg
+        if isinstance(adjust_figsize, bool):
+            adjust_figsize = (int(adjust_figsize), int(adjust_figsize) * 0.8)
+        elif isinstance(adjust_figsize, float):
+            adjust_figsize = (adjust_figsize, adjust_figsize)
+        self.adjust_figsize = adjust_figsize
+        self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
+
+    def _create_gridspec(self):
+        """Create the gridspec for the subplots."""
+        if isinstance(self.panels, int):
+            self._create_subplots((1, self.panels) if not self.transpose else (self.panels, 1))
+        elif isinstance(self.panels, list):
+            self._create_subplots(
+                (
+                    (len(self.panels), np.prod(np.unique(self.panels)))
+                    if not self.transpose
+                    else (np.prod(np.unique(self.panels)), len(self.panels))
+                ),
+                self.panels,
+            )
+        elif isinstance(self.panels, tuple):
+            self._create_subplots(self.panels)
+        else:
+            raise TypeError(f"Unable to interpret the number of panels to create: {self.panels}")
+        if self.adjust_figsize:
+            self._do_figure_adjustment()
+
+    def _label_subplots(self):
+        """Label the subplots if necessary."""
+        if self.label_panels:
+            self._label_figure()
+
+    def _create_subplots(self, panels, nplots=None):
         """Create the subplots for the given panels."""
         gs_kwargs = _filter_dict(self.kwargs, _gsargs)
         self.gs = self.figure.add_gridspec(*panels, **gs_kwargs)
@@ -745,7 +752,7 @@ class MultiPanel(_PlotContextSequence, _Preserve_Fig):
         else:
             self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
 
-    def _do_figure_adjuement(self):
+    def _do_figure_adjustment(self):
         """Work out how to adjust figure size."""
         f = self.adjust_figsize[0]
         if f < 0:
