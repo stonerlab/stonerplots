@@ -12,7 +12,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 from mpl_toolkits.axes_grid1.inset_locator import InsetPosition
 import numpy as np
 
-import stonerplots
+import stonerplots  # pylint: disable=unused-import # NOQA # Importing here to modify matplotlib colours
 
 __all__ = ["SavedFigure", "InsetPlot", "StackVertical", "MultiPanel", "counter", "roman"]
 
