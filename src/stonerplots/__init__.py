@@ -18,7 +18,7 @@ from .context import SavedFigure
 from .context import StackVertical
 
 __all__ = ["context", "SavedFigure", "InsetPlot", "StackVertical", "MultiPanel", "counter", "roman"]
-__version__ = "1.5.1"
+__version__ = "1.5.2"
 
 # register the included stylesheet in the matplotlib style library
 stonerplots_path = Path(__file__).parent

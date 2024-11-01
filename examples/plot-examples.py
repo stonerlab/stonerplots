@@ -13,6 +13,6 @@ if pth not in sys.path:
 
 os.chdir("plot_examples")
 
-from plot_examples import *
+from plot_examples import *  # NOQA
 
 os.chdir("..")
