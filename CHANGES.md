@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.5.2 Release
+## v1.5.2 (pre) Release
 
 Further code cleanups following codacy code quality checks.
 
