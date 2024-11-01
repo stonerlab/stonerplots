@@ -1,23 +1,24 @@
 # v1.5.2 Release
 
-- Further code cleanups following codacy code quality checks.
+Further code cleanups following codacy code quality checks.
 
 # v1.5.1 Release
 
-- Some refactoring of the context managers and other code cleanups. No intentional changes to the API.
+Some refactoring of the context managers and other code cleanups. No intentional changes to the API.
 
 # v1.5.0 Release
 
-- Iregular grids in MultuPanel now can also do different numbers of rows in each column with the _transpose_ parameter.
+regular grids in MultuPanel now can also do different numbers of rows in each column with the _transpose_ parameter.
 
 # v1.4.0 Release
 
-- Iregullar grids in MultiPanel that support different numbers of plots in each row.
+Iregullar grids in MultiPanel that support different numbers of plots in each row.
 
 # v1.3.2 Release
 
-- Improve StackVertical to allow asymmetric stacked plots and make an example for plotting
-  GenX fits.
+Improve StackVertical to allow asymmetric stacked plots and make an example for plotting
+GenX fits.
+
 - Add AAAS-Science stylesheet with 2 and 3 column variants.
 - Improve SavedFigure to make it reusable and also adjustable after creation via call method.
 - Improvements to StackVertical and MultiPanel to do more calculations with plot transforms.

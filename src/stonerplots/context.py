@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 """Context Managers to help with plotting and saving figures."""
-import weakref
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable
+from collections.abc import Sequence
 from pathlib import Path
+import warnings
+import weakref
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+from mpl_toolkits.axes_grid1.inset_locator import InsetPosition
 import numpy as np
-from mpl_toolkits.axes_grid1.inset_locator import InsetPosition, inset_axes
 
 import stonerplots
 
@@ -69,7 +72,8 @@ def roman(ix):
 
         The Vinculum standard multiplies digits by 1000 above M, by adding an overline over the digit. There doesn't
         seem to be a standard way to deal with numbers bigger than 1 000 000 - presumeably Romans didn't need to do
-        this very often!"""
+        this very often!
+    """
     numerals = {
         1_000_000: "$\\overline{\\mathrm{M}}$",
         900_000: "$\\overline{\\mathrm{CM}}$",
@@ -285,7 +289,7 @@ class SavedFigure(object):
 
     @property
     def formats(self):
-        """Store the output formats as a list of strings"""
+        """Store the output formats as a list of strings."""
         return self._formats
 
     @formats.setter
@@ -470,7 +474,7 @@ class InsetPlot(_Preserve_Fig):
             plt.sca(axins)
         return self.axins
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, value, traceback):
         """Reposition the inset as the standard positioning can cause labels to overlap."""
         parent_bbox = self.ax.get_position()
         inset_bbox = self.axins.get_tightbbox().transformed(self.ax.figure.transFigure.inverted())
@@ -682,7 +686,7 @@ class MultiPanel(_PlotContextSequence, _Preserve_Fig):
         self.kwargs = kwargs
         self.same_aspect = "height_ratios" not in kwargs and "wdith_ratios" not in kwargs and same_aspect
         if "nplots" in self.kwargs:
-            raise DeprecationWarning(
+            warnings.defaultaction(
                 "nplots aregument is depricated. Pass the same value directly as the number of panels now."
             )
             self.panels = self.kwargs.pop("nplots")
@@ -696,7 +700,7 @@ class MultiPanel(_PlotContextSequence, _Preserve_Fig):
         self._label_subplots()
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, value, traceback):
         """Clean up the axes."""
         self.figure.canvas.draw()
         if self.same_aspect:  # Force the aspect ratios to be the same
@@ -780,15 +784,15 @@ class MultiPanel(_PlotContextSequence, _Preserve_Fig):
     def _mark_used(self, used, r, c, extent):
         """Mark the used subplots in the grid."""
         if self.transpose:
-            used[r : r + extent, c] = True
+            used[r:r + extent, c] = True
         else:
-            used[r, c : c + extent] = True
+            used[r, c:c + extent] = True
 
     def _create_subplot(self, r, c, extent):
         """Create a subplot for the given row, column, and extent."""
         if self.transpose:
-            return self.figure.add_subplot(self.gs[r : r + extent, c])
-        return self.figure.add_subplot(self.gs[r, c : c + extent])
+            return self.figure.add_subplot(self.gs[r:r + extent, c])
+        return self.figure.add_subplot(self.gs[r, c:c + extent])
 
     def _do_figure_adjustment(self):
         """Adjust the figure size based on the adjust_figsize setting."""
@@ -811,7 +815,7 @@ class MultiPanel(_PlotContextSequence, _Preserve_Fig):
             ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
             y = (ax_height - title_pts * 1.5) / ax_height
 
-            ax.set_title(f" {counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs))
+            ax.set_title(f" {counter(ix, self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs))
 
 
 class StackVertical(MultiPanel):
@@ -884,7 +888,6 @@ class StackVertical(MultiPanel):
 
     def __enter__(self):
         """Create the grid of axes."""
-
         panels = (self.number, 1)
         super().__init__(
             panels,
@@ -899,7 +902,7 @@ class StackVertical(MultiPanel):
 
         return super().__enter__()
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, value, traceback):
         """Clean up the axes."""
         if self.joined:
             self._label_outer_axes()
