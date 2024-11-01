@@ -1,5 +1,6 @@
 ﻿[![GitHub version](https://badge.fury.io/gh/stonerlab%2Fstonerplots.svg)](https://badge.fury.io/gh/stonerlab%2Fstonerplots)
 [![pytest](https://github.com/stonerlab/stonerplots/actions/workflows/pytest.yaml/badge.svg)](https://github.com/stonerlab/stonerplots/actions/workflows/pytest.yaml)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/bc7404ac3cbf432184a13b6c3cb88ea4)](https://app.codacy.com/gh/stonerlab/stonerplots/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![PyPI version](https://badge.fury.io/py/StonerPlots.svg)](https://badge.fury.io/py/StonerPlots)
 [![Build Docs](https://github.com/stonerlab/stonerplots/actions/workflows/publish_sphinx.yaml/badge.svg)](https://stonerlab.github.io/stonerplots/)
 [![Conda](https://github.com/stonerlab/stonerplots/actions/workflows/build_conda.yaml/badge.svg)](https://github.com/stonerlab/stonerplots/actions/workflows/build_conda.yaml)
