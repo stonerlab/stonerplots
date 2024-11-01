@@ -2,11 +2,20 @@
 
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 from matplotlib.colors import _colors_full_map
+import matplotlib.pyplot as plt
 
-from .colours import tube_colours, tube_colours_10, tube_colours_50, tube_colours_70, tube_colours_90
-from .context import InsetPlot, MultiPanel, SavedFigure, StackVertical, counter, roman
+from .colours import tube_colours
+from .colours import tube_colours_10
+from .colours import tube_colours_50
+from .colours import tube_colours_70
+from .colours import tube_colours_90
+from .context import counter
+from .context import InsetPlot
+from .context import MultiPanel
+from .context import roman
+from .context import SavedFigure
+from .context import StackVertical
 
 __all__ = ["context", "SavedFigure", "InsetPlot", "StackVertical", "MultiPanel", "counter", "roman"]
 __version__ = "1.5.1"

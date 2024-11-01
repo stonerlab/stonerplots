@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """Demonstrate the SavedFigure context manager and InsetPlot context manager."""
+from common import figures
+from common import model
+from common import pparam
+from common import x
 import matplotlib.pyplot as plt
-from common import figures, model, pparam, x
 
-from stonerplots import SavedFigure, StackVertical
+from stonerplots import SavedFigure
+from stonerplots import StackVertical
 
 with SavedFigure(figures / "fig7b.png", style=["stoner"], autoclose=__name__ != "__main__"):
     fig = plt.figure()

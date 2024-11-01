@@ -686,8 +686,9 @@ class MultiPanel(_PlotContextSequence, _Preserve_Fig):
         self.kwargs = kwargs
         self.same_aspect = "height_ratios" not in kwargs and "wdith_ratios" not in kwargs and same_aspect
         if "nplots" in self.kwargs:
-            warnings.defaultaction(
-                "nplots aregument is depricated. Pass the same value directly as the number of panels now."
+            warnings.warn(
+                "nplots aregument is depricated. Pass the same value directly as the number of panels now.",
+                DeprecationWarning,
             )
             self.panels = self.kwargs.pop("nplots")
 
@@ -784,15 +785,15 @@ class MultiPanel(_PlotContextSequence, _Preserve_Fig):
     def _mark_used(self, used, r, c, extent):
         """Mark the used subplots in the grid."""
         if self.transpose:
-            used[r:r + extent, c] = True
+            used[r : r + extent, c] = True
         else:
-            used[r, c:c + extent] = True
+            used[r, c : c + extent] = True
 
     def _create_subplot(self, r, c, extent):
         """Create a subplot for the given row, column, and extent."""
         if self.transpose:
-            return self.figure.add_subplot(self.gs[r:r + extent, c])
-        return self.figure.add_subplot(self.gs[r, c:c + extent])
+            return self.figure.add_subplot(self.gs[r : r + extent, c])
+        return self.figure.add_subplot(self.gs[r, c : c + extent])
 
     def _do_figure_adjustment(self):
         """Adjust the figure size based on the adjust_figsize setting."""

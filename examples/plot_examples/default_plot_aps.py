@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """Demonstrate the SavedFigure context manager and default Stoner plot style in APS format."""
+from common import figures
+from common import model
+from common import pparam
+from common import x
 import matplotlib.pyplot as plt
-from common import figures, model, pparam, x
 
 from stonerplots import SavedFigure
 

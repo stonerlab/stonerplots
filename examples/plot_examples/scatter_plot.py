@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Demonstrate the SavedFigure context manager and Scatter Plot settings."""
+from common import figures
 import matplotlib.pyplot as plt
 import numpy as np
-from common import figures
 
 from stonerplots import SavedFigure
 

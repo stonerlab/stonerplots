@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 """Use stonerplots to create a 3 panel; (1+2) plot."""
 
+from common import figures
+from common import model
+from common import pparam
+from common import x
 import matplotlib.pyplot as plt
-from common import figures, model, pparam, x
 
-from stonerplots import MultiPanel, SavedFigure
+from stonerplots import MultiPanel
+from stonerplots import SavedFigure
 
 autoclose = __name__ != "__main__"
 

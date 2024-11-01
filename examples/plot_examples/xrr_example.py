@@ -2,11 +2,12 @@
 """Setting up a StackVertical Context Manager for GenX."""
 from pathlib import Path
 
+from common import figures  # Just for the figures path
 import matplotlib.pyplot as plt
 import numpy as np
-from common import figures  # Just for the figures path
 
-from stonerplots import SavedFigure, StackVertical
+from stonerplots import SavedFigure
+from stonerplots import StackVertical
 
 autoclose = __name__ != "__main__"
 

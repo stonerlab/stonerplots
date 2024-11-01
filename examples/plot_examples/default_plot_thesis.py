@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """Demonstrate the SavedFigure context manager and default Stoner plot style."""
+from common import figures
+from common import model
+from common import pparam
+from common import x
 import matplotlib.pyplot as plt
-from common import figures, model, pparam, x
 
-from stonerplots import MultiPanel, SavedFigure
+from stonerplots import MultiPanel
+from stonerplots import SavedFigure
 
 with SavedFigure(figures / "fig02h_{int}", style="stoner,thesis", formats="pdf,png", autoclose=True):
     fig, ax = plt.subplots()

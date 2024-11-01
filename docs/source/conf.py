@@ -6,8 +6,8 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-import sys
 from pathlib import Path
+import sys
 
 modpath = Path(__file__).parent.parent.parent / "src"
 sys.path.insert(0, str(modpath))
