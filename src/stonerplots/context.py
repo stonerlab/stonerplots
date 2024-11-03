@@ -183,7 +183,57 @@ class _Preserve_Fig(object):
             plt.figure(self._save_fig)
 
 
-class SavedFigure(object):
+class _TrackPlots(object):
+    """A context handler that is deisnged to be used as a mixin class to track open matplotlib figures and axes.
+
+    This makes a note of all open figures and their axes on entry. The references are held as weakrefs to ensure
+    that we can close the plots.
+
+    There is no exit method, but we supply two iterators that will yield the newly opened figures and axes tht
+    could be used in an exit method to manipulate the open figures.
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Add tracking instance variables."""
+        self._include_open = kwargs.pop("include_open", False)
+        self._open_figs = []
+        self._tracked_axes = {}
+
+    def __enter__(self):
+        """Note all figures and axes currently open.
+
+        If include_open is True, then don;t note anything.
+        """
+        if not self._include_open:
+            for num in plt.get_fignums():
+                fref = weakref.ref(plt.figure(num))
+                self._tracked_axes[fref] = [weakref.ref(ax) for ax in plt.figure(num).axes]
+                self._open_figs.append(fref)
+
+    def new_figures(self):
+        """Yield any new figures that were not previously noted."""
+        self._open_figs = [fig() for fig in self._open_figs if fig() is not None]
+        for num in plt.get_fignums():
+            fig = plt.figure(num)
+            if fig not in self._open_figs:
+                yield fig
+
+    def new_axes(self):
+        """Yield any new figures that were not previously noted."""
+        open_figs = {fig(): fig for fig in self._open_figs if fig() is not None}
+        for num in plt.get_fignums():
+            fig = plt.figure(num)
+            if figref := open_figs.get(fig, None):
+                axes = self._tracked_axes[figref]
+            else:  # By definition all axes are new
+                axes = []
+            for ax in fig.axes:
+                if ax in axes:
+                    continue
+                yield ax
+
+
+class SavedFigure(_TrackPlots):
     """Context manager that applies a style and saves figures.
 
     Keyword Arguments:
@@ -259,18 +309,17 @@ class SavedFigure(object):
                 If set to True (default is False), then existing figures will be included when saving.
 
         """
+        super().__init__(include_open=include_open)
         # Set internal state
         self._filename = None
         self._formats = []
         self._style = []
-        self._open_figs = []
         # Copy constrictor parameters
         self.filename = filename
         self.style = style
         self.autoclose = autoclose
         self.style_context = None
         self.formats = formats
-        self.include_open = include_open
 
     @property
     def filename(self):
@@ -336,9 +385,7 @@ class SavedFigure(object):
         has been created within the context manager or not. We use weak references to allow figures to be closed
         without blocking.
         """
-        for num in plt.get_fignums():
-            if not self.include_open:
-                self._open_figs.append(weakref.ref(plt.figure(num)))
+        super().__enter__()
         if self.style:
             self.style_context = mpl.style.context(self.style)
             self.style_context.__enter__()
@@ -353,20 +400,15 @@ class SavedFigure(object):
         if self.style:
             self.style_context.__exit__(exc_type, exc_value, traceback)
 
-        self._open_figs = [fig() for fig in self._open_figs if fig() is not None]
         processed = -1
 
-        for num in plt.get_fignums():
-            fig = plt.figure(num)
-            if fig in self._open_figs:
-                continue
-
+        for fig in self.new_figures():
             processed += 1
             label = fig.get_label()
             filename = self._generate_filename(label, processed)
             self._save_figure(fig, filename, processed)
             if self.autoclose:
-                plt.close(num)
+                plt.close(fig)
 
         self._reset_state()
 

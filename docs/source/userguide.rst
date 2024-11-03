@@ -30,6 +30,14 @@ running in for the duration of the enclosed lines of code. `Matplotlib <https://
 context managers that operate in this way to temporarily set default parameters
 (:py:func:`matplotlib.pyplot.rc_context`) or to temporarily apply stylesheets (py:func:`matplotlib.style.context`).
 
+It is worth noting that context managers can be *stacked* either with nested `with` statements, or by combinging
+multiple context handlers in the same `with` clause as in this minimal file copier.::
+
+    with (open(filename_in,"r") as data_reader,
+          open(filename_out,"w") as data_writer):
+        for line in data_reader:
+            data_writer.write(line)
+
 
 Using Stoner Plots to make thesis figures
 -----------------------------------------
@@ -174,6 +182,30 @@ than dark-on-light and so `presentation_dark` adjusts elements to make the overa
         ... # all your plotting commands
         ... # But don't plt.close() your figure!
 
+Numbers on Axes Labels
+~~~~~~~~~~~~~~~~~~~~~~
+
+Scientific results often end up with the very large or very small numbers on the axis labels on plots. There are a
+variety of conventions for dealing with this - such as using scientific notation. The normal advice for many branches
+of Physics is to scale the number by the appropriate power of 1000 and use the corresponding si prefix in the axis
+label, so that the digits part of the label is between 0.1 and 1000.
+
+Matplotlib provides an EngFormatter that does this, but it renders the micro-prefix as a u. To get the proper greek
+letter mu, stonerplots provides a TexEngFormatter that switches to LaTeX rendering. For consistency, it also provides
+a TexFormatter.
+
+However, it is still annoying to have to do the call to `ax.xaxis.set_major_formatter()` etc. so stonerplots provides
+a `PlotLabeller` context manager to do this for you. As with `SavedFigure` it can handle already open figures and
+only work with new figures and exes.::
+
+    with SavedFigure(figures/"fig_01", style=["stoner","ieee"],
+                    formats=["png","eps"], autoclose=True), PlotLabeller()):
+        fig.ax = plt.subplots()
+        ... # all your plotting commands
+        ... # But don't plt.close() your figure!
+
+See :doc:`Axes Labelling<plotlabeller>` for full details of the :py:class:`PlotLAbeller` context manager.
+
 Double and Multi-Panel Figures
 ------------------------------
 
@@ -269,3 +301,4 @@ size relative to the parent axes. See `Inset Plots<insetplot>` for the full expl
    Stacked Plots <stackvertical>
    Multi-Panel Plots <multipanel>
    Inset Plots <insetplot>
+   PlotLabeller <plotlabeller>

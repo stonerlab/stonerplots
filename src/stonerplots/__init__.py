@@ -16,8 +16,21 @@ from .context import MultiPanel
 from .context import roman
 from .context import SavedFigure
 from .context import StackVertical
+from .format import PlotLabeller
+from .format import TexEngFormatter
+from .format import TexFormatter
 
-__all__ = ["context", "SavedFigure", "InsetPlot", "StackVertical", "MultiPanel", "counter", "roman"]
+__all__ = [
+    "context",
+    "SavedFigure",
+    "InsetPlot",
+    "StackVertical",
+    "MultiPanel",
+    "counter",
+    "roman",
+    "format",
+    "PlotLabeller",
+]
 __version__ = "1.5.2"
 
 # register the included stylesheet in the matplotlib style library
