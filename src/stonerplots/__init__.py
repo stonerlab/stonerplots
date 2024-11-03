@@ -30,6 +30,8 @@ __all__ = [
     "roman",
     "format",
     "PlotLabeller",
+    "TexFormatter",
+    "TexEngFormatter",
 ]
 __version__ = "1.5.2"
 

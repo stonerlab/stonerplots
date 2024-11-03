@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Additional matplotlib formatting classes."""
-from matplotlib import pyplot as plt
 from matplotlib.ticker import EngFormatter
 from matplotlib.ticker import Formatter
 from matplotlib.ticker import Locator
