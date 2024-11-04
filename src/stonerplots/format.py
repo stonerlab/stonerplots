@@ -141,20 +141,26 @@ class PlotLabeller(_TrackPlots):
 
     def __init__(self, *args, x=TexEngFormatter, y=TexEngFormatter, z=TexEngFormatter, **kargs):
         """Store tick formatting classes."""
-        for label, axis in zip("xyz", (x, y, z)):
-            if not isinstance(axis, (list, tuple)):
-                axis = [axis]
-            for elem in axis:
-                if isinstance(elem, type):
-                    elem = elem()
-                if isinstance(elem, (Locator, Formatter)):
-                    continue
+        self._initialize_axes("x", x)
+        self._initialize_axes("y", y)
+        self._initialize_axes("z", z)
+        super().__init__(*args, **kargs)
+
+    def _initialize_axes(self, label, axis):
+        """Initialize axis with given formatters or locators."""
+        if not isinstance(axis, (list, tuple)):
+            axis = [axis]
+        formatted_axes = []
+        for elem in axis:
+            if isinstance(elem, type):
+                elem = elem()
+            if not isinstance(elem, (Locator, Formatter)):
                 raise TypeError(
                     f"{label} should only contain matplotlib.ticker.Formatter subclasses "
                     "or instances of matplotlib.ticker.Locator"
                 )
-            setattr(self, f"{label}axis", axis)
-        super().__init__(*args, **kargs)
+            formatted_axes.append(elem)
+        setattr(self, f"{label}axis", formatted_axes)
 
     def __exit__(self, exc_type, exc_value, traceback):
         """Apply the ticker formatter to all the opened axes."""
@@ -171,6 +177,6 @@ class PlotLabeller(_TrackPlots):
                         if not isinstance(axis.get_minor_formatter(), NullFormatter):
                             axis.set_minor_formatter(elem)
                     elif isinstance(elem, Locator):
-                        axis.set_mahor_locator(elem)
+                        axis.set_major_locator(elem)
                         if not isinstance(axis.get_minor_locator(), NullFormatter):
                             axis.set_minor_locator(elem)
