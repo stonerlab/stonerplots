@@ -1,465 +1,447 @@
 # -*- coding: utf-8 -*-
 """Context Managers to help with plotting and saving figures."""
-from collections.abc import Iterable
-from collections.abc import Sequence
+# Standard library imports
+from collections.abc import Iterable, Sequence
 from pathlib import Path
-import warnings
+from typing import Any, List, Union
 import weakref
 
+# Third-party imports
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-from mpl_toolkits.axes_grid1.inset_locator import InsetPosition
 import numpy as np
 
-import stonerplots  # pylint: disable=unused-import # NOQA # Importing here to modify matplotlib colours
+# Project-specific imports
+from stonerplots import *
 
 __all__ = ["SavedFigure", "InsetPlot", "StackVertical", "MultiPanel", "counter", "roman"]
 
+# Constants
 _fontargs = ["font", "fontfamily", "fontname", "fontsize", "fontstretch", "fontstyle", "fontvariant", "fontweight"]
-
 _gsargs = ["left", "bottom", "right", "top", "width_ratios", "height_ratios", "hspace", "wspace", "h_pad", "w_pad"]
 
+ROMAN_NUMERAL_MAP = {
+    1_000_000: "$\\overline{\\mathrm{M}}$",
+    900_000: "$\\overline{\\mathrm{CM}}$",
+    500_000: "$\\overline{\\mathrm{D}}$",
+    400_000: "$\\overline{\\mathrm{CD}}$",
+    100_000: "$\\overline{\\mathrm{C}}$",
+    90_000: "$\\overline{\\mathrm{XC}}$",
+    50_000: "$\\overline{\\mathrm{L}}$",
+    40_000: "$\\overline{\\mathrm{XL}}$",
+    10_000: "$\\overline{\\mathrm{X}}$",
+    9_000: "$\\overline{\\mathrm{IX}}$",
+    5_000: "$\\overline{\\mathrm{V}}$",
+    4_000: "$\\overline{\\mathrm{IV}}$",
+    1_000: "M",
+    900: "CM",
+    500: "D",
+    400: "CD",
+    100: "C",
+    90: "XC",
+    50: "L",
+    40: "XL",
+    10: "X",
+    9: "IX",
+    5: "V",
+    4: "IV",
+    1: "I",
+}
 
-class _ravel_list(list):
-    """A list with a ravel.method."""
+class RavelList(list):
+    """A list with additional flattening and fake 2D indexing capabilities."""
 
-    def ravel(self):
-        """Implement a sort of ravel for a list."""
-        ret = []
-        for x in self:
-            if isinstance(x, list):
-                ret.extend(x)
-            else:
-                ret.append(x)
-        return ret
+    def flatten(self) -> List[Any]:
+        """
+        Flattens a nested list into a single-level list.
+        Returns:
+            List[Any]: A flattened list.
+        """
+        return self._flatten_recursive(self)
 
-    def __getitem__(self, index):
-        """Fake 2D indexing with a tuple."""
+    @staticmethod
+    def _flatten_recursive(items: Union[list, Any]) -> List[Any]:
+        """Helper method to recursively flatten a list."""
+        return [element for sublist in items for element in (sublist if isinstance(sublist, list) else [sublist])]
+
+    def __getitem__(self, index: Union[int, tuple]) -> Any:
+        """
+        Implements 2D-style indexing using tuples. For simple indices, default list behavior is used.
+        Args:
+            index (Union[int, tuple]): Index or tuple of indices.
+        Returns:
+            Any: Element at the specified index.
+        """
         if not isinstance(index, tuple):
             return super().__getitem__(index)
-        r = self
+        result = self
         for ix in index:
-            r = r[ix]
-        return r
+            result = result[ix]
+        return result
 
 
-def _filter_dict(dic, keys):
-    """Return a dictionary derived from dic that only contains the keys in keys."""
-    ret = {}
-    for key in set(dic.keys()) & set(keys):
-        ret[key] = dic[key]
-    return ret
-
-
-def roman(ix):
-    """Return a roman numeral representation of a positive integer.
+# Functions
+def _filter_keys_in_dict(dic, keys):
+    """Filter a dictionary to only include specified keys.
 
     Args:
-        ix (int):
-            A positive integer to be represetned as roman numerals.
+        dic (dict): The dictionary to filter.
+        keys (iterable): The keys to retain in the dictionary.
 
     Returns:
-        (str):
-            *ix* in an upper case Roman numeral representation.
+        dict: A new dictionary containing only the specified keys.
+    """
+    return {key: dic[key] for key in keys if key in dic}
+
+
+def roman(number):
+    """Convert a positive integer to Roman numeral representation.
+
+    Args:
+        number (int): A positive integer.
+
+    Returns:
+        str: The number represented as an upper-case Roman numeral string.
 
     Raises:
-        - ValueError if *ix* is not a positive integer.
-
-    Notes:
-        The conversion routine uses the Vinculum notation (overlines) for numerals from 4000 up to a million. This
-        is implemented as LaTeX codes (since the routine assumes mathtext of similar rendering is available.
-
-        The Vinculum standard multiplies digits by 1000 above M, by adding an overline over the digit. There doesn't
-        seem to be a standard way to deal with numbers bigger than 1 000 000 - presumeably Romans didn't need to do
-        this very often!
+        ValueError: If the input is not a positive integer.
     """
-    numerals = {
-        1_000_000: "$\\overline{\\mathrm{M}}$",
-        900_000: "$\\overline{\\mathrm{CM}}$",
-        500_000: "$\\overline{\\mathrm{D}}$",
-        400_000: "$\\pverline{\\mathrm{CD}}$",
-        100_000: "$\\overline{\\mathrm{C}}$",
-        90_000: "$\\overline{\\mathrm{XC}}$",
-        50_000: "$\\overline{\\mathrm{L}}$",
-        40_000: "$\\overbar{\\mathrm{XL}}$",
-        10_000: "$\\overline{\\mathrm{X}}$",
-        9_000: "$\\overline{\\mathrm{IX}}$",
-        5_000: "$\\overline{\\mathrm{V}}$",
-        4_000: "$\\overline{\\mathrm{IV}}$",
-        1_000: "M",
-        900: "CM",
-        500: "D",
-        400: "CD",
-        100: "C",
-        90: "XC",
-        50: "L",
-        40: "XL",
-        10: "X",
-        9: "IX",
-        5: "V",
-        4: "IV",
-        1: "I",
-    }
-    if not isinstance(ix, int) or ix <= 0:
+    if not isinstance(number, int) or number <= 0:
         raise ValueError("Only positive integers can be represented as Roman numerals.")
-    output = []
-    for val, numeral in numerals.items():
-        count, ix = divmod(ix, val)
-        output.append(numeral * count)
-    return "".join(output)
+
+    result = ""
+    for value, numeral in ROMAN_NUMERAL_MAP.items():
+        count = number // value
+        if count:
+            result += numeral * count
+            number -= count * value
+    return result
 
 
-def counter(ix, pattern="({alpha})", **kargs):
-    """Return a representation of an integer according to a pattern.
+def counter(value, pattern="({alpha})", **kwargs):
+    """Format an integer as a string using a pattern and various representations.
 
     Args:
-        ix (int): The integer to convert to a string.
-
-    Keyword Arguments:
-        pattern (str): The pattern to be used to format the conversion. Default is '({alpha})'.
-        **kargs: Other data to replace pattern with.
+        value (int): The integer to format.
+        pattern (str): A format string with placeholders (default: '({alpha})').
+        **kwargs: Additional data to replace placeholders.
 
     Returns:
-        str: ix converted to a string according to pattern.
-
-    Notes:
-        *pattern* is a standard format string with place holders in {}. It is formatted with preset representations
-        of the integer *ix*
-        - int - ix as an integer
-        - alpha - ix as a,b,c...
-        - Alpha - ix as A,B,C...
-        - roman - ix as i,ii,iii,iv...
-        - Roman - ix as I,II,III,IV....
-
+        str: The formatted string.
     """
-    if not isinstance(ix, int) or ix < 0:
-        raise ValueError("ix must be a non-negative integer.")
+    alpha = chr(ord("a") + value)  # Lowercase alphabet representation
+    Roman = to_roman(value + 1)  # Uppercase Roman numeral
+    return pattern.format(
+        alpha=alpha,
+        Alpha=alpha.upper(),
+        roman=Roman.lower(),
+        Roman=Roman,
+        int=value,
+        **kwargs
+    )
 
-    alpha = chr(ord("a") + ix)
-    Roman = roman(ix + 1)
-    replacements = {"alpha": alpha, "Alpha": alpha.upper(), "roman": Roman.lower(), "Roman": Roman, "int": ix}
-    replacements.update(kargs)
-
-    return pattern.format(**replacements)
+import matplotlib.pyplot as plt
 
 
-class _Preserve_Fig(object):
-    """Mixin for preserving figure and current axes."""
+class _PreserveFigureMixin:
+    """Mixin for preserving the current figure and axes."""
+
+    _UNSET = None  # Constant representing the unset state
 
     def __init__(self):
-        """Set instance variables."""
-        self._save_fig = None
-        self._save_axes = None
+        """Initialize figure and axes preservation attributes."""
+        self._saved_figure = self._UNSET
+        self._saved_axes = self._UNSET
         super().__init__()
 
-    def _get_gcfa(self):
-        """Safely get the currenbt figure and axes without creating new ones.
-
-        Notes:
-            Checks if plt.get_fignums() is empty and if so, leaves the figure and axes unset
-            Otherwise, getsa the current figure and then checks whether that has axes or not
-            and if so, stores the current axes.
-
-            The problem with naively calling plt.gcf() and plt.gca() is that they will create
-            new figures and axes if they don't exist.
+    def _store_current_figure_and_axes(self):
         """
-        self._save_fig = None
-        self._save_axes = None
-        if not plt.get_fignums():  # No current figures
-            return
-        self._save_fig = plt.gcf()
-        if self._save_fig.axes:
-            self._save_axes = plt.gca()
-
-    def _set_gcfa(self):
-        """Set the current figure and axes from state if not None.
-
-        This safely revets the effect of the _get_gcfa() method.
+        Safely store the current figure and axes without creating new ones.
+        Key points:
+            - If no figures exist, both figure and axes remain unset.
+            - If a figure exists, stores it, and checks whether it has axes.
         """
-        if self._save_axes:
-            plt.sca(self._save_axes)
-        elif self._save_fig:
-            plt.figure(self._save_fig)
+        self._saved_figure, self._saved_axes = self._UNSET, self._UNSET
 
+        if plt.get_fignums():  # Check if any figures exist
+            self._saved_figure = plt.gcf()
+            if self._saved_figure.axes:  # Check if the current figure has axes
+                self._saved_axes = plt.gca()
 
-class _TrackPlots(object):
-    """A context handler that is deisnged to be used as a mixin class to track open matplotlib figures and axes.
-
-    This makes a note of all open figures and their axes on entry. The references are held as weakrefs to ensure
-    that we can close the plots.
-
-    There is no exit method, but we supply two iterators that will yield the newly opened figures and axes tht
-    could be used in an exit method to manipulate the open figures.
-    """
-
-    def __init__(self, *args, **kwargs):
-        """Add tracking instance variables."""
-        self._include_open = kwargs.pop("include_open", False)
-        self._open_figs = []
-        self._tracked_axes = {}
-
-    def __enter__(self):
-        """Note all figures and axes currently open.
-
-        If include_open is True, then don;t note anything.
+    def _restore_current_figure_and_axes(self):
         """
-        if not self._include_open:
-            for num in plt.get_fignums():
-                fref = weakref.ref(plt.figure(num))
-                self._tracked_axes[fref] = [weakref.ref(ax) for ax in plt.figure(num).axes]
-                self._open_figs.append(fref)
+        Restore the saved figure and axes if previously set.
+        Safely reverses the effect of `_store_current_figure_and_axes`.
+        """
+        if self._saved_axes is not self._UNSET:
+            plt.sca(self._saved_axes)  # Restore current axes
+        elif self._saved_figure is not self._UNSET:
+            plt.figure(self._saved_figure)  # Restore current figure
 
-    def new_figures(self):
-        """Yield any new figures that were not previously noted."""
-        self._open_figs = [fig() for fig in self._open_figs if fig() is not None]
-        for num in plt.get_fignums():
-            fig = plt.figure(num)
-            if fig not in self._open_figs:
-                yield fig
+class SavedFigure(_PreserveFigureMixin):
+    """A context manager for applying plotting styles and saving matplotlib figures.
 
-    def new_axes(self):
-        """Yield any new figures that were not previously noted."""
-        open_figs = {fig(): fig for fig in self._open_figs if fig() is not None}
-        for num in plt.get_fignums():
-            fig = plt.figure(num)
-            if figref := open_figs.get(fig, None):
-                axes = self._tracked_axes[figref]
-            else:  # By definition all axes are new
-                axes = []
-            for ax in fig.axes:
-                if ax in axes:
-                    continue
-                yield ax
+    This class simplifies the process of managing figure styling and saving multiple figures
+    within a single context. It allows for automatic application of matplotlib stylesheets and
+    handles the generation of unique filenames for figures, taking into account user-provided
+    templates and output formats. SavedFigure can be reused across multiple `with` blocks,
+    and its settings can dynamically be reconfigured by calling the instance with new parameters.
 
-
-class SavedFigure(_TrackPlots):
-    """Context manager that applies a style and saves figures.
-
-    Keyword Arguments:
-        filename (str, Path, default=None):
-            The filename to use for saving the figure created. If None then the figure's label is used as a
-            filename.
-        style (str, List[str], default is `stoner`):
-            The mnatplotlib syslesheet(s) to use for plotting. Multiple stylesheets can be specified either as a list
-            of strings, or as a comman separated values string.
-        autoclose (bool, default=False):
-            Automatically close figures after they are saved. This leaves open figures that were open before we
-            started,
-        formats (str, list of str, default "png"):
-            String or list of strings for file extensions (and hence formats) to use when saving the file. As with
-            style, a comma separated values string or  a list of strings can be used to specify multiple formats.
+    Args:
+        filename (str, Path, None):
+            The base filename or target directory for saving figures.
+            - If `filename` is a directory, the figure's label is used to generate the filename.
+            - If `filename` includes placeholders (e.g., `{label}`, `{number}`), they will be replaced dynamically.
+        style (list[str], str, None):
+            One or more matplotlib stylesheets to apply. If a single string is provided, it is split by commas
+            to form a list of styles. Defaults to ["stoner"].
+        autoclose (bool):
+            Determines whether figures should be closed automatically after being saved. Default is `False`.
+        formats (str, list[str], None):
+            The output file formats for saved figures (e.g., "png", "pdf"). Can be a comma-separated string,
+            a list of strings, or `None` (default: ["png"]).
         include_open (bool):
-            If set to True (default is False), then existing figures will be included when saving.
+            If `True`, any figures opened before entering the context are included for saving. Default is `False`.
+
+    Attributes:
+        filename (Path):
+            A property representing the base filename or directory for saving figures.
+        formats (list[str]):
+            A list of file formats to save the figures (e.g., ["png", "pdf"]).
+        style (list[str]):
+            A list of stylesheets to apply to the figures.
+        autoclose (bool):
+            Indicates whether figures are closed after being saved.
+        include_open (bool):
+            Determines whether figures already open before entering the context are saved.
 
     Notes:
-        This wraps the mpl.style.context() context manager and also determines what new figures have been created and
-        saves them with a soecified filename.
+        - `SavedFigure` can identify and save only the new figures created while inside its context, unless
+          `include_open` is set to `True`.
+        - `filename` and `formats` parameters support dynamic placeholders:
+          - `{number}`: Figure number.
+          - `{label}`: Figure label.
+          - `{alpha}`, `{Alpha}`: Counter in lowercase or uppercase.
+          - `{roman}`, `{Roman}`: Roman numeral (lowercase/uppercase).
+        - Files are automatically numbered if placeholders are missing and multiple figures are created.
 
-        *Filename* can be a directory - in which case the fiogure label will be used as the final part of the filename.
-        *Filename* can also include placeholders:
-            - number - the figure plot number
-            - label - the fogire label
-            - alpha/Alpha/roman/Roman/int - a counter that increases for each saved file in the current with:... block.
+    Examples:
+        Saving two figures in the same context:
 
-        SavedFigure supports reuse - so can do somethingf like.::
+        >>> cm = SavedFigure(filename="plots/figure_{label}.png", style="default", autoclose=True)
+        >>> with cm:
+        ...     plt.figure("plot1")
+        ...     plt.plot([1, 2, 3], [4, 5, 6])
+        ...     plt.show()
+        ...     plt.figure("plot2")
+        ...     plt.plot([7, 8, 9], [10, 11, 12])
+        ...     plt.show()
 
-            cm = SavedFigure(filename="figures/fig_{label}.png",
-                             style="stoiner,thesis", autoclose=True)
-            with cm:
-                plt.figure("one")
-                ....
+        After exiting the context, SavedFigure will save:
+        - plots/figure_plot1.png
+        - plots/figure_plot2.png
 
-            with cm:
-                plt.figure("two")
+        Dynamically updating SavedFigure settings during reuse:
 
-        and get `figures/fig_one.png` and `figures/fig_two.png` with a consistent styling.
+        >>> with cm(formats=["pdf", "png"]):
+        ...     plt.figure("plot3")
+        ...     plt.plot([3, 4, 5], [9, 8, 7])
+        ...     plt.show()
 
-        SavedFigure objects can be called with the same parameters as the consuctor to upadte their settings.::
-
-            cm = SavedFigure(filename="figures/fig_{label}.png",
-                             style="stoiner,thesis", autoclose=True)
-            with cm:
-                plt.figure("one")
-                ....
-
-            with cm(fprmats=["pdf","png"!]):
-                plt.figure("two")
-
-        Would do the same as above, but also creater `figures/fig_two.pdf`.
+        This saves:
+        - plots/figure_plot3.pdf
+        - plots/figure_plot3.png
     """
 
     _keys = ["filename", "style", "autoclose", "formats", "include_open"]
 
     def __init__(self, filename=None, style=None, autoclose=False, formats=None, include_open=False):
-        """Create the context manager.
-
-        Keyword Arguments:
-            filename (str, Path, default=None):
-                The filename to use for saving the figure created. If None then the figure's label is used as a
-                filename.
-            style (str, List[str, False], default is ['stoner']):
-                The mnatplotlib syslesheet(s) to use for plotting. If False, then the current styling is unchanged.
-            autoclose (bool, default=False):
-                Automatically close figures after they are saved. This leaves open figures that were open before we
-                started.
-            formats (list of str, default ["png"]):
-                List of file extensions (and hence formats) to use when saving the file.
-            include_open (bool):
-                If set to True (default is False), then existing figures will be included when saving.
-
-        """
-        super().__init__(include_open=include_open)
-        # Set internal state
+        """Initialize with default settings."""
+        # Internal state initialization
         self._filename = None
         self._formats = []
         self._style = []
-        # Copy constrictor parameters
+        self._existing_open_figs = []
+
+        # Parameter assignment
         self.filename = filename
         self.style = style
         self.autoclose = autoclose
         self.style_context = None
         self.formats = formats
+        self.include_open = include_open
 
     @property
     def filename(self):
-        """Store the filename as a Path object without an extension."""
+        """Return filename as a Path object without extension."""
         return self._filename
 
     @filename.setter
     def filename(self, value):
+        """Set filename and extract its extension if valid."""
         if value is not None:
             value = Path(value)
             ext = value.suffix[1:]
-            if ext not in self.formats:
+            if ext and ext not in self.formats:
                 self.formats.append(ext)
             value = value.parent / value.stem
         self._filename = value
 
     @property
     def formats(self):
-        """Store the output formats as a list of strings."""
+        """Return the output formats as a list of strings."""
         return self._formats
 
     @formats.setter
     def formats(self, value):
-        """Ensure formats is a list of strings."""
+        """Ensure formats are stored as a list of strings."""
         if isinstance(value, str):
-            self._formatrs = [x.strip() for x in value.split(",") if x.strip() != ""]
+            self._formats = [x.strip() for x in value.split(",") if x.strip()]
         elif isinstance(value, Iterable):
             self._formats = list(value)
         elif value is None:
-            if len(self._formats) == 0:
+            if not self._formats:  # Use default if formats aren't set
                 self._formats = ["png"]
         else:
-            raise TypeError("Cannot workout format type")
+            raise TypeError("Invalid type for formats. Expected str, iterable, or None.")
 
     @property
     def style(self):
-        """Store the stylesheets as a list of strings."""
+        """Return the stylesheets as a list of strings."""
         return self._style
 
     @style.setter
     def style(self, value):
-        """Ensure style is a list of strings."""
+        """Ensure style is stored as a list of strings."""
         if isinstance(value, str):
-            self._style = [x.strip() for x in value.split(",") if x.strip() != ""]
+            self._style = [x.strip() for x in value.split(",") if x.strip()]
         elif isinstance(value, Iterable):
             self._style = list(value)
         elif value is None:
             self._style = ["stoner"]
         else:
-            raise TypeError("Cannot workout style type")
+            raise TypeError("Invalid type for style. Expected str, iterable, or None.")
 
-    def __cal__(self, **kwargs):
-        """Update the settings and return ourself."""
-        settings = _filter_dict(kwargs, self.keys)
+    def __call__(self, **kwargs):
+        """Update settings dynamically and return self."""
+        settings = {key: kwargs[key] for key in self._keys if key in kwargs}
         for key, val in settings.items():
             setattr(self, key, val)
         return self
 
     def __enter__(self):
-        """Record the open figures and start the style context manager.
-
-        Creates a list of weak references to all the open figures. This is then used to detect whether an open figure
-        has been created within the context manager or not. We use weak references to allow figures to be closed
-        without blocking.
-        """
-        super().__enter__()
+        """Record existing open figures and enter style context (if any)."""
+        for num in plt.get_fignums():
+            if not self.include_open:
+                self._existing_open_figs.append(weakref.ref(plt.figure(num)))
         if self.style:
             self.style_context = mpl.style.context(self.style)
             self.style_context.__enter__()
 
     def __exit__(self, exc_type, exc_value, traceback):
-        """Cleanup context manager and save figures created.
-
-        First call the __exit__ of the style context manager to finish plotting with the specified stylesheet, then
-        check all the open figures and if they were not in our list of figures open before, save them with a filename
-        from the keyword parameter to __init__ or the plot label.
-        """
+        """Exit style context, save new figures, and optionally close them."""
         if self.style:
             self.style_context.__exit__(exc_type, exc_value, traceback)
 
-        processed = -1
+        self._existing_open_figs = [ref() for ref in self._existing_open_figs if ref() is not None]
+        new_file_counter = 0
 
-        for fig in self.new_figures():
-            processed += 1
+        for num in plt.get_fignums():
+            fig = plt.figure(num)
+            if fig in self._existing_open_figs:  # Skip figures opened before context
+                continue
+
+            new_file_counter += 1
             label = fig.get_label()
-            filename = self._generate_filename(label, processed)
-            self._save_figure(fig, filename, processed)
+            filename = self.generate_filename(label, new_file_counter)
+
+            for fmt in self.formats:
+                output_file = f"{filename}.{fmt.lower()}"
+                fig.savefig(output_file)
+
             if self.autoclose:
                 plt.close(fig)
 
-        self._reset_state()
-
-    def _generate_filename(self, label, processed):
-        """Generate the filename for the figure."""
-        if self.filename.is_dir():
-            filename = self.filename / "{label}"
-        else:
-            filename = self.filename or Path("{label}")
-
-        return filename
-
-    def _save_figure(self, fig, filename, processed):
-        """Save the figure in the specified formats."""
-        for fmt in self.formats:
-            new_file = filename.parent / f"{filename.stem}.{fmt.lower()}"
-            new_file = counter(processed, str(new_file), number=fig.number, label=fig.get_label())
-
-            if new_file == filename and processed > 0:
-                parts = new_file.split(".")
-                parts[-2] += f"-{processed}"
-                new_file = ".".join(parts)
-
-            fig.savefig(new_file)
-
-    def _reset_state(self):
-        """Reset the internal state of the context manager."""
-        self._open_figs = []
+        # Reset state
+        self._existing_open_figs.clear()
         self.style_context = None
 
+    def generate_filename(self, label, counter):
+        """
+        Helper to generate filenames based on `filename` and placeholders.
 
-class InsetPlot(_Preserve_Fig):
-    """A context manager to help make inset plopts a bit less painful.
+        Supports placeholders like {label}, {number}, and appends
+        a counter if multiple new figures are detected.
+        """
+        if self.filename.is_dir():
+            filename:Path = self.filename / "{label}"
+        else:
+            filename:Path = self.filename if self.filename is not None else Path("{label}")
 
-    Keyword Arguments:
-        ax (matplotlib.Axes):
-            The axes in which to create the inset. If not set (default is None), then use the current axes.
-        loc (str,int):
-            Location string - same meanings as legend locators except there isn't an "auto" value 0.
-        width, height (float):
-            Dimension of the width and height of the inset. The units are in inches unless *dimension* is "fraction" -
-            which is the default.
-        dimension (str, default 'fraction'):
-            If 'fraction' then the width and height are a fraction of the parent axes, otherwise the dimensions are
-            in inches.
+        filename = str(filename).format(label=label, number=counter)
+        # Append counter if filename lacks placeholders and multiple files
+        if "{label}" not in str(self.filename) and "{number}" not in str(self.filename) and counter > 1:
+            parts = filename.rsplit(".", 1)
+            filename = f"{parts[0]}-{counter}.{parts[1]}" if len(parts) > 1 else f"{filename}-{counter}"
+        return filename
+
+class InsetPlot(_PreserveFigureMixin):
+    """A context manager for creating inset plots in matplotlib with minimal effort.
+
+    The `InsetPlot` class simplifies the process of generating inset plots that are properly
+    positioned relative to the parent axes. It ensures that the inset labels do not overlap
+    with the parent axes and provides flexibility in specifying the dimensions, position, and
+    behavior of the inset plot.
+
+    Args:
+        ax (matplotlib.Axes, None):
+            The parent axes in which to create the inset plot. If `None` (default), the current
+            axes from `plt.gca()` are used.
+        loc (str, int):
+            Location of the inset. Accepts location strings compatible with matplotlib legends
+            (e.g., "upper left", "center", etc.) or their numeric equivalents. The default is "upper left".
+        width (float):
+            The width of the inset. Units depend on the `dimension` argument. Default is `0.25`.
+        height (float):
+            The height of the inset. Units depend on the `dimension` argument. Default is `0.25`.
+        dimension (str):
+            Specifies whether `width` and `height` are given as fractions of the parent axes
+            ("fraction") or in inches. Default is "fraction".
         switch_to_inset (bool):
-            If True (default), then within the context mananager, pyplot's current axes are set to the inset and the
-            previous axes are restored as the 'current axes' on exit.
+            If `True`, the inset axes become the current axes within the context, and the parent
+            axes are restored when the context ends. Default is `True`.
+        padding (float):
+            The padding between the inset and the parent axes. Default is `0.05`.
 
-    The InsetPlot conext manager will adjust the placement of the inset as it exists to ensure the inset axes labels
-    don't collide with the parent axes.
+    Attributes:
+        locations (dict):
+            A dictionary mapping location strings (e.g., "upper right") to their numeric equivalents.
+
+    Notes:
+        - The `dimension` parameter determines whether the `width` and `height` of the inset are
+          interpreted as fractions of the parent axes or as absolute values in inches.
+        - The context manager ensures that matplotlib's pyplot functions act on the inset axes
+          while inside the context, making plotting within the inset more convenient.
+        - After exiting the context, the placement of the inset is automatically adjusted to
+          prevent overlaps with the parent axes labels.
+
+    Examples:
+        Creating an inset plot within a parent plot:
+
+        >>> fig, ax = plt.subplots()
+        >>> ax.plot([1, 2, 3], [4, 5, 6])
+        >>> with InsetPlot(ax=ax, loc="upper right", width=0.3, height=0.3) as inset_ax:
+        ...     inset_ax.plot([1, 2, 3], [6, 5, 4])
+        >>> plt.show()
+
+        The inset plot is placed in the upper right corner of the parent plot.
+
+        Using an inset on the current axes:
+
+        >>> plt.plot([1, 2, 3], [4, 5, 6], label="Main Plot")
+        >>> with InsetPlot(loc="lower left", width=0.25, height=0.25) as inset_ax:
+        ...     inset_ax.scatter([1, 2, 3], [10, 9, 8], color="red")
+        >>> plt.show()
     """
 
     locations = {
@@ -476,36 +458,48 @@ class InsetPlot(_Preserve_Fig):
     }
 
     def __init__(
-        self,
-        ax=None,
-        loc="upper left",
-        width=0.25,
-        height=0.25,
-        dimension="fraction",
-        switch_to_inset=True,
-        padding=0.05,
+            self,
+            ax=None,
+            loc="upper left",
+            width=0.25,
+            height=0.25,
+            dimension="fraction",
+            switch_to_inset=True,
+            padding=0.05,
     ):
-        """Set the location for the axes."""
+        """
+        Initialize the `InsetPlot` context manager.
+
+        Parameters are used to configure the parent axes, inset plot dimensions, location, and
+        context behavior.
+        """
         super().__init__()
         self._ax = ax
         self._loc = loc
         if dimension == "fraction":
             if isinstance(height, float) and 0.0 < height <= 1.0:
-                height = f"{height*100:.0f}%"
+                height = f"{height * 100:.0f}%"
             if isinstance(width, float) and 0.0 < width <= 1.0:
-                width = f"{width*100:.0f}%"
+                width = f"{width * 100:.0f}%"
         self.height = height
         self.width = width
         self.padding = padding
         self.switch_to_inset = switch_to_inset
 
     def __enter__(self):
-        """Create the inset axes using the axes_grid toolkit."""
-        self._get_gcfa()  # Note the current figure and axes safely
+        """
+        Create the inset axes and adjust their positioning.
+
+        During this context, pyplot functions target the inset axes if `switch_to_inset` is `True`.
+
+        Returns:
+            matplotlib.Axes: The newly created inset axes.
+        """
+        self._store_current_figure_and_axes()  # Note the current figure and axes safely
         if self._ax is None:  # Use current axes if not passed explicitly
             self.ax = plt.gca()
         else:
-            self.ax = self.ax
+            self.ax = self._ax
         if not isinstance(self._loc, int):
             self.loc = self.locations.get(str(self._loc).lower().replace("-", " "), 1)
         else:
@@ -516,119 +510,146 @@ class InsetPlot(_Preserve_Fig):
             plt.sca(axins)
         return self.axins
 
-    def __exit__(self, exc_type, value, traceback):
-        """Reposition the inset as the standard positioning can cause labels to overlap."""
+    def __exit__(self, exc_type, exc_value, traceback):
+        """
+        Exit the context and adjust the position of the inset.
+
+        Ensures that the inset does not overlap with the parent axes labels,
+        and restores the original axes settings (if applicable).
+        """
         parent_bbox = self.ax.get_position()
         inset_bbox = self.axins.get_tightbbox().transformed(self.ax.figure.transFigure.inverted())
         inset_axes_bbox = self.axins.get_position()
-
-        dx0, dy0, rw, rh = self._calculate_dimensions(parent_bbox, inset_bbox, inset_axes_bbox)
-        x0, y0 = self._calculate_position(dx0, dy0, rw, rh)
-
-        newpos = InsetPosition(self.ax, [x0, y0, rw, rh])
-        self.axins.set_axes_locator(newpos)
-        self.ax.figure.canvas.draw()
-
-        if self.switch_to_inset:
-            self._set_gcfa()
-
-    def _calculate_dimensions(self, parent_bbox, inset_bbox, inset_axes_bbox):
-        """Calculate the dimensions for inset positioning."""
         dx0 = (inset_axes_bbox.x0 - inset_bbox.x0) / parent_bbox.width  # X axes label space
         dy0 = inset_axes_bbox.y0 - inset_bbox.y0 / parent_bbox.height  # Y axes label space
         rw = inset_bbox.width / parent_bbox.width
         rh = inset_bbox.height / parent_bbox.height
-        return dx0, dy0, rw, rh
 
-    def _calculate_position(self, dx0, dy0, rw, rh):
-        """Calculate the position based on the location."""
         if self.loc == 1:  # Upper right
-            return 1 - rw - self.padding, 1 - rh - self.padding
+            x0 = 1 - rw - self.padding
+            y0 = 1 - rh - self.padding
         elif self.loc == 2:  # Upper left
-            return dx0 + self.padding, 1 - rh - self.padding
+            x0 = dx0 + self.padding
+            y0 = 1 - rh - self.padding
         elif self.loc == 3:  # Lower left
-            return dx0 + self.padding, dy0 + self.padding
+            x0 = dx0 + self.padding
+            y0 = dy0 + self.padding
         elif self.loc == 4:  # Lower right
-            return 1 - rw - self.padding, dy0 + self.padding
+            x0 = 1 - rw - self.padding
+            y0 = dy0 + self.padding
         elif self.loc in [5, 7]:  # Right
-            return 1 - rw - self.padding, (1 - rh) / 2
+            x0 = 1 - rw - self.padding
+            y0 = (1 - rh) / 2
         elif self.loc == 6:  # Center left
-            return dx0 + self.padding, (1 - rh) / 2
+            x0 = dx0 + self.padding
+            y0 = (1 - rh) / 2
         elif self.loc == 8:  # Lower center
-            return (1 - rw) / 2, dy0 + self.padding
+            x0 = (1 - rw) / 2
+            y0 = dy0 + self.padding
         elif self.loc == 9:  # Upper center
-            return dx0 + self.padding, 1 - rh - self.padding
+            x0 = dx0 + self.padding
+            y0 = 1 - rh - self.padding
         elif self.loc == 10:  # Center
-            return (1 - rw) / 2, (1 - rh) / 2
-        return 0, 0  # Default case if location is not matched
+            x0 = (1 - rw) / 2
+            y0 = (1 - rh) / 2
+        newpos = InsetPosition(self.ax, [x0, y0, rw, rh])
+        self.axins.set_axes_locator(newpos)
+        self.ax.figure.canvas.draw()
+        if self.switch_to_inset:
+            self._restore_current_figure_and_axes()
 
 
 class _PlotContextSequence(Sequence):
-    """Base class for Plot Context Managers that deals with Sequence Like Behaviour."""
+    """A context manager that provides sequence-like access and operations for Matplotlib axes.
+
+    The `_PlotContextSequence` class is designed to handle multiple Matplotlib axes effectively
+    and provides utilities for accessing, iterating, and managing axes in a sequence-like
+    manner. It ensures that actions like iteration or item access automatically handle the
+    current Matplotlib axes state, making it easier to work with complex plots.
+
+    This class integrates with Matplotlib's state machine to ensure that the "current" figure
+    and axes are updated automatically when individual axes are accessed or iterated over.
+
+    Attributes:
+        axes (list):
+            A list containing Matplotlib axes objects for sequential access.
+        _save_fig (Optional[matplotlib.figure.Figure]):
+            Holds a reference to the current Matplotlib figure, if any, during context-saving operations.
+        _save_axes (Optional[matplotlib.axes.Axes]):
+            Holds a reference to the current Matplotlib axes, if any, during context-saving operations.
+
+    Notes:
+        - The class includes a set of sequence-like operations (`__getitem__`, `__iter__`, etc.)
+          that are seamlessly integrated with the current Matplotlib state.
+        - The `ravel` operator is used internally to manage and flatten nested axes structures.
+        - Accessing an individual axis automatically updates Matplotlib to treat it as the "current" axis.
+
+    Examples:
+        Accessing and iterating over axes:
+
+        ```python
+        sequence = _PlotContextSequence()
+        for ax in sequence:
+            ax.plot([1, 2, 3], [4, 5, 6])
+        ```
+
+        Checking if an axis is in the sequence:
+
+        ```python
+        ax in sequence  # Returns True/False
+        ```
+
+        Retrieving a specific axis and setting it as the current axis:
+
+        ```python
+        specific_ax = sequence[0]
+        ```
+    """
+
+    _NO_FIGURES_MSG = "No current figures exist."
 
     def __init__(self):
-        """Ensure private  attributes exist."""
+        """Initialize class and ensure private attributes exist."""
         self.axes = _ravel_list()
         self._save_fig = None
         self._save_axes = None
 
-    def __len__(self):
-        """Pass through to self.axes.
+    @property
+    def raveled_axes(self):
+        """Unravel and provide the flattened list of axes."""
+        return self.axes.ravel()
 
-        Note:
-            self.axes may be a _ravel_list - so unravel the list first.
-        """
-        return len(self.axes.ravel())
+    def __len__(self):
+        """Return the number of axes."""
+        return len(self.raveled_axes)
 
     def __contains__(self, value):
-        """Pass through to self.axes.
-
-        Note:
-            self.axes may be a _ravel_list - so unravel the list first.
-        """
-        return value in self.axes.ravel()
+        """Check if a value is contained within the axes."""
+        return value in self.raveled_axes
 
     def __getitem__(self, index):
-        """Pass through to self.axes.
-
-        Notes:
-            If the result is a single axes instance, then call :py:func:`matplotlib.pyplot.sca`
-            with it.
-        """
+        """Get axis item at index and optionally set it as current."""
         ret = self.axes[index]
-        if isinstance(ret, mpl.axes.Axes):
-            plt.sca(ret)
+        self._check_single_axis_selection(ret)
         return ret
 
     def __iter__(self):
-        """Iterate over self.axes.
-
-        Note:
-            self.axes may be a _ravel_list - so unravel the list first.
-        """
-        for ax in self.axes.ravel():
+        """Iterate over the axes and set each as current when iterating."""
+        for ax in self.raveled_axes:
             plt.sca(ax)
             yield ax
 
     def __reversed__(self):
-        """Iterate over reversed self.axes.
+        """Iterate in reverse over the axes and set each as current."""
+        yield from reversed(self.raveled_axes)
 
-        Note:
-            self.axes may be a _ravel_list - so unravel the list first.
-        """
-        yield from reversed(self.axes.ravel())
+    def _check_single_axis_selection(self, ret):
+        """If the result is a single axis, set it as the current axis."""
+        if isinstance(ret, mpl.axes.Axes):
+            plt.sca(ret)
 
-    def _get_gcfa(self):
-        """Safely get the currenbt figure and axes without creating new ones.
-
-        Notes:
-            Checks if plt.get_fignums() is empty and if so, leaves the figure and axes unset
-            Otherwise, getsa the current figure and then checks whether that has axes or not
-            and if so, stores the current axes.
-
-            The problem with naively calling plt.gcf() and plt.gca() is that they will create
-            new figures and axes if they don't exist.
-        """
+    def _save_current_fig_and_axes(self):
+        """Safely save the current figure and axes without creating new ones."""
         self._save_fig = None
         self._save_axes = None
         if not plt.get_fignums():  # No current figures
@@ -637,85 +658,104 @@ class _PlotContextSequence(Sequence):
         if self._save_fig.axes:
             self._save_axes = plt.gca()
 
-    def _set_gcfa(self):
-        """Set the current figure and axes from state if not None.
-
-        This safely revets the effect of the _get_gcfa() method.
-        """
+    def _restore_saved_fig_and_axes(self):
+        """Restore the saved figure and axes, if not None."""
         if self._save_axes:
             plt.sca(self._save_axes)
         elif self._save_fig:
             plt.figure(self._save_fig)
 
 
-class MultiPanel(_PlotContextSequence, _Preserve_Fig):
-    """A context manager for sorting out multi-panel plots in matplotlib.
+class MultiPanel(_PlotContextSequence, _PreserveFigureMixin):
+    """Context manager for creating multi-panel plots in Matplotlib.
+
+    The `MultiPanel` class simplifies the process of creating and managing multi-panel plots. It supports both regular
+    and irregular grids of subplots, automatically adjusts figure sizes, supports shared axes options, and can apply
+    labeling patterns to subplots.
 
     Args:
-        panels (tuple[int.int],int, List[int]):
-            Nunber of sub-plots to produce.
-            - tuple(rows, columns) - regular grid of rows and coluimns
-            - int - Make a grid of 1 row and n columns
-            - list(columns per row) - make an irregular grid of different numbers of plots on each row.
+        panels (tuple[int, int], int, or list[int]):
+            Specifies the number of subplots to create. Options:
+            - `tuple(rows, columns)`: Regular grid with the specified number of rows and columns.
+            - `int`: Single row grid with `n` columns.
+            - `list[int]`: Irregular grid where each element specifies the number of panels in a row.
 
     Keyword Args:
-        figure (matplotlib.Figure):
-            Figure to use to contain the sub-plots in. If None (default) then the current figure is used.
-        sharex, sharey (bool):
-            Wherther the sub-plots have common x or y axes. Default is neither.
-        adjust_figsize (tuple[float,float], float,bool):
-            Whether to increase the figure height to accomodate the extra plots. If True, the figure is
-            increased by 0.6 of the original height and 1 times the original width  for each additional sub-plot
-            row or column after the first. If a float is given, then the additional height ad width factor is the
-            adjust_figsize value. If a tuple, them separate expansion factors can be given for each dimenion
-            (width, height). The default is True, or 0.8
+        figure (matplotlib.figure.Figure):
+            Figure to contain the subplots. Defaults to the current active figure if `None`.
+        sharex (bool):
+            Enables shared x-axis among subplots. Default is `False`.
+        sharey (bool):
+            Enables shared y-axis among subplots. Default is `False`.
+        adjust_figsize (bool, float, or tuple[float, float]):
+            Adjusts figure size to fit the subplots. Options:
+            - `True` (default): Automatically adjusts width/height using pre-defined factors for extra rows/columns.
+            - `float`: Applies a uniform factor for width and height adjustment.
+            - `tuple[float, float]`: Separately adjusts width and height with the provided factors.
         label_panels (str or bool):
-            Whether to add (a), (b) etc. to the sub-plots. Default of True positions labels in the top right corner of
-            the sub-plots. The top sub-plot is the first one. If a string, then use this as a the pattern to determine
-            how to format the plot number to a string. The default value of True corresponds to '({alpha})', other
-            supported counters are
-            - int - simpe numeral
-            - alpha / Alpha - lower / uppper case letters
-            - roman / Roman - lower / upper case Roman numerals.
+            Adds subplot labels (e.g., "(a)", "(b)"). Default of `True` applies the `({alpha})` format. If a string is
+            provided, it is used as the format pattern.
         same_aspect (bool):
-            If *nnplots* is in use then the aspect ratio of each plot will be adjusted to be the same unless you
-            set this to be False, or unless you pass *width_ratios* or *height_ratios* to control the aspect ratios.
+            Ensures all subplots have the same aspect ratio. Ignored if width or height ratios are specified in
+            GridSpec-related configurations. Default is `True`.
         transpose (bool):
-            If True, then transpose the rows and columns if panels is a tuple. If panels is a list, then assume that
-            the list specifies the number of rows in each column rather than the default of assuming if is the number
-            of columns in each row.
+            Interprets the grid layout based on transposed rows and columns. For irregular grids, rows are treated as
+            columns if `transpose=True`. Default is `False`.
 
-        kwargs:
-            Other keyword arguments can be used to set the label fonts and are passed into ax.set_title, arguments
-            for GridSpec are passed to fig.add_gridspec.
+        **kwargs:
+            Additional keyword arguments passed down to:
+            - `ax.set_title` for subplot font adjustments.
+            - `fig.add_gridspec` for grid configuration.
 
     Returns:
-        (List[matplotlib.Axes]):
-            The context manager bariable is the list of axes created.
+        List[matplotlib.axes.Axes]:
+            List of the created Matplotlib Axes.
 
     Notes:
-        Since double-column figures in journals are more than twice the single figure dimension, it might be useful to
-        use the double width figure stylesheet, and then specify an *adjust_figsize* of (0,<something>) to keep the
-        full width figure setting and expand the height as required (bearing in mind the double column figures often
-        already have more height.)
+        - For wide multi-column plots in journal submissions, use double-width figure styles along with
+          `adjust_figsize` to maintain figure height while increasing width.
+        - The `nplots` parameter is deprecated. Use the `panels` argument instead to specify the number of subplots.
+
+    Examples:
+        Create a 2x3 grid with shared x-axis and labeled panels:
+
+        ```python
+        with MultiPanel((2, 3), sharex=True, label_panels=True) as axes:
+            for ax in axes:
+                ax.plot([1, 2, 3], [4, 5, 6])
+        ```
+
+        Create an irregular grid with 2 rows (3 panels in the first row, 1 in the second):
+
+        ```python
+        with MultiPanel([3, 1], adjust_figsize=(0.5, 1.0)) as axes:
+            axes[0].plot([1, 2, 3], [3, 2, 1])
+            axes[1].scatter([1, 2, 3], [4, 5, 6])
+        ```
     """
 
     def __init__(
-        self,
-        panels,
-        figure=None,
-        sharex=False,
-        sharey=False,
-        adjust_figsize=True,
-        label_panels=True,
-        same_aspect=True,
-        transpose=False,
-        **kwargs,
+            self,
+            panels,
+            figure=None,
+            sharex=False,
+            sharey=False,
+            adjust_figsize=True,
+            label_panels=True,
+            same_aspect=True,
+            transpose=False,
+            **kwargs,
     ):
-        """Configure figure and a gridspec for multi-panel plotting."""
+        """Initialize the context manager for creating a grid of subplots.
+
+        Sets up the figure and grid layout based on the provided `panels` argument, allowing customization of subplot
+        configurations such as shared axes, automatic size adjustments, and labeling.
+        """
         super().__init__()
-        if isinstance(panels, int):  # Assume 1 x panels
-            panels = (1, panels)
+
+        # Handle different `panels` input formats
+        if isinstance(panels, int):
+            panels = (1, panels)  # Assume a single-row grid
         self.panels = panels
         self._fig_arg = figure
         self.gs = None
@@ -723,132 +763,114 @@ class MultiPanel(_PlotContextSequence, _Preserve_Fig):
         self.sharey = sharey
         self._adjust_figsize_arg = adjust_figsize
         self.transpose = transpose
-        # Adjust fig size can be a tuple
+
+        # Determine if labels are enabled or a pattern is provided
         self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
+
+        # Set up aspect ratio handling and kwargs
         self.kwargs = kwargs
-        self.same_aspect = "height_ratios" not in kwargs and "wdith_ratios" not in kwargs and same_aspect
-        if "nplots" in self.kwargs:
-            warnings.warn(
-                "nplots aregument is depricated. Pass the same value directly as the number of panels now.",
-                DeprecationWarning,
+        self.same_aspect = not any(key in kwargs for key in ["width_ratios", "height_ratios"]) and same_aspect
+
+        # Deprecation warning for `nplots` keyword
+        if "nplots" in kwargs:
+            raise DeprecationWarning(
+                "The `nplots` argument is deprecated. Use the `panels` argument instead to specify the number of subplots."
             )
-            self.panels = self.kwargs.pop("nplots")
+            self.panels = kwargs.pop("nplots")
 
     def __enter__(self):
-        """Create the grid of axes."""
+        """Create and configure the subplots for the figure.
+
+        Saves the current figure and axes context, adjusts the figure size, creates a grid of subplots based on `panels`.
+        Also applies panel labeling and aspect-ratio adjustments if specified.
+        """
+        # Save the current figure/axes context and configure the figure
         self._get_gcfa()
-        self._set_figure()
-        self._adjust_figure_size()
-        self._create_gridspec()
-        self._label_subplots()
+        self.figure = self._fig_arg or plt.gcf()
+
+        if isinstance(self.figure, int) and self.figure in plt.get_fignums():
+            self.figure = plt.figure(self.figure)  # Activate by figure ID
+        elif isinstance(self.figure, str) and self.figure in plt.get_figlabels():
+            self.figure = plt.figure(self.figure)  # Activate by figure label
+        plt.figure(self.figure)  # Switch to the specified figure
+
+        # Process and interpret figure size adjustments
+        if isinstance(self._adjust_figsize_arg, bool):
+            adjust = (0.8, 0.6) if self._adjust_figsize_arg else (0, 0)
+        elif isinstance(self._adjust_figsize_arg, (float, tuple)):
+            adjust = self._adjust_figsize_arg
+        else:
+            raise ValueError("Invalid value for `adjust_figsize`. Must be a bool, float, or (float, float) tuple.")
+        self.adjust_figsize = adjust
+        self.figsize = (self.figure.get_figwidth(), self.figure.get_figheight())
+
+        # Generate subplot grids based on the `panels` argument
+        if isinstance(self.panels, tuple):
+            self._create_subplots(self.panels)
+        elif isinstance(self.panels, list):
+            self._create_irregular_subplots(self.panels)
+        else:
+            raise TypeError("Invalid `panels` value. Must be a tuple, int, or list.")
+
+        # Adjust figure size and add subplot labels if needed
+        if self.adjust_figsize:
+            self._adjust_figure_size()
+        if self.label_panels:
+            self._label_panels()
+
         return self
 
-    def __exit__(self, exc_type, value, traceback):
-        """Clean up the axes."""
-        self.figure.canvas.draw()
-        if self.same_aspect:  # Force the aspect ratios to be the same
-            asp = np.array([ax.bbox.width / ax.bbox.height for ax in self.axes.ravel()]).min()
-            for ax in self.axes.ravel():
-                ax.set_box_aspect(1 / asp)
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Finalize the subplots and perform clean up.
 
+        Ensures that all settings, aspect ratios, and grid configurations are properly applied and regenerates
+        the figure canvas for display.
+        """
+        self.figure.canvas.draw()
+        if self.same_aspect:
+            self._enforce_aspect_ratio()
         self._set_gcfa()
 
-    def _set_figure(self):
-        """Set the figure based on the provided figure argument or the current figure."""
-        self.figure = self._fig_arg or plt.gcf()
-        if isinstance(self.figure, int):
-            self.figure = plt.figure(self.figure)
-        elif isinstance(self.figure, str):
-            self.figure = plt.figure(self.figure)
-        plt.figure(self.figure)
-
-    def _adjust_figure_size(self):
-        """Adjust the figure size if necessary."""
-        adjust_figsize = self._adjust_figsize_arg
-        if isinstance(adjust_figsize, bool):
-            adjust_figsize = (int(adjust_figsize), int(adjust_figsize) * 0.8)
-        elif isinstance(adjust_figsize, float):
-            adjust_figsize = (adjust_figsize, adjust_figsize)
-        self.adjust_figsize = adjust_figsize
-        self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
-
-    def _create_gridspec(self):
-        """Create the gridspec for the subplots."""
-        if isinstance(self.panels, int):
-            self._create_subplots((1, self.panels) if not self.transpose else (self.panels, 1))
-        elif isinstance(self.panels, list):
-            self._create_subplots(
-                (
-                    (len(self.panels), np.prod(np.unique(self.panels)))
-                    if not self.transpose
-                    else (np.prod(np.unique(self.panels)), len(self.panels))
-                ),
-                self.panels,
-            )
-        elif isinstance(self.panels, tuple):
-            self._create_subplots(self.panels)
-        else:
-            raise TypeError(f"Unable to interpret the number of panels to create: {self.panels}")
-        if self.adjust_figsize:
-            self._do_figure_adjustment()
-
-    def _label_subplots(self):
-        """Label the subplots if necessary."""
-        if self.label_panels:
-            self._label_figure()
-
-    def _create_subplots(self, panels, nplots=None):
+    def _Create_subplots(self, panels, nplots=None):
         """Create the subplots for the given panels."""
         gs_kwargs = _filter_dict(self.kwargs, _gsargs)
         self.gs = self.figure.add_gridspec(*panels, **gs_kwargs)
-        self.axes = _ravel_list([])
-
         if nplots is not None:
             used = np.zeros(panels, dtype=bool)
+            self.axes = _ravel_list([])
             for r in range(panels[0]):
                 row_axes = []
                 for c in range(panels[1]):
                     if used[r, c]:
                         continue  # already taken this subplot
-                    extent = self._calculate_extent(panels, nplots, r, c)
-                    self._mark_used(used, r, c, extent)
-                    subplot = self._create_subplot(r, c, extent)
-                    row_axes.append(subplot)
+                    if self.transpose:
+                        extent = panels[0] // nplots[c]
+                        used[r : r + extent, c] = True
+                    else:
+                        extent = panels[1] // nplots[r]
+                        used[r, c : c + extent] = True
+                    if self.transpose:
+                        row_axes.append(self.figure.add_subplot(self.gs[r : r + extent, c]))
+                    else:
+                        row_axes.append(self.figure.add_subplot(self.gs[r, c : c + extent]))
                 self.axes.append(row_axes)
         else:
             self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
 
-    def _calculate_extent(self, panels, nplots, r, c):
-        """Calculate the extent of the subplot."""
-        if self.transpose:
-            return panels[0] // nplots[c]
-        return panels[1] // nplots[r]
-
-    def _mark_used(self, used, r, c, extent):
-        """Mark the used subplots in the grid."""
-        if self.transpose:
-            used[r : r + extent, c] = True
+    def _do_figure_adjuement(self):
+        """Work out how to adjust figure size."""
+        f = self.adjust_figsize[0]
+        if f < 0:
+            extra_w = self.figsize[0] * (1 + f)
         else:
-            used[r, c : c + extent] = True
-
-    def _create_subplot(self, r, c, extent):
-        """Create a subplot for the given row, column, and extent."""
-        if self.transpose:
-            return self.figure.add_subplot(self.gs[r : r + extent, c])
-        return self.figure.add_subplot(self.gs[r, c : c + extent])
-
-    def _do_figure_adjustment(self):
-        """Adjust the figure size based on the adjust_figsize setting."""
-        extra_width = self._calculate_dimension(self.figsize[0], self.adjust_figsize[0], self.panels[1])
-        extra_height = self._calculate_dimension(self.figsize[1], self.adjust_figsize[1], self.panels[0])
-        self.figure.set_figwidth(extra_width)
-        self.figure.set_figheight(extra_height)
-
-    def _calculate_dimension(self, base_size, factor, panels_count):
-        """Calculate the extra dimension (width or height) based on the factor and panels count."""
-        if factor < 0:
-            return base_size * (1 + factor)
-        return base_size * factor * (panels_count - 1) + base_size
+            extra_w = self.figsize[0] * f * (self.panels[1] - 1) + self.figsize[0]
+        f = self.adjust_figsize[1]
+        if f < 0:
+            extra_h = self.figsize[1] * (1 + f)
+        else:
+            extra_h = self.figsize[1] * f * (self.panels[0] - 1) + self.figsize[1]
+        self.figure.set_figwidth(extra_w)
+        self.figure.set_figheight(extra_h)
 
     def _label_figure(self):
         """Do the subplot figure labelling."""
@@ -858,79 +880,90 @@ class MultiPanel(_PlotContextSequence, _Preserve_Fig):
             ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
             y = (ax_height - title_pts * 1.5) / ax_height
 
-            ax.set_title(f" {counter(ix, self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs))
+            ax.set_title(f" {counter(ix,self.label_panels)}", loc="left", y=y, **_filter_dict(self.kwargs, _fontargs))
 
 
 class StackVertical(MultiPanel):
-    """A context manager that will generate a stack of subplots with common x axes.
+    """A context manager for generating a vertical stack of subplots with shared x-axes.
+
+    This class creates a vertical stack of subplots, optionally removing the vertical space between them
+    for a clean and compact layout. Automatically handles adjustments to the figure height, subplot
+    alignment, and axes label formatting.
 
     Args:
         number (int):
-            Nunber of sub-plots to stack vertically.
+            The number of subplots to stack vertically.
 
     Keyword Args:
         figure (matplotlib.Figure):
-            Figure to use to contain the sub-plots in. If None (default) then the current figure is used.
+            The figure to use for the subplots. Defaults to the current active figure if `None`.
         joined (bool):
-            Whether to remove the vertical space between the sub-plots or not. Default is True.
-        sharex, sharey (bool):
-            Wherther the sub-plots have common x or y axes. Default is shared x and separate y.
-        adjust_figsize (float,bool):
-            Whether to increase the figure height to accomodate the extra plots. If True, the figure is
-            increased by 0.6 of the original height for each additional sub-plot after the first. If a float
-            is given, then the additional height factor is the adjust_figsize value. The default is True, or 0.6
+            Whether to remove vertical space between subplots for a seamless look. Default is `True`.
+        sharex (bool):
+            Whether the subplots share the same x-axis. Default is `True`.
+        sharey (bool):
+            Whether the subplots share the same y-axis. Default is `False`.
+        adjust_figsize (bool or float):
+            Whether to adjust the figure height to accommodate additional subplots. Options:
+            - `True` (default): Increases figure height by `0.6` of the original height for each additional subplot
+              beyond the first.
+            - `float`: Specifies a custom height adjustment factor for each additional subplot.
         label_panels (str or bool):
-            Whether to add (a), (b) etc. to the sub-plots. Default of True positions labels in the top right corner of
-            the sub-plots. The top sub-plot is the first one. If a string, then use this as a the pattern to determine
-            how to format the plot number to a string. The default value of True corresponds to '({alpha})', other
-            supported counters are
-            - int - simpe numeral
-            - alpha / Alpha - lower / uppper case letters
-            - roman / Roman - lower / upper case Roman numerals.
-
-        kwargs:
-            Other keyword arguments can be used to set the label fonts and are passed into ac.set_title and gridspec
-            arguments are passed to fig.add_gridspec.
+            Adds labels (e.g., "(a)", "(b)") to the subplots for clear identification.
+            - Default is `True`, which applies the `({alpha})` pattern.
+            - A custom string can be provided to format the labels.
+        **kwargs:
+            Additional arguments:
+            - Passed to `ax.set_title` for subplot fonts.
+            - GridSpec arguments passed to `fig.add_gridspec`.
 
     Returns:
-        (List[matplotlib.Axes]):
-            The context manager bariable is the list of axes created.
+        List[matplotlib.axes.Axes]:
+            The list of axes created within the context.
 
     Notes:
-        Matplotlib's constrained layout makes it extra hard to get the pots to stack with no space between them as
-        labels and figure titles can get in the way and the whole point of constrained layout is to avoid these
-        elements colliding. The context manager gets around this by inspecting the y-ticks and y-limits in the
-        __exit__  method and adjusting limits as necessary to keep the tick lables from clashing. Within the context
-        manager, the current figure will be the one with the stacked axes. The previous active figure is restored on
-        exit.
+        - Matplotlib's layout engine can make it challenging to remove vertical space between stacked subplots
+          due to constraints on label and title positioning. This class manages this for you by adjusting y-limits
+          and ensuring tick labels do not overlap.
+        - The current figure during the context is the one with the stacked subplots. Upon exiting the context,
+          the previous active figure is restored.
+
+    Examples:
+        Create a vertical stack of 3 subplots with shared x-axes:
+
+        ```python
+        with StackVertical(3, sharex=True, joined=True) as axes:
+            for ax in axes:
+                ax.plot([1, 2, 3], [4, 5, 6])
+        ```
     """
 
     def __init__(
-        self,
-        number,
-        figure=None,
-        joined=True,
-        sharex=True,
-        sharey=False,
-        adjust_figsize=True,
-        label_panels=True,
-        **kwargs,
+            self,
+            number,
+            figure=None,
+            joined=True,
+            sharex=True,
+            sharey=False,
+            adjust_figsize=True,
+            label_panels=True,
+            **kwargs,
     ):
-        """Set up for the stack of plots."""
+        """Initialize the StackVertical class with configuration for stacked subplots."""
         self.number = number
         self.joined = joined
         self._fig_tmp = figure
         self.gs = None
         self.sharex = sharex
         self.sharey = sharey
-        self.hspace = 0 if self.joined else self.kwargs.pop("hspace", 0.1)
+        self.hspace = 0 if self.joined else kwargs.pop("hspace", 0.1)
         self.adjust_figsize = adjust_figsize if isinstance(adjust_figsize, float) else float(int(adjust_figsize)) * 0.8
         self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
         self.align_labels = kwargs.pop("align__labels", True)
         self.kwargs = kwargs
 
     def __enter__(self):
-        """Create the grid of axes."""
+        """Set up and create the stacked subplots."""
         panels = (self.number, 1)
         super().__init__(
             panels,
@@ -942,43 +975,29 @@ class StackVertical(MultiPanel):
             same_aspect=False,
             **self.kwargs,
         )
-
         return super().__enter__()
 
-    def __exit__(self, exc_type, value, traceback):
-        """Clean up the axes."""
+    def __exit__(self, type, value, traceback):
+        """Clean up and adjust the subplot layout upon exiting the context."""
         if self.joined:
-            self._label_outer_axes()
+            for ax in self.axes:
+                ax.label_outer()
             plt.draw()
-            self._adjust_limits_for_axes()
-            self._adjust_layout_engine()
-
+            for ix, ax in enumerate(self.axes):
+                self._fix_limits(ix, ax)
+            eng = self.figure.get_layout_engine()
+            rect = list(eng.get()["rect"])
+            h = self.figure.get_figheight()
+            boundary = 0.05 / h
+            rect[1] = boundary if rect[1] == 0 else rect[1]
+            rect[3] = 1 - 2 * boundary if rect[3] == 1 else rect[3]
+            self.figure.get_layout_engine().set(h_pad=0.0, hspace=0.0, rect=rect)
         self._align_labels()
         self.figure.canvas.draw()
         self._set_gcfa()
 
-    def _label_outer_axes(self):
-        """Label outer axes."""
-        for ax in self.axes:
-            ax.label_outer()
-
-    def _adjust_limits_for_axes(self):
-        """Adjust y-limits for all axes."""
-        for ix, ax in enumerate(self.axes):
-            self._fix_limits(ix, ax)
-
-    def _adjust_layout_engine(self):
-        """Adjust the layout engine settings."""
-        eng = self.figure.get_layout_engine()
-        rect = list(eng.get()["rect"])
-        h = self.figure.get_figheight()
-        boundary = 0.05 / h
-        rect[1] = boundary if rect[1] == 0 else rect[1]
-        rect[3] = 1 - 2 * boundary if rect[3] == 1 else rect[3]
-        self.figure.get_layout_engine().set(h_pad=0.0, hspace=0.0, rect=rect)
-
     def _align_labels(self):
-        """Align y-axist labels."""
+        """Align the y-axis labels across all subplots."""
         if not self.align_labels:
             return
         label_pos = []
@@ -990,36 +1009,21 @@ class StackVertical(MultiPanel):
             ax.yaxis.set_label_coords(label_pos, 0.5)
 
     def _fix_limits(self, ix, ax):
-        """Adjust y-limits so labels are inside the axes frame."""
-        dy = self._calculate_dy(ax)
+        """Adjust the y-axis limits to ensure tick labels are inside the axes frame."""
+        fig = self.figure
+        fnt_pts = ax.yaxis.get_ticklabels()[0].get_fontsize()
+        ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
+        dy = fnt_pts / ax_height  # Space needed in axes units for labels.
         ylim = list(ax.get_ylim())
-        tr = ax.transData + ax.transAxes.inverted()  # Transform Data to Axes
-        yticks = self._get_yticks_in_axes_units(ax, tr)
+        tr = ax.transData + ax.transAxes.inverted()  # Transform data to axes units
+        yticks = [tr.transform((0, x))[1] for x in ax.get_yticks()]  # Tick positions in axes units.
 
-        if yticks[1] < dy and ix != len(self.axes) - 1:  # Adjust range of plots except bottom one
-            ylim[0] = self._adjust_ylim_lower(tr, -dy)
-        if yticks[-2] < 1.0 - dy and ix != 0:  # Adjust range of plots except top one.
-            ylim[1] = self._adjust_ylim_upper(tr, 1 + dy)
+        if yticks[1] < dy and ix != len(self.axes) - 1:  # Adjust range for non-bottom plots
+            ylim[0] = tr.inverted().transform((0, -dy))[1]
+        if yticks[-2] < 1.0 - dy and ix != 0:  # Adjust range for non-top plots
+            ylim[1] = tr.inverted().transform((0, 1 + dy))[1]
         ax.set_ylim(ylim)
         self.figure.canvas.draw()
-
-    def _calculate_dy(self, ax):
-        """Calculate the space needed in axes units for the label."""
-        fnt_pts = ax.yaxis.get_ticklabels()[0].get_fontsize()
-        ax_height = ax.bbox.transformed(self.figure.transFigure.inverted()).height * self.figure.get_figheight() * 72
-        return fnt_pts / ax_height
-
-    def _get_yticks_in_axes_units(self, ax, tr):
-        """Get y-tick locations in axes units."""
-        return [tr.transform((0, x))[1] for x in ax.get_yticks()]
-
-    def _adjust_ylim_lower(self, tr, dy):
-        """Adjust the lower y-limit."""
-        return tr.inverted().transform((0, dy))[1]
-
-    def _adjust_ylim_upper(self, tr, dy):
-        """Adjust the upper y-limit."""
-        return tr.inverted().transform((0, dy))[1]
 
 
 if __name__ == "__main__":
