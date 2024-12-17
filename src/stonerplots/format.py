@@ -6,7 +6,7 @@ from matplotlib.ticker import Locator
 from matplotlib.ticker import NullFormatter
 import numpy as np
 
-from .context import _TrackPlots
+from .context import _PlotContextSequence
 
 
 def _round(value, offset=2):
@@ -116,7 +116,7 @@ class TexEngFormatter(EngFormatter):
         return f"{value:g}"
 
 
-class PlotLabeller(_TrackPlots):
+class PlotLabeller(_PlotContextSequence):
     """Adjust the x and y axis tick formatters of plots created in the context handler.
 
     Keyword Arguments:

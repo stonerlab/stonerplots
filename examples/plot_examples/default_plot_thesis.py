@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from stonerplots import MultiPanel
 from stonerplots import SavedFigure
 
-with SavedFigure(figures / "fig02h_{int}", style="stoner,thesis", formats="pdf,png", autoclose=True):
+with SavedFigure(figures / "fig02h_{number}", style="stoner,thesis", formats="pdf,png", autoclose=True):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:
         ax.plot(x, model(x, p), label=p, marker="")
