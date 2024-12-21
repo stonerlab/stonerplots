@@ -2,7 +2,8 @@
 
 ## v1.6.0 Release
 
-New features:
+New features
+
 - Added the inset autolocator code.
 - Added a medium resolution style sheet.
 - PlotLabeller context manager to apply axes formatting to new figures.

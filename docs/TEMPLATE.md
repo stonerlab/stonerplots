@@ -5,35 +5,50 @@ Docstrings should be written in ReStructured Text format.
 
 ## General Structure
 
-1.  **Short Summary**
+1. **Short Summary**
+
     - A brief description of the class or method functionality.
     - This should include a one line summary written as an imperitive satement,
       followed by a longer summary of the purpose of the class, function or method.
     - The on line summary should start on the openning """" of the docstring.
-2.  **Args**
+
+2. **Args**
+
     - A section describing the positional parameters in order.
     - Each parameter should be described following the format:
       `parameter_name (type): Description of what the parameter represents.`
     - If the description takes more than the remainder of the line, it should
       form a short block.
-3.  **Keyword Parameters**
+
+3. **Keyword Parameters**
+
     - A section describing the keyword parameters.
     - Each keyword parameter should be described following the format:
     - `parameter_name (type): Description of what the parameter represents.`
        and the default value.`
-3.  **Attributes**
+
+3. **Attributes**
+
     - Provide brief explanations for key internal class attributes:
       `attribute_name (type): Description.`
-4.  **Raises**
+
+4. **Raises**
+
     - Provide a list of any Exceptions that are eplicitly raised with a
       brief description of the circumstances in which they are raise.
-5.  **Returns**
+
+5. **Returns**
+
     - Indicate the return type of the function or method.
     - Give a brief description of the return value.
-6.  **Notes**
+
+6. **Notes**
+
     - Explain important implementation details, gotchas, or assumptions.
     - THis section may be omitted if there are no important details or gotchas.
-5.  **Examples**
+
+5. **Examples**
+
     - Include real-world examples of how to use the functionality, both basic and advanced.
     - This section may be omitted for functions, methods and classes that are not intended
       for third parties to use - for example, base classes, internal or private functions or methods.
