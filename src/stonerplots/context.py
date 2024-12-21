@@ -13,9 +13,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
-# Project-specific imports
-from stonerplots import *  # NOQA:
-
 from .util import find_best_position, move_inset, new_bbox_for_loc
 
 __all__ = ["SavedFigure", "InsetPlot", "StackVertical", "MultiPanel", "counter", "roman"]
@@ -988,7 +985,7 @@ class StackVertical(MultiPanel):
         )
         return super().__enter__()
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, value, traceback):
         """Clean up and adjust the subplot layout upon exiting the context."""
         if self.joined:
             for ax in self.axes:
