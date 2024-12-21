@@ -6,7 +6,7 @@ from matplotlib.ticker import Locator
 from matplotlib.ticker import NullFormatter
 import numpy as np
 
-from .context import _PlotContextSequence
+from .context import _TrackNewFiguresAndAxes
 
 
 def _round(value, offset=2):
@@ -116,7 +116,7 @@ class TexEngFormatter(EngFormatter):
         return f"{value:g}"
 
 
-class PlotLabeller(_PlotContextSequence):
+class PlotLabeller(_TrackNewFiguresAndAxes):
     """Adjust the x and y axis tick formatters of plots created in the context handler.
 
     Keyword Arguments:
@@ -164,7 +164,7 @@ class PlotLabeller(_PlotContextSequence):
 
     def __exit__(self, exc_type, exc_value, traceback):
         """Apply the ticker formatter to all the opened axes."""
-        for ax in self.new_axes():
+        for ax in self.new_axes:
             for name in ("xaxis", "yaxis", "zaxis"):
                 axis = getattr(ax, name, None)
                 if not axis:
@@ -180,3 +180,4 @@ class PlotLabeller(_PlotContextSequence):
                         axis.set_major_locator(elem)
                         if not isinstance(axis.get_minor_locator(), NullFormatter):
                             axis.set_minor_locator(elem)
+        super().__exit__(exc_type, exc_value, traceback)

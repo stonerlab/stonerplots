@@ -141,6 +141,47 @@ def counter(value, pattern="({alpha})", **kwargs):
     return pattern.format(alpha=alpha, Alpha=alpha.upper(), roman=Roman.lower(), Roman=Roman, int=value, **kwargs)
 
 
+class _TrackNewFiguresAndAxes:
+    """A simple context manager to handle identiifying new figures or axes."""
+
+    def __init__(self, *args, **kwargs):
+        """Set storage of figures and axes."""
+        super().__init__()
+        self._existing_open_figs = []
+        self._existing_open_axes = {}
+        self.include_open = kwargs.pop("include_open", False)
+
+    def __enter__(self):
+        """Record any already open figures and axes."""
+        for num in plt.get_fignums():
+            if not self.include_open:
+                self._existing_open_figs.append(weakref.ref(plt.figure(num)))
+                self._existing_open_axes[num] = [weakref.ref(ax) for ax in plt.figure(num).axes]
+
+    @property
+    def new_figures(self):
+        """Return an iterator over figures created since the context manager was entered."""
+        for num in plt.get_fignums():
+            fig = plt.figure(num)
+            if fig in self._existing_open_figs:  # Skip figures opened before context
+                continue
+            yield fig
+
+    @property
+    def new_axes(self):
+        """Return an iterator over all new axes created since the context manager was entered."""
+        for num in plt.get_fignums():
+            fig = plt.figure(num)
+            for ax in fig.axes:
+                if ax in self._existing_open_axes:  # Skip figures opened before context
+                    continue
+                yield ax
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Clean up the saved figures and axes."""
+        self._existing_open_figs = []
+        self._existing_open_axes = {}
+
 
 class _PreserveFigureMixin:
     """Mixin for preserving the current figure and axes."""
@@ -178,7 +219,7 @@ class _PreserveFigureMixin:
             plt.figure(self._saved_figure)  # Restore current figure
 
 
-class SavedFigure(_PreserveFigureMixin):
+class SavedFigure(_TrackNewFiguresAndAxes, _PreserveFigureMixin):
     """A context manager for applying plotting styles and saving matplotlib figures.
 
     This class simplifies the process of managing figure styling and saving multiple figures
@@ -258,10 +299,10 @@ class SavedFigure(_PreserveFigureMixin):
     def __init__(self, filename=None, style=None, autoclose=False, formats=None, include_open=False):
         """Initialize with default settings."""
         # Internal state initialization
+        super().__init__(include_open=False)
         self._filename = None
         self._formats = []
         self._style = []
-        self._existing_open_figs = []
 
         # Parameter assignment
         self.filename = filename
@@ -269,7 +310,6 @@ class SavedFigure(_PreserveFigureMixin):
         self.autoclose = autoclose
         self.style_context = None
         self.formats = formats
-        self.include_open = include_open
 
     @property
     def filename(self):
@@ -331,9 +371,7 @@ class SavedFigure(_PreserveFigureMixin):
 
     def __enter__(self):
         """Record existing open figures and enter style context (if any)."""
-        for num in plt.get_fignums():
-            if not self.include_open:
-                self._existing_open_figs.append(weakref.ref(plt.figure(num)))
+        super().__enter__()
         if self.style:
             self.style_context = mpl.style.context(self.style)
             self.style_context.__enter__()
@@ -346,10 +384,7 @@ class SavedFigure(_PreserveFigureMixin):
         self._existing_open_figs = [ref() for ref in self._existing_open_figs if ref() is not None]
         new_file_counter = 0
 
-        for num in plt.get_fignums():
-            fig = plt.figure(num)
-            if fig in self._existing_open_figs:  # Skip figures opened before context
-                continue
+        for fig in self.new_figures:
 
             new_file_counter += 1
             label = fig.get_label()
@@ -363,7 +398,7 @@ class SavedFigure(_PreserveFigureMixin):
                 plt.close(fig)
 
         # Reset state
-        self._existing_open_figs.clear()
+        super().__exit__(exc_type, exc_value, traceback)
         self.style_context = None
 
     def generate_filename(self, label, counter):
@@ -509,7 +544,7 @@ class InsetPlot(_PreserveFigureMixin):
     def __exit__(self, exc_type, value, traceback):
         """Reposition the inset as the standard positioning can cause labels to overlap."""
         if self.loc == 0:
-            self.loc,_ = find_best_position(self.ax, self.axins)
+            self.loc, _ = find_best_position(self.ax, self.axins)
         inset_location = new_bbox_for_loc(self.axins, self.ax, self.loc, self.padding)
         # We need to give co-ordinates in axes units, not figure units.
         position = inset_location.transformed(self.ax.figure.transFigure).transformed(self.ax.transAxes.inverted())
