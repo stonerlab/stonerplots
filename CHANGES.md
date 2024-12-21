@@ -1,4 +1,7 @@
 # Changelog
+## v1.6.0 Release
+
+Add the inset autolocator code.
 
 ## v1.5.2 Release
 

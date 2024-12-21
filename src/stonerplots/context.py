@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Context Managers to help with plotting and saving figures."""
 # Standard library imports
+from copy import copy
 from collections.abc import Iterable, Sequence
 from pathlib import Path
 from typing import Any, List, Union
@@ -11,11 +12,12 @@ import weakref
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-from mpl_toolkits.axes_grid1.inset_locator import InsetPosition
 import numpy as np
 
 # Project-specific imports
 from stonerplots import *  # NOQA:
+
+from .util import calculate_position, find_best_position, new_bbox_for_loc, move_inset
 
 __all__ = ["SavedFigure", "InsetPlot", "StackVertical", "MultiPanel", "counter", "roman"]
 
@@ -137,6 +139,7 @@ def counter(value, pattern="({alpha})", **kwargs):
     alpha = chr(ord("a") + value)  # Lowercase alphabet representation
     Roman = roman(value + 1)  # Uppercase Roman numeral
     return pattern.format(alpha=alpha, Alpha=alpha.upper(), roman=Roman.lower(), Roman=Roman, int=value, **kwargs)
+
 
 
 class _PreserveFigureMixin:
@@ -394,21 +397,22 @@ class InsetPlot(_PreserveFigureMixin):
         ax (matplotlib.Axes, None):
             The parent axes in which to create the inset plot. If `None` (default), the current
             axes from `plt.gca()` are used.
-        loc (str, int):
+        loc (str, int, None):
             Location of the inset. Accepts location strings compatible with matplotlib legends
-            (e.g., "upper left", "center", etc.) or their numeric equivalents. The default is "upper left".
+            (e.g., "upper left", "center", etc.) or their numeric equivalents. Includes "best" or
+            "auto" (or 0) in which case an auto-placement algorithm is used. This is the default.
         width (float):
-            The width of the inset. Units depend on the `dimension` argument. Default is `0.25`.
+            The width of the inset. Units depend on the `dimension` argument. Default is `0.33`.
         height (float):
-            The height of the inset. Units depend on the `dimension` argument. Default is `0.25`.
+            The height of the inset. Units depend on the `dimension` argument. Default is `0.33`.
         dimension (str):
             Specifies whether `width` and `height` are given as fractions of the parent axes
             ("fraction") or in inches. Default is "fraction".
         switch_to_inset (bool):
             If `True`, the inset axes become the current axes within the context, and the parent
             axes are restored when the context ends. Default is `True`.
-        padding (float):
-            The padding between the inset and the parent axes. Default is `0.05`.
+        padding (float, float):
+            The padding between the inset and the parent axes. Default is `0.02,0.02`.
 
     Attributes:
         locations (dict):
@@ -436,12 +440,14 @@ class InsetPlot(_PreserveFigureMixin):
         Using an inset on the current axes:
 
         >>> plt.plot([1, 2, 3], [4, 5, 6], label="Main Plot")
-        >>> with InsetPlot(loc="lower left", width=0.25, height=0.25) as inset_ax:
+        >>> with InsetPlot(loc="best", width=0.25, height=0.25) as inset_ax:
         ...     inset_ax.scatter([1, 2, 3], [10, 9, 8], color="red")
         >>> plt.show()
     """
 
     locations = {
+        "auto": 0,
+        "best": 0,
         "upper right": 1,
         "upper left": 2,
         "lower left": 3,
@@ -457,12 +463,12 @@ class InsetPlot(_PreserveFigureMixin):
     def __init__(
         self,
         ax=None,
-        loc="upper left",
-        width=0.25,
-        height=0.25,
+        loc="best",
+        width=0.33,
+        height=0.33,
         dimension="fraction",
         switch_to_inset=True,
-        padding=0.05,
+        padding=(0.02, 0.02),
     ):
         """
         Initialize the `InsetPlot` context manager.
@@ -494,57 +500,26 @@ class InsetPlot(_PreserveFigureMixin):
             self.loc = self.locations.get(str(self._loc).lower().replace("-", " "), 1)
         else:
             self.loc = self._loc
-        axins = inset_axes(self.ax, width=self.width, height=self.height, loc=self.loc)
+        axins = inset_axes(self.ax, width=self.width, height=self.height, loc=self.loc if self.loc else 1)
         self.axins = axins
         if self.switch_to_inset:
-            plt.sca(axins)
+            plt.sca(self.axins)
         return self.axins
 
     def __exit__(self, exc_type, value, traceback):
         """Reposition the inset as the standard positioning can cause labels to overlap."""
-        parent_bbox = self.ax.get_position()
-        inset_bbox = self.axins.get_tightbbox().transformed(self.ax.figure.transFigure.inverted())
-        inset_axes_bbox = self.axins.get_position()
+        if self.loc == 0:
+            self.loc,_ = find_best_position(self.ax, self.axins)
+        inset_location = new_bbox_for_loc(self.axins, self.ax, self.loc, self.padding)
+        # We need to give co-ordinates in axes units, not figure units.
+        position = inset_location.transformed(self.ax.figure.transFigure).transformed(self.ax.transAxes.inverted())
 
-        dx0, dy0, rw, rh = self._calculate_dimensions(parent_bbox, inset_bbox, inset_axes_bbox)
-        x0, y0 = self._calculate_position(dx0, dy0, rw, rh)
-
-        newpos = InsetPosition(self.ax, [x0, y0, rw, rh])
-        self.axins.set_axes_locator(newpos)
+        # Matplotlib won;t let you move an inset in 3.10, so instead we need to create a new one and copy!
+        move_inset(self.ax, self.axins, position)
         self.ax.figure.canvas.draw()
 
         if self.switch_to_inset:
             self._restore_current_figure_and_axes()
-
-    def _calculate_dimensions(self, parent_bbox, inset_bbox, inset_axes_bbox):
-        """Calculate the dimensions for inset positioning."""
-        dx0 = (inset_axes_bbox.x0 - inset_bbox.x0) / parent_bbox.width  # X axes label space
-        dy0 = inset_axes_bbox.y0 - inset_bbox.y0 / parent_bbox.height  # Y axes label space
-        rw = inset_bbox.width / parent_bbox.width
-        rh = inset_bbox.height / parent_bbox.height
-        return dx0, dy0, rw, rh
-
-    def _calculate_position(self, dx0, dy0, rw, rh):
-        """Calculate the position based on the location."""
-        if self.loc == 1:  # Upper right
-            return 1 - rw - self.padding, 1 - rh - self.padding
-        elif self.loc == 2:  # Upper left
-            return dx0 + self.padding, 1 - rh - self.padding
-        elif self.loc == 3:  # Lower left
-            return dx0 + self.padding, dy0 + self.padding
-        elif self.loc == 4:  # Lower right
-            return 1 - rw - self.padding, dy0 + self.padding
-        elif self.loc in [5, 7]:  # Right
-            return 1 - rw - self.padding, (1 - rh) / 2
-        elif self.loc == 6:  # Center left
-            return dx0 + self.padding, (1 - rh) / 2
-        elif self.loc == 8:  # Lower center
-            return (1 - rw) / 2, dy0 + self.padding
-        elif self.loc == 9:  # Upper center
-            return dx0 + self.padding, 1 - rh - self.padding
-        elif self.loc == 10:  # Center
-            return (1 - rw) / 2, (1 - rh) / 2
-        return 0, 0  # Default case if location is not matched
 
 
 class _PlotContextSequence(Sequence):
@@ -880,7 +855,9 @@ class MultiPanel(_PlotContextSequence, _PreserveFigureMixin):
             ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
             y = (ax_height - title_pts * 1.5) / ax_height
 
-            ax.set_title(f" {counter(ix, self.label_panels)}", loc="left", y=y, **_filter_keys_in_dict(self.kwargs, _fontargs))
+            ax.set_title(
+                f" {counter(ix, self.label_panels)}", loc="left", y=y, **_filter_keys_in_dict(self.kwargs, _fontargs)
+            )
 
 
 class StackVertical(MultiPanel):

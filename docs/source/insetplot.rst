@@ -10,23 +10,23 @@ matplotlib can be a little tricky as the stadnard tools to setup and position th
 avoid the inset axes clashing with the primary axes.
 
 Stonerplot's :py:class:`InsetPlot` context manager is designed to make this easier by tweakign the placement of the
-inset. It is a wrapper around :py:func:`mpl_toolkits.axes_grid1.inset_locator.inset_axes` with additional logic to
+inset. It is a wrapper around :py:func:`axes.Axes.inset_axes` with additional logic to
 adjust the position of the inset.::
 
     with InsetPlot() as inset:
         inset.plot(x, y)
 
-will create an inset that is placed int he upper-left corner of te current axes and occupies 25% of the axes
-horizontally and vertically. By default the context manager also manipulates the :py:mod:`matplotlib.pyplot`'s
-current axes so that inside the context manager the current axes are the inset plot and afterwards they are restored to
-the originally active axes.
+will create an inset that is then automatically placed in the best location within the current axes and occupies
+33% of the axes horizontally and vertically. By default the context manager also manipulates the
+:py:mod:`matplotlib.pyplot`'s current axes so that inside the context manager the current axes are the inset plot
+and afterwards they are restored to the originally active axes.
 
 Controlling Inset Location
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The context anager takes a *loc* parameter that defines the location of the inset. These take the same value as for
-:py:func:`matplotlib.pyplot.legend` - except there is no 'auto' setting. (For convenience any hyphens in the location
-string are replaced with spaces and everything is lower-cased).::
+:py:func:`matplotlib.pyplot.legend` (For convenience any hyphens in the location string are replaced with spaces and
+everything is lower-cased).::
 
     with InsetPlot(loc="lower right") as inset:
         inset.plot(x, y)
@@ -61,3 +61,17 @@ the inset inside the context manager.::
         plt.plot(x_inset,y_inset)  # On the inset axes
     plt.xlabel("Main X") # Back on the main axes again
     plt.ylabel("Main Y")
+
+Multiple Insets
+~~~~~~~~~~~~~~~
+
+The automatic location of insets is aware of both the main axes legend and other insets and will attempt to locate
+the second inset in the best remaining location.::
+
+    plt.plot(x_main,y_main)
+    with InsetPlot() as inset_1:
+        inset_1.plot(x_inset_1,y_inset_1)
+    with InsetPlot() as inset_2:
+        inset_2.plot(x_inset_2,y_inset_2)
+
+

@@ -33,7 +33,7 @@ __all__ = [
     "TexFormatter",
     "TexEngFormatter",
 ]
-__version__ = "1.5.2"
+__version__ = "1.6.0"
 
 # register the included stylesheet in the matplotlib style library
 stonerplots_path = Path(__file__).parent
