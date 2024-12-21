@@ -85,7 +85,7 @@ def _auto_linset_data(ax, axins, renderer, insets=True):
         elif isinstance(artist, PolyCollection):
             lines.extend(artist.get_transform().transform_path(path) for path in artist.get_paths())
         elif isinstance(artist, Collection):
-            transform, transOffset, hoffsets, _ = artist._prepare_points()
+            _, transOffset, hoffsets, _ = artist._prepare_points()
             if len(hoffsets):
                 offsets.extend(transOffset.transform(hoffsets))
         elif isinstance(artist, Text):

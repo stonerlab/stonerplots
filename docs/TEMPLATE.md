@@ -25,7 +25,7 @@ Docstrings should be written in ReStructured Text format.
     - Provide brief explanations for key internal class attributes:
       `attribute_name (type): Description.`
 4. **Raises**
-    - Provide a list of any Exceptions that are eplicitly raised with a 
+    - Provide a list of any Exceptions that are eplicitly raised with a
       brief description of the circumstances in which they are raise.
 5. **Returns**
     - Indicate the return type of the function or method.
@@ -38,7 +38,7 @@ Docstrings should be written in ReStructured Text format.
     - This section may be omitted for functions, methods and classes that are not intended
       for third parties to use - for example, base classes, internal or private functions or methods.
 
-### Example Template for a Class:
+### Example Template for a Class
 
 ```python
 """One-line short description.
@@ -54,10 +54,10 @@ Args:
 
 Keyword Arguments:
     kwarg1 (type): Description of this keyword parameter (default: value)
-    kwarg2 (type): 
+    kwarg2 (type):
         Description of this keyword parameter takes more than one line to
         explain so use a short block. (default: kwarg2_value)
- 
+
 Attributes:
     attribute1 (type): Brief description of the attribute.
     attribute2 (type): Brief description, if necessary.
@@ -67,10 +67,10 @@ Raises:
     (exception2):
         Descrption of when exception2 is raised. If too long for a single
         line, use a short block.
-    
+
 Returns:
     (return_type): Brief description of return value.
-    
+
 Notes:
     - Key implementation details to know about.
     - Important assumptions or limitations.

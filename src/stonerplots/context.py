@@ -4,7 +4,6 @@
 import warnings
 import weakref
 from collections.abc import Iterable, Sequence
-from copy import copy
 from pathlib import Path
 from typing import Any, List, Union
 
@@ -17,7 +16,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 # Project-specific imports
 from stonerplots import *  # NOQA:
 
-from .util import calculate_position, find_best_position, move_inset, new_bbox_for_loc
+from .util import find_best_position, move_inset, new_bbox_for_loc
 
 __all__ = ["SavedFigure", "InsetPlot", "StackVertical", "MultiPanel", "counter", "roman"]
 

@@ -1,7 +1,12 @@
 # Changelog
+
 ## v1.6.0 Release
 
-Add the inset autolocator code.
+New features:
+- Added the inset autolocator code.
+- Added a medium resolution style sheet.
+- PlotLabeller context manager to apply axes formatting to new figures.
+- Additional Formatting functions from the stoner Package.
 
 ## v1.5.2 Release
 
@@ -13,7 +18,7 @@ Some refactoring of the context managers and other code cleanups. No intentional
 
 ## v1.5.0 Release
 
-regular grids in MultuPanel now can also do different numbers of rows in each column with the _transpose_ parameter.
+Iregular grids in MultuPanel now can also do different numbers of rows in each column with the _transpose_ parameter.
 
 ## v1.4.0 Release
 
