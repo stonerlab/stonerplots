@@ -215,13 +215,23 @@ everything up.
   :align: center
 
 
-High Resolution Mode
-~~~~~~~~~~~~~~~~~~~~
+Higher Resolution Modes
+~~~~~~~~~~~~~~~~~~~~~~~
 
 In general for printed media you should pick a vector format for saving figures - such as eps, svg or pdf. It this
-is not feasible and a bitmapped image is needed, then a higher dpi is needed. This can be done by using the *hi-res*
-style.
+is not feasible and a bitmapped image is needed, then a higher dpi is needed. This can be done by using the *med-res& or
+*hi-res* styles.
 
+med-res Style
+^^^^^^^^^^^^^
+
+.. image:: ../../examples/figures/fig05g.png
+  :alt: 600dpi image mode.
+  :align: center
+
+
+hi-res Style
+^^^^^^^^^^^^
 
 .. image:: ../../examples/figures/fig05f.png
   :alt: 600dpi image mode.
@@ -248,6 +258,7 @@ Inset Plots
 ~~~~~~~~~~~
 
 The :py:class:`stonerplots.InsetPlot` context manager can be used to add a new set of axes as an inset to a plot.
+It can automatically position the inset(s) to keep clear of each other and the parent plot features.
 
 
 .. image::  ../../examples/figures/fig07a.png
@@ -275,3 +286,13 @@ option. The :py:class:`stonerplots.MultiPanel` context manager makes this a bit 
 .. image:: ../../examples/figures/fig7c.png
   :alt: 2x2 multi-panel plot.
   :align: center
+
+Consistent Axes Formatting
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :pt:clkass:`stonerplots.PlotLabeller` context manager can adjsut the axes label formatting for multiple figures.
+
+.. image:: ../../examples/figures/fig01c.png
+  :alt: 2x2 multi-panel plot.
+  :align: center
+

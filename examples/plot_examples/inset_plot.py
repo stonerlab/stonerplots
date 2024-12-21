@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 """Demonstrate the SavedFigure context manager and InsetPlot context manager."""
-from common import figures
-from common import model
-from common import pparam
-from common import x
 import matplotlib.pyplot as plt
+from common import figures, model, pparam, x
 
-from stonerplots import InsetPlot
-from stonerplots import SavedFigure
+from stonerplots import InsetPlot, SavedFigure
 
 with SavedFigure(figures / "fig07a.png", style="stoner, thesis", autoclose=__name__ != "__main__"):
     fig, ax = plt.subplots()

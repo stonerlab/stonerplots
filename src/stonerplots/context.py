@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 """Context Managers to help with plotting and saving figures."""
 # Standard library imports
-from copy import copy
-from collections.abc import Iterable, Sequence
-from pathlib import Path
-from typing import Any, List, Union
 import warnings
 import weakref
+from collections.abc import Iterable, Sequence
+from copy import copy
+from pathlib import Path
+from typing import Any, List, Union
 
 # Third-party imports
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import numpy as np
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 # Project-specific imports
 from stonerplots import *  # NOQA:
 
-from .util import calculate_position, find_best_position, new_bbox_for_loc, move_inset
+from .util import calculate_position, find_best_position, move_inset, new_bbox_for_loc
 
 __all__ = ["SavedFigure", "InsetPlot", "StackVertical", "MultiPanel", "counter", "roman"]
 

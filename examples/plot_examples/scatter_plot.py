@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """Demonstrate the SavedFigure context manager and Scatter Plot settings."""
-from common import figures
 import matplotlib.pyplot as plt
 import numpy as np
+from common import figures
 
 from stonerplots import SavedFigure
 
-with SavedFigure(figures / "fig03.png", style=["stoner", "scatter", "latex"], autoclose=True):
+with SavedFigure(figures / "fig03.png", style=["stoner", "scatter", "latex"], autoclose=__name__ != "__main__"):
     fig, ax = plt.subplots(figsize=(4, 4))
     ax.plot([-2, 2], [-2, 2], "k--")
     ax.fill_between([-2, 2], [-2.2, 1.8], [-1.8, 2.2], color="dodgerblue", alpha=0.2, lw=0)

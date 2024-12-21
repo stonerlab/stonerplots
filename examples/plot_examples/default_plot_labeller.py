@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 """Demonstrate the PlotLabeller context manager and TexEngFormatter."""
-from common import figures
-from common import model
-from common import pparam
-from common import x
 import matplotlib.pyplot as plt
+from common import figures, model, pparam, x
 
-from stonerplots import PlotLabeller
-from stonerplots import SavedFigure
+from stonerplots import PlotLabeller, SavedFigure
 
 with SavedFigure(figures / "fig01c.png", style=["stoner"], autoclose=__name__ != "__main__"), PlotLabeller():
     fig, ax = plt.subplots()

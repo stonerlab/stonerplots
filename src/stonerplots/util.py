@@ -3,17 +3,14 @@
 
 BAsed on code used in matplotlib to automatically position a legend.
 """
-from matplotlib.lines import Line2D
-from matplotlib.patches import (
-    Patch,
-    Rectangle,
-)
-from matplotlib.collections import Collection, PolyCollection
-from matplotlib.text import Text
 from matplotlib.axes import Axes
+from matplotlib.axes._base import _TransformedBoundsLocator
+from matplotlib.collections import Collection, PolyCollection
 from matplotlib.figure import Figure
 from matplotlib.legend import Legend
-from matplotlib.axes._base import _TransformedBoundsLocator
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch, Rectangle
+from matplotlib.text import Text
 from matplotlib.transforms import IdentityTransform
 
 

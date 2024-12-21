@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """Additional matplotlib formatting classes."""
-from matplotlib.ticker import EngFormatter
-from matplotlib.ticker import Formatter
-from matplotlib.ticker import Locator
-from matplotlib.ticker import NullFormatter
 import numpy as np
+from matplotlib.ticker import EngFormatter, Formatter, Locator, NullFormatter
 
 from .context import _TrackNewFiguresAndAxes
 

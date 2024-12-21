@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 """Demonstrate the SavedFigure context manager and InsetPlot context manager."""
-from common import figures
-from common import model
-from common import pparam
-from common import x
 import matplotlib.pyplot as plt
+from common import figures, model, pparam, x
 
-from stonerplots import MultiPanel
-from stonerplots import SavedFigure
+from stonerplots import MultiPanel, SavedFigure
 
-with SavedFigure(figures / "fig7c.png", style=["stoner", "iop"], autoclose=True):
+with SavedFigure(figures / "fig7c.png", style=["stoner", "iop"], autoclose=__name__ != "__main__"):
     fig = plt.figure()
     with MultiPanel((2, 2)) as axes:
         for ix, ax in enumerate(axes):
