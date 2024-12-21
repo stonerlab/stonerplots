@@ -50,7 +50,7 @@ Docstrings should be written in ReStructured Text format.
 1. **Examples**
 
     - Include real-world examples of how to use the functionality, both basic and advanced.
-    - This section may be omitted for functions, methods and classes that are not intended
+    - This section should be omitted for functions, methods and classes that are not intended
       for third parties to use - for example, base classes, internal or private functions or methods.
 
 ### Example Template for a Class
