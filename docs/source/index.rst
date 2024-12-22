@@ -69,10 +69,10 @@ Explore various aspects of StonerPlots through the following sections:
 .. toctree::
    :maxdepth: 2
 
-   User Guide <userguide>       # Basic instructions for using StonerPlots
-   Style Gallery <style-gallery> # Examples of available map styles
-   Colours <colours>             # Full palette of colour options, including shaded variations
-   API <api>                     # Detailed API references
+   User Guide <userguide>
+   Style Gallery <style-gallery>
+   Colours <colours>
+   API <api>
 
 Indices and tables
 ==================

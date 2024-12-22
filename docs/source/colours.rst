@@ -10,11 +10,11 @@ these colours by the names of the London Underground lines (e.g., 'bakerloo', 'c
 may be most intuitive for users familiar with the London Underground system!
 
 **Why use the TfL palette?**
+
 - Visually appealing: The bold colours stand out against light and white backgrounds.
 - Consistency: Named options provide an easier way to stylize plots systematically.
 - Hierarchical shades: The palette includes predefined shades (e.g., 90%, 70%, etc.), offering flexibility while maintaining a unified look.
 
----
 
 Tube Map Colours
 -----------------
@@ -25,7 +25,6 @@ The full set of Tube map colours is shown below. The colours correspond to the o
    :align: center
    :width: 600px
 
----
 
 Tube Map 90% Shade Colours
 ---------------------------
@@ -37,7 +36,6 @@ These shades are particularly effective for creating layered or hierarchical plo
    :align: center
    :width: 600px
 
----
 
 Tube Map 70% Shade Colours
 ---------------------------
@@ -49,7 +47,6 @@ distinction.
    :align: center
    :width: 600px
 
----
 
 Tube Map 50% Shade Colours
 ---------------------------
@@ -60,7 +57,6 @@ The 50% shades offer further blending opportunities, creating a subtler appearan
    :align: center
    :width: 600px
 
----
 
 Tube Map 10% Shade Colours
 ---------------------------
@@ -72,33 +68,41 @@ less prominent plot elements.
    :align: center
    :width: 600px
 
----
 
 Using the StonerPlots Colour Palette
 ------------------------------------
 The StonerPlots colour palette integrates seamlessly with matplotlib, allowing you to use colours based on their Tube map names.
 Here's an example of how the colour names could correspond to their respective London Underground lines:
 
-+-------------------+---------------------+
++-------------------+--------------------+
 | Tube Line         | Colour (Hex Code)  |
-+===================+=====================+
++===================+====================+
 | Bakerloo          | #B36305            |
+|                   |                    |
 | Central           | #E32017            |
+|                   |                    |
 | Circle            | #FFD300            |
+|                   |                    |
 | District          | #00782A            |
+|                   |                    |
 | Hammersmith & City| #F3A9BB            |
+|                   |                    |
 | Jubilee           | #A0A5A9            |
+|                   |                    |
 | Metropolitan      | #9B0056            |
+|                   |                    |
 | Northern          | #000000            |
+|                   |                    |
 | Piccadilly        | #003688            |
+|                   |                    |
 | Victoria          | #0098D4            |
+|                   |                    |
 | Waterloo & City   | #95CDBA            |
-+-------------------+---------------------+
++-------------------+--------------------+
 
 For shades, consider appending `90`, `70`, etc., to form a hierarchy of shades for the respective lines.
 
----
+.. note::
 
-## Notes
-- If you're unfamiliar with the TfL Tube map colours, they are based on London's underground transport line colours.
-  More details can be found [here on Transport for London's website](https://tfl.gov.uk).
+    - If you're unfamiliar with the TfL Tube map colours, they are based on London's underground transport line colours.
+      More details can be found [here on Transport for London's Blog](https://blog.tfl.gov.uk/2022/12/22/digital-colour-standard/).

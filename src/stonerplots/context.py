@@ -157,7 +157,7 @@ def counter(value, pattern="({alpha})", **kwargs):
     Args:
         value (int): The integer to format.
         pattern (str): A format string with placeholders (default: '({alpha})').
-        **kwargs: Additional data to replace placeholders.
+        \*\*kwargs: Additional data to replace placeholders.
 
     Returns:
         str: The formatted string.
@@ -853,31 +853,27 @@ class DoubleYAxis(_PreserveFigureMixin):
     Examples:
         Basic usage with default settings:
 
-        ```python
-        fig, ax = plt.subplots()
-        ax.plot([0, 1, 2], [10, 20, 30], label="Primary")
-        with DoubleYAxis(ax=ax) as ax2:
-            ax2.plot([0, 1, 2], [100, 200, 300], label="Secondary", color="red")
-        plt.show()
-        ```
+        >>> fig, ax = plt.subplots()
+        >>> ax.plot([0, 1, 2], [10, 20, 30], label="Primary")
+        >>> with DoubleYAxis(ax=ax) as ax2:
+        >>>     ax2.plot([0, 1, 2], [100, 200, 300], label="Secondary", color="red")
+        >>> plt.show()
 
         Customizing legend location and axis colours:
 
-        ```python
-        fig, ax = plt.subplots()
-        ax.plot([0, 1], [0, 1], label="Primary")
-        with DoubleYAxis(ax=ax, loc="upper left", colours=["green", "orange"]) as ax2:
-            ax2.plot([0, 1], [10, 20], label="Secondary")
-        plt.show()
-        ```
+        >>> fig, ax = plt.subplots()
+        >>> ax.plot([0, 1], [0, 1], label="Primary")
+        >>> with DoubleYAxis(ax=ax, loc="upper left", colours=["green", "orange"]) as ax2:
+        >>>     ax2.plot([0, 1], [10, 20], label="Secondary")
+        >>> plt.show()
     """
 
     locations = InsetPlot().locations
 
     def __init__(self, ax=None, legend=True, loc="best", colours=None, switch_to_y2=True):
-        """
-        Initialize the DoubleYAxis context manager, ensuring proper validation and formatting
-        of input parameters.
+        """Initialize the DoubleYAxis context manager.
+
+        Ensures proper validation and formatting of input parameters.
 
         Args:
             ax (matplotlib.axes.Axes | None):
@@ -935,8 +931,7 @@ class DoubleYAxis(_PreserveFigureMixin):
         self._switch = switch_to_y2
 
     def __enter__(self):
-        """
-        Handle context entry for managing temporary switchable axes in a Matplotlib figure.
+        """Handle context entry for managing temporary switchable axes in a Matplotlib figure.
 
         Returns:
             matplotlib.axes._subplots.AxesSubplot:
@@ -950,9 +945,9 @@ class DoubleYAxis(_PreserveFigureMixin):
         return self.ax2
 
     def __exit__(self, exc_type, value, traceback):
-        """
-        Handles the exit portion of the context manager, customizing axis properties, legends,
-        and restoring the original figure and axes.
+        """Handle the exit portion of the context manager.
+
+        Customise axis properties, legends, and restoring the original figure and axes.
 
         This method ensures dual Y-axes share customizable colour properties and adjusts their
         visibility. Legends from both axes are merged and updated to their defined location.
@@ -1028,6 +1023,7 @@ class MultiPanel(_PlotContextSequence, _PreserveFigureMixin):
     Args:
         panels (tuple[int, int], int, or list[int]):
             Specifies the number of subplots to create. Options:
+
             - `tuple(rows, columns)`: Regular grid with the specified number of rows and columns.
             - `int`: Single row grid with `n` columns.
             - `list[int]`: Irregular grid where each element specifies the number of panels in a row.
@@ -1041,9 +1037,11 @@ class MultiPanel(_PlotContextSequence, _PreserveFigureMixin):
             Enables shared y-axis among subplots. Default is `False`.
         adjust_figsize (bool, float, or tuple[float, float]):
             Adjusts figure size to fit the subplots. Options:
+
             - `True` (default): Automatically adjusts width/height using pre-defined factors for extra rows/columns.
             - `float`: Applies a uniform factor for width and height adjustment.
             - `tuple[float, float]`: Separately adjusts width and height with the provided factors.
+
         label_panels (str or bool):
             Adds subplot labels (e.g., "(a)", "(b)"). Default of `True` applies the `({alpha})` format. If a string is
             provided, it is used as the format pattern.
@@ -1054,13 +1052,14 @@ class MultiPanel(_PlotContextSequence, _PreserveFigureMixin):
             Interprets the grid layout based on transposed rows and columns. For irregular grids, rows are treated as
             columns if `transpose=True`. Default is `False`.
 
-        **kwargs:
+        \*\*kwargs:
             Additional keyword arguments passed down to:
-            - `ax.set_title` for subplot font adjustments.
-            - `fig.add_gridspec` for grid configuration.
+
+            - :py:meth:`matplitlib.axes.Axes.set_title` for subplot font adjustments.
+            - :py:meth:`matplotlib.figure.Figure.add_gridspec` for grid configuration.
 
     Returns:
-        List[matplotlib.axes.Axes]:
+        (List[matplotlib.axes.Axes]):
             List of the created Matplotlib Axes.
 
     Notes:
@@ -1071,19 +1070,15 @@ class MultiPanel(_PlotContextSequence, _PreserveFigureMixin):
     Examples:
         Create a 2x3 grid with shared x-axis and labeled panels:
 
-        ```python
-        with MultiPanel((2, 3), sharex=True, label_panels=True) as axes:
-            for ax in axes:
-                ax.plot([1, 2, 3], [4, 5, 6])
-        ```
+        >>> with MultiPanel((2, 3), sharex=True, label_panels=True) as axes:
+        >>>     for ax in axes:
+        >>>         ax.plot([1, 2, 3], [4, 5, 6])
 
         Create an irregular grid with 2 rows (3 panels in the first row, 1 in the second):
 
-        ```python
-        with MultiPanel([3, 1], adjust_figsize=(0.5, 1.0)) as axes:
-            axes[0].plot([1, 2, 3], [3, 2, 1])
-            axes[1].scatter([1, 2, 3], [4, 5, 6])
-        ```
+        >>> with MultiPanel([3, 1], adjust_figsize=(0.5, 1.0)) as axes:
+        >>>     axes[0].plot([1, 2, 3], [3, 2, 1])
+        >>>     axes[1].scatter([1, 2, 3], [4, 5, 6])
     """
 
     def __init__(
@@ -1271,17 +1266,22 @@ class StackVertical(MultiPanel):
             Whether the subplots share the same y-axis. Default is `False`.
         adjust_figsize (bool or float):
             Whether to adjust the figure height to accommodate additional subplots. Options:
-            - `True` (default): Increases figure height by `0.6` of the original height for each additional subplot
-              beyond the first.
+
+            - `True` (default): Increases figure height by `0.6` of the original height for each
+               additional subplot beyond the first.
             - `float`: Specifies a custom height adjustment factor for each additional subplot.
+
         label_panels (str or bool):
             Adds labels (e.g., "(a)", "(b)") to the subplots for clear identification.
+
             - Default is `True`, which applies the `({alpha})` pattern.
             - A custom string can be provided to format the labels.
-        **kwargs:
+
+        \*\*kwargs:
             Additional arguments:
-            - Passed to `ax.set_title` for subplot fonts.
-            - GridSpec arguments passed to `fig.add_gridspec`.
+
+            - :py:meth:`matplitlib.axes.Axes.set_title` for subplot font adjustments.
+            - :py:meth:`matplotlib.figure.Figure.add_gridspec` for grid configuration.
 
     Returns:
         List[matplotlib.axes.Axes]:
@@ -1297,11 +1297,9 @@ class StackVertical(MultiPanel):
     Examples:
         Create a vertical stack of 3 subplots with shared x-axes:
 
-        ```python
-        with StackVertical(3, sharex=True, joined=True) as axes:
-            for ax in axes:
-                ax.plot([1, 2, 3], [4, 5, 6])
-        ```
+        >>> with StackVertical(3, sharex=True, joined=True) as axes:
+        >>>     for ax in axes:
+        >>>         ax.plot([1, 2, 3], [4, 5, 6])
     """
 
     def __init__(

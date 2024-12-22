@@ -44,5 +44,5 @@ intersphinx_mapping = {
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "alabaster"
-html_static_path = ["_static"]
+html_static_path = [str(Path(__file__).parent/"_static")]
 html_logo = "figures/StonerLogo2.png"

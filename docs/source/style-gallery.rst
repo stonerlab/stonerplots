@@ -290,7 +290,7 @@ option. The :py:class:`stonerplots.MultiPanel` context manager makes this a bit 
 Consistent Axes Formatting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :pt:clkass:`stonerplots.PlotLabeller` context manager can adjsut the axes label formatting for multiple figures.
+The :py:class:`stonerplots.PlotLabeller` context manager can adjsut the axes label formatting for multiple figures.
 
 .. image:: ../../examples/figures/fig01c.png
   :alt: 2x2 multi-panel plot.
