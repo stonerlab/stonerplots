@@ -19,13 +19,20 @@ def move_inset(parent, inset_axes, new_bbox):
 
     Args:
         parent (Axes, Figure, None):
-            The parent class to determine the new bounding box co-ordinate sytstem.
+            The parent class to determine the new bounding box coordinate system.
         inset_axes (Axes):
-            The Axes to change the locator for,
+            The Axes to change the locator for.
         new_bbox (BBox):
             The new position bounding box.
 
-    This creates a new axes locator and assigns it to the axes.
+    Notes:
+        This creates a new axes locator and assigns it to the axes.
+
+    Examples:
+        >>> fig, ax = plt.subplots()
+        >>> inset_ax = fig.add_axes([0.1, 0.1, 0.3, 0.3])
+        >>> new_bbox = Bbox.from_bounds(0.5, 0.5, 0.3, 0.3)
+        >>> move_inset(ax, inset_ax, new_bbox)
     """
     match parent:
         case Figure():
@@ -42,11 +49,14 @@ def _get_inset_axes(ax):
     """Get a list of axes that overlap the axes given.
 
     Args:
-        ax (Axes):
-            Parent axes.
+        ax (Axes): Parent axes.
 
-    Rather than checking whether we have inset axes, this simply looks for all
-    axes in the figure that overlap with the gien axes and are not the given axes themselves.
+    Returns:
+        list: List of axes that overlap with the given axes and are not the given axes themselves.
+
+    Notes:
+        Rather than checking whether we have inset axes, this simply looks for all
+        axes in the figure that overlap with the given axes and are not the given axes themselves.
     """
     fig = ax.figure
     container = ax.get_position()
@@ -62,56 +72,73 @@ def _get_inset_axes(ax):
 def _auto_linset_data(ax, axins, renderer, insets=True):
     """Return display coordinates for hit testing for "best" positioning.
 
+    Args:
+        ax (Axes): Parent axes.
+        axins (Axes): Inset axes.
+        renderer (Renderer): The figure renderer being used.
+        insets (bool): Whether to include inset axes in the calculations. Defaults to True.
+
     Returns:
-        bboxes:
-            List of bounding boxes of all patches.
-        lines:
-            List of `.Path` corresponding to each line.
-        offsets:
-            List of (x, y) offsets of all collection.
+        tuple: A tuple containing:
+            - bboxes (list): List of bounding boxes of all patches.
+            - lines (list): List of `.Path` corresponding to each line.
+            - offsets (list): List of (x, y) offsets of all collections.
     """
-    bboxes = []
-    lines = []
-    offsets = []
-    insets = _get_inset_axes(ax) if insets else []
-    #    if axins.get_label()=="Inset 2": breakpoint()
-    for artist in ax.get_children() + insets:
-        if isinstance(artist, Line2D):
+    bboxes, lines, offsets = [], [], []
+    inset_axes = _get_inset_axes(ax) if insets else []
+
+    for artist in ax.get_children() + inset_axes:
+        _process_artist(artist,renderer, axins, bboxes, lines, offsets)
+
+    return bboxes, lines, offsets
+
+
+def _process_artist(artist, renderer, axins, bboxes, lines, offsets):
+    """Process an artist to extract relevant display coordinates."""
+    match artist:
+        case Line2D():
             lines.append(artist.get_transform().transform_path(artist.get_path()))
-        elif isinstance(artist, Rectangle):
+        case Rectangle():
             bboxes.append(artist.get_bbox().transformed(artist.get_data_transform()))
-        elif isinstance(artist, Patch):
+        case Patch():
             lines.append(artist.get_transform().transform_path(artist.get_path()))
-        elif isinstance(artist, PolyCollection):
+        case PolyCollection():
             lines.extend(artist.get_transform().transform_path(path) for path in artist.get_paths())
-        elif isinstance(artist, Collection):
+        case Collection():
             _, transOffset, hoffsets, _ = artist._prepare_points()
-            if len(hoffsets):
+            if hoffsets.size>0:
                 offsets.extend(transOffset.transform(hoffsets))
-        elif isinstance(artist, Text):
+        case Text():
             bboxes.append(artist.get_window_extent(renderer))
-        elif isinstance(artist, (Axes, Legend)) and artist is not axins:
+        case Axes() | Legend() if artist is not axins:
             sub_bboxes, sub_lines, sub_offsets = _auto_linset_data(artist, axins, renderer, insets=False)
             bboxes.extend(sub_bboxes)
             lines.extend(sub_lines)
             offsets.extend(sub_offsets)
-
-    return bboxes, lines, offsets
+        case _:
+            pass
 
 
 def calculate_position(inset_bbox, parent__bbox, loc=1):
     """Calculate the shift in position based on the location of an inset within a parent.
 
     Args:
-        inset_bbox (Bbox):
-            bounding box of the inset - including labels and padding.
-        parent_bbox (Bbox):
-            bounding box of the parent axes.
-        loc (int):
-            Location code (1-10 inclusive).
+        inset_bbox (Bbox): Bounding box of the inset including labels and padding.
+        parent_bbox (Bbox): Bounding box of the parent axes.
+        loc (int): Location code (1-10 inclusive).
 
-    This simply works out which corner of the inset box needs to align to which corner of the parent
-    bbox and thus the required dx,dy shift.
+    Returns:
+        tuple: The required (dx, dy) shift to align the inset.
+
+    Notes:
+        This simply works out which corner of the inset box needs to align to which corner of the parent
+        bbox and thus the required dx, dy shift.
+
+    Examples:
+        >>> inset_bbox = Bbox.from_bounds(0.1, 0.1, 0.2, 0.2)
+        >>> parent_bbox = Bbox.from_bounds(0, 0, 1, 1)
+        >>> calculate_position(inset_bbox, parent_bbox, loc=1)
+        (0.9, 0.9)
     """
     box_centre = (inset_bbox.x0 + inset_bbox.x1) / 2, (inset_bbox.y0 + inset_bbox.y1) / 2
     parent_centre = (parent__bbox.x0 + parent__bbox.x1) / 2, (parent__bbox.y0 + parent__bbox.y1) / 2
@@ -160,7 +187,10 @@ def new_bbox_for_loc(axins, ax, loc=1, padding=(0.02, 0.02)):
     dx, dy = calculate_position(inset_bbox, parent_bbox, loc)
 
     # Get the current inset position and apply our dx,dy shift.
-    inset_location = axins.get_position()
+    try:
+        inset_location = axins.get_position()
+    except AttributeError:
+        inset_location = axins.get_window_extent().transformed(ax.transAxes.inverted())
     inset_location.update_from_data_xy(
         [[inset_location.x0 + dx, inset_location.y0 + dy], [inset_location.x1 + dx, inset_location.y1 + dy]]
     )
@@ -168,26 +198,30 @@ def new_bbox_for_loc(axins, ax, loc=1, padding=(0.02, 0.02)):
 
 
 def find_best_position(ax, axins, renderer=None):
-    """Determine the best location to place the legend.
+    """Calculate a new axes bounding box for a given location.
 
     Args:
-        ax (Axes):
-            Parent axes in which the inset is placed.
-        axins (Axes):
-            The inset axes to be moved to the best position.
-
-    Keyword Arguments:
-        renderer (Renderer):
-            The figure renderer being used - can default to None.
+        axins (Axes): The inset axes to relocate.
+        ax (Axes): The parent axes to locate relative to.
+        loc (int): A location code (1-10) - as per matplotlib legend locations.
+        padding (Tuple[float, float]):
+            Additional padding (in Axes coordinates) to add around the tight
+            bounding box of the inset.
 
     Returns:
-        Tuple[int, Bbox]):
-            The optimal matplotlib location code and the corresponding axes bounding box.
+        Bbox: The new bounding box for the axes.
 
-    This uses a variation on the algorithm used to auto locate matplolotlib legends - except it
-    takes account of the legend location (!) and any overlapping axes such as other insets. It is
-    a rather simple algorithm that just counts the number of collisions with data points, lines, text items
-    and the legend and contents of insets. Possibly it should give some weighting to some of there components.
+    Notes:
+        This uses a variation on the algorithm used to auto locate matplolotlib legends - except it
+        takes account of the legend location (!) and any overlapping axes such as other insets. It is
+        a rather simple algorithm that just counts the number of collisions with data points, lines, text items
+        and the legend and contents of insets. Possibly it should give some weighting to some of there components.
+
+    Examples:
+        >>> fig, ax = plt.subplots()
+        >>> axins = fig.add_axes([0.1, 0.1, 0.3, 0.3])
+        >>> new_bbox_for_loc(axins, ax, loc=1)
+        Bbox(...)
     """
     ax.figure.canvas.draw()  # render the figure
     bboxes, lines, offsets = _auto_linset_data(ax, axins, renderer)
@@ -211,3 +245,17 @@ def find_best_position(ax, axins, renderer=None):
     _, idx, insetBox = min(candidates)
 
     return idx, insetBox
+
+def copy_properties(obj,properties):
+    """Copy matplotlib properties to an object."""
+    for k,v in properties.items():
+        if attr:=getattr(obj,f"set_{k}",None):
+            match v:
+                case bool()|int()|float()|str():
+                    attr(v)
+                case Text():
+                    attr(v.get_text(),v.get_fontproperties())
+                case _:
+                    pass
+
+

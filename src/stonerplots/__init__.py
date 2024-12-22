@@ -12,7 +12,7 @@ from .colours import (
     tube_colours_70,
     tube_colours_90,
 )
-from .context import InsetPlot, MultiPanel, SavedFigure, StackVertical, counter, roman
+from .context import InsetPlot, MultiPanel, SavedFigure, StackVertical, DoubleYAxis, counter, roman
 from .format import PlotLabeller, TexEngFormatter, TexFormatter
 
 __all__ = [
@@ -21,6 +21,7 @@ __all__ = [
     "InsetPlot",
     "StackVertical",
     "MultiPanel",
+    "DoubleYAxis",
     "counter",
     "roman",
     "format",

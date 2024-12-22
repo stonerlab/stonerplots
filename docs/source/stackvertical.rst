@@ -33,7 +33,7 @@ The equation used for this is:
    h_{new} = h_{old} (f h_{old} (N_{plots}-1)+1)
 
 with :math:`f` being a fraction of the old plot size set by the *adjust_figsize* parameter to :py:class:`StackVertical`.
-If this is left at the default value of `True`, then :math:`f` is set to 0.6 and to 0 if *adjust_figsize* is `False`.
+If this is left at the default value of `True`, then :math:`f` is set to 0.6 and reduced to 0 if *adjust_figsize* is `False`.
 
 Typically stacked plots have a bigger aspect ratio (width:height) than a single plot.::
 
@@ -57,8 +57,8 @@ Labelling the Panels
 
 A common requirement of a multi-panel figure is to label the individual sets of axes (a), (b)... or similar. This is
 supported by the *label_panels* parameter. If this takes the value `True` then each set of axes is labelled '(a)',
-'(b)' and so on. For added control, the parameter can also take a string with a similar format to that used in
-:py:class:`SavedFigure` above. Placeholders such as {Alpha} or {roman} can be used and will give the axes number.::
+'(b)' and so forth. For additional control, the parameter can also take a string similar to the format used in
+:py:class:`SavedFigure` above. Placeholders such as {Alpha} or {roman} can be used to indicate the axes number.::
 
     with StackVertical(3, label_panels=True) as axes:
         for ax,y in zip(axes, [y_data1, y_data2, y_data3]):
@@ -122,7 +122,7 @@ of data one might show the data and fit on the main panel and the residuals or a
     # This is stonerplots context managers at work
     with SavedFigure(figures / "genx_plot.png", style=["stoner", "presentation"], autoclose=True):
         plt.figure()
-        with StackVertical(2, adjust_figsize=False, height_ratios=[3, 1]) as axes:
+        with StackVertical(2, adjust_figsize=False, heights_ratio=[3, 1]) as axes:
             main, residual = axes
             main.plot(x, measured, linestyle="", marker=".", label="Data", c="victoria")
             main.plot(x, fit, marker="", label="Fit", c="central")
@@ -137,3 +137,4 @@ following outptut:
 .. image:: ../../examples/figures/genx_plot.png
   :alt: Two panel fit of XRR data
   :align: center
+

@@ -8,6 +8,7 @@ New features
 - Added a medium resolution style sheet.
 - PlotLabeller context manager to apply axes formatting to new figures.
 - Additional Formatting functions from the stoner Package.
+- Added a DoubleYAxis context manager for helping with double-y axis plots.
 
 ## v1.5.2 Release
 

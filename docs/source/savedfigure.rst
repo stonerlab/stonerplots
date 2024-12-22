@@ -4,9 +4,10 @@ SavedFigure Context Manager
 .. currentmodule:: stonerplots.context
 
 
-The  :py:class:`SavedFigure` is used to both apply style sheets and capture the current figure and save it to disk.
-It applies stylesheets by wrapping a :py:func:`matplotlib.style.context` context manager. On entry, the context manager
-will note the open matplotlib figures, and on exit it will compare the list of copen figures with those that existed at
+The  :py:class:`SavedFigure` is used to apply stylesheets, capture the current figure, and save it to disk.
+It applies stylesheets by wrapping a :py:func:`matplotlib.style.context` context manager around the code. On entry, the context manager
+
+will note the open matplotlib figures, and on exit it will compare the list of open figures with those that existed at
 entry, and save all the new figures. Therefore, it is very important that figure creation is done **inside** the
 :py:class:`SavedFigure` context manager.
 
@@ -19,8 +20,8 @@ In its simplest form, :py:class:`SavedFigure` just needs to know a filename to s
         fig, ax = plt.subplots()
         ax.plot(x_data, y_data)
 
-In this case, the stylesheet is switched to the default "stoner" style, the format to save the file in is determined
-from the filename to be a PNG file, and the open figure will be saved to the current working directory as
+In this case, the stylesheet is switched to the default "stoner" style. The format to save the file is determined
+from the filename, resulting in a PNG file. The open figure will then be saved to the current working directory as
 "example.png". The figure that was created will be left open at the end of the run.
 
 If you don't specify a filename, then :py:class:`SavedFigure` will look for a label for your figures (set with
@@ -29,15 +30,15 @@ If you don't specify a filename, then :py:class:`SavedFigure` will look for a la
 Applying Styles
 ~~~~~~~~~~~~~~~
 
-To apply one or more stylesheets to the :py:class:`SavedFigure`, just pass them as the keyword parameter *stle*::
+To apply one or more stylesheets to the :py:class:`SavedFigure`, just pass them as the keyword parameter *style*::
 
     with SavedFigure("example.png", style=["stoner","nature"]):
         fig, ax = plt.subplots()
         ax.plot(x_data, y_data)
 
-Alternatively, if you want to stop :py:class:`SavedFigure` from messing with the existing style parameters, pass False to *style*::
+Alternatively, if you want to stop :py:class:`SavedFigure` from altering the existing style parameters, pass False to *style*::
 
-    with SavedFigure("example.png", style=False):
+This will suppress the encapsulated :py:func:`matplotlib.style.context` context manager from being used.
         fig, ax = plt.subplots()
         ax.plot(x_data, y_data)
 
@@ -46,8 +47,8 @@ This will suppress the encapsulated :py:func:`matplotlib.style.context` context 
 Automatically Closing the Plot Figures
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once you have saved your figures to disk, you probably don't want to leave them open as eventually matplotlib will
-complain about the number of open figures. :py:class:`SavedFigure` has an *autoclose* parameter that will close all the figures
+Once you have saved your figures to disk, you may not want to leave them open, as eventually Matplotlib will
+complain about the number of open figures. The :py:class:`SavedFigure` class has an *autoclose* parameter that will close all the figures
 that it has saved for you::
 
     with SavedFigure("example.png", autoclose=True):
@@ -57,19 +58,22 @@ that it has saved for you::
 Setting the Format of the Saved Figure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Matplotlib has the ability to save figures in a variety of different formats. For scientific writing, one often wants
-to save in a vector format, such as encapsulated postscript (eps), scalable vector graphics (svg), or portable document
+Matplotlib supports saving figures in a variety of formats. In scientific writing, vector formats are often preferred, such as encapsulated postscript (eps), scalable vector graphics (svg), or portable document
 format (pdf). However, when the graphics are to be used in a PowerPoint presentation (or poster), a bitmapped image
 format such as Portable Network Graphics (png) is easiest to work with.
 
 .. warning::
-    JPEG encoding is not a good choice to use due to the image artefacts it introduces. JPEG uses a wavelet encoding
-    algorithm to achieve high levels of image compression. Whilst this often works well for photographs, it handles
-    sharp changes in contrast rather poorly and produces often very visible artefacts at such features. Unfortunately,
-    scientic plots have lots of such features - axes lines, data lins, axes labels etc. and as a result JPEG encoded
-    plots do not reproduce well and should be avoided.
+    JPEG encoding is not a good choice to use due to the image artefacts it introduces. JPEG uses wavelet encoding
+    to achieve high compression levels. Whilst effective for photographs, it handles
 
-The :py:class:`SavedFigure` context manager lets you specify the figure format(s) to use via the the *formats* parameter. This can
+    sharp changes in contrast poorly, often producing visible artefacts. Unfortunately,
+
+    scientific plots have lots of such features - axes lines, data lines, axes labels etc. and as a result JPEG encoded
+
+    scientific plots often contain contrasting elements - axes lines, data lines, axes labels etc. As a result, JPEG-encoded
+    plots do not reproduce well and should therefore be avoided.
+
+The :py:class:`SavedFigure` context manager lets you specify the figure format(s) to use via the *formats* parameter. This can
 be either a single string representing the desired file extension, or a list of such file extensions.  In this latter
 case, :py:class:`SavedFigure` will save multiple copies of the same figure in the different format. This can be helpful if, e.g.
 you need eps formats for a LaTeX document, but also want png images to check the figures look ok.::
@@ -88,8 +92,8 @@ The choice of formats is determined by :py:func:`matplotlib.pyplot.savefig`.
 Multiple Figures and SavedFigure
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you create multiple figures within a :py:class:`SavedFigure` context manager, it will attempt to save all of yor figures. In
-this case it is rpobably desirable to set how each figure should be named. You can do this by providing a pattern
+If you create multiple figures within a :py:class:`SavedFigure` context manager, it will attempt to save all of your figures. In
+this case, it may be desirable to set how each figure should be named. You can do this by providing a pattern
 within the figure filename. The number of the figure being saved is substituted into a placeholder in the filename
 string like so::
 

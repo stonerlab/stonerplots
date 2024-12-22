@@ -11,14 +11,14 @@
 
 # Stoner Plots
 
-Stoner Plots is a fork of Science Plots
+Stoner Plots is a fork of Science Plots with additional features to make plotting of scientific plots easier.
 
 <img src="https://raw.githubusercontent.com/stonerlab/stonerplots/main/examples/figures/fig05a.png" width=640 alt="Presentation Style Image"/>
 
 ## Usage
 
-Before using the new styles you need to import stonerplots - but it's ok to just import e.g. the SavedFigure context
-manager:
+Before using the new styles you need to import stonerplots - but you will most likely also want to make use of
+one of the context managers - the `SavedFigure` class.::
 
     from stonerplots import SavedFigure
 
@@ -27,21 +27,18 @@ manager:
         plt.plot(x,y,label="Dataset")
         ...
 
-The SavedFigure context manager will handle the call to the matplotlib style context manager and will also save any
-figures opened within the context manager. If the filename for the figure has an embedded place holder for {ix}, then
-multiple figures can be saved without clobbering the filename.
+There are three main parts to this package::
 
-There is also an InsetPlot context manager that can help you get insets placed correctly so that axes
-labels don't escape over the edge of the surrounding figure.
+1. A set of matplotlib style sheets for making lots wih styles suitable for a variety of Physics related journals
+   and formats such as presentations and posters as well as reports and theses.
 
-    with SavedFigure("my_figure.pdf", style=["stoner","aps"]):
-        plt.figure()
-        plt.plot(x,y,label="Dataset")
-        ...
-        with InsetPlot(loc="lower right", width=0.25, height=0.25, padding=0.05) as inset:
-            inset.plot(x, model(x, 200), linestyle="--")
+1. A set of Python Content managers designed to help with the process of preparing production quality figures in
+  matplotlib.
 
-See below for the full list of styles and context managers.
+1. Soem defintitions of colours based on the Transport for London colour palette and inserted as named colours into
+   the matplotlib colour tables.
+
+The package is fully documented (see link below) and comes with a set of examples that also server as unit tests.
 
 ## Documentation
 
@@ -71,6 +68,7 @@ Documentation can be found on the [github pages for this repository](https://sto
 - aip2 - Switch to 2 column wide format for AIP journals
 - stoner-dark - Switch to a dark background a lighter plotting colours.
 - hi-res - Switches to 600dpi plotting (but using eps, pdf or svg is generally a better option)
+- med-res - like hi-res, but switches to 300dpi plotting.
 - presentation_sm - a style for making 1/2 width graphs.
 - presentation_dark - tweak the weight of elements for dark presnetations.
 - science-2col, science-3col - Science 2 and 3 column width figures
@@ -104,16 +102,44 @@ The package is designed to work by using python context managers to aid plotting
   the top-x-axis on one frame is the bottom of the next.
 - MultiPanel - a general; purpose miulti-panel plotting helper.
 - InsetPlot - create an inset set of axes.
+- DoubleYAxis - setup the righthand y axis for a second scale and optional colour the y-axes differently and merge
+  the legend into a single legend.
 
 This package draws heavily on [scienceplots](https://github.com/garrettj403/SciencePlots), so it seems only fair to cite the original work....
 
-    @article{StonerPlots,
-      author       = {John D. Garrett},
-      title        = {{garrettj403/SciencePlots}},
-      month        = sep,
-      year         = 2021,
-      publisher    = {Zenodo},
-      version      = {1.0.9},
-      doi          = {10.5281/zenodo.4106649},
-      url          = {http://doi.org/10.5281/zenodo.4106649}
-    }
+@software{john_garrett_2023_10206719,
+  author       = {John Garrett and
+                  Echedey Luis and
+                  H.-H. Peng and
+                  Tim Cera and
+                  gobinathj and
+                  Josh Borrow and
+                  Mehmet Keçeci and
+                  Splines and
+                  Suraj Iyer and
+                  Yuming Liu and
+                  cjw and
+                  Mikhail Gasanov},
+  title        = {garrettj403/SciencePlots: 2.1.1},
+  month        = nov,
+  year         = 2023,
+  publisher    = {Zenodo},
+  version      = {2.1.1},
+  doi          = {10.5281/zenodo.10206719},
+  url          = {https://doi.org/10.5281/zenodo.10206719},
+}
+
+The doi and BibTex reference for stonerplots is:
+
+https://doi.org/10.5281/zenodo.14026874
+
+@software{gavin_burnell_2024_14026874,
+  author       = {Gavin Burnell},
+  title        = {stonerlab/stonerplots},
+  month        = nov,
+  year         = 2024,
+  publisher    = {Zenodo},
+  version      = {v1.5.2},
+  doi          = {10.5281/zenodo.14026874},
+  url          = {https://doi.org/10.5281/zenodo.14026874},
+}

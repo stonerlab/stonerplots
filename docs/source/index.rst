@@ -1,7 +1,7 @@
 .. StonerPlots documentation master file, created by
-   sphinx-quickstart on Wed Mar 27 11:46:49 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+sphinx-quickstart on Wed Mar 27 11:46:49 2024.
+You can adapt this file completely to your liking, but it should at least
+contain the root `toctree` directive.
 
 Welcome to StonerPlots's documentation!
 =======================================
@@ -13,11 +13,9 @@ Welcome to StonerPlots's documentation!
 Introduction
 ------------
 
-StonerPlots is a package to help make publication quality matplotlib figures more easily. In particular,
-it is indended to create plots that match the style of common Physics journals, but equally can help
-keep matplotlib figures consistent for writing reports and theses.
+StonerPlots is a Python package designed to simplify the creation of publication-quality matplotlib figures. In particular, it is intended to produce plots that align with the style of common physics journals. StonerPlots also helps ensure consistency in matplotlib figures for reports, theses, and similar documentation.
 
-It originated as a fork of the scienceplots package by John D. Garrett
+The library originated as a fork of the `scienceplots` package by John D. Garrett.
 
 Quickstart
 ----------
@@ -25,53 +23,68 @@ Quickstart
 Installation
 ~~~~~~~~~~~~
 
-StonerPlots can be installed wither with pip or with conda::
+StonerPlots can be installed using either `pip` or `conda`:
 
-    pip install stonerplots
+```bash
+pip install stonerplots
+```
 
-Conda packages are uploaded to the Anaconda channel phygbu::
+Conda packages are available from the Anaconda channel `phygbu`:
 
-    conda install -c phygbu stonerplots
+```bash
+conda install -c phygbu stonerplots
+```
 
-It is packaged for python >= 3.10 and you need to have matplotlib installed as well (obviously!). The
-example code also uses numpy.
+StonerPlots requires **Python 3.10 or later** and depends on `matplotlib`, which will be installed automatically. However, most example code also makes use of `numpy`, so you may wish to ensure it is installed.
 
 Example
 ~~~~~~~
 
-The easiest way to get started is to use the SavedFigure context manager. This both applies the requested
-styles and also collects any new figures and saves them to disk.::
+The easiest way to get started is by using the `SavedFigure` context manager. This automatically applies the requested styles and collects any new figures, saving them to disk:
 
-    x = np.linspace(-np.pi,np.pi,181)
-    params = {"xlabel":r"Angle $^\circ$","ylabel":"Signal (V)"}
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from stonerplots import SavedFigure
 
-    with SavedFigure(figures / "example-1.png"):
-        fig, ax = plt.subplots()
-        for i in range(1,6):
-            ax.plot(x*180/np.pi,(1/i)*np.sin(x*i+np.pi/i),
-                                    marker="", label=f"{i=}")
-        ax.legend(title="Curve")
-        ax.set(**params)
+# Generate example data
+x = np.linspace(-np.pi, np.pi, 181)
+fig_params = {"xlabel": r"Angle ($^\circ$)", "ylabel": "Signal (V)"}
 
-In this example, the new figure will be saved as example-1.png (auto-detecting the png format) in the path *figures*. and the
-default "stoner" stylesheet will be applied.
+# Save a styled figure
+with SavedFigure("figures/example-1.png"):  # Replace 'figures' with your desired output path
+    fig, ax = plt.subplots()
+    for i in range(1, 6):
+        ax.plot(x * 180 / np.pi, (1 / i) * np.sin(x * i + np.pi / i),
+                marker="", label=f"i = {i}")
+    ax.legend(title="Curve")
+    ax.set(**fig_params)
+```
+
+In this example, the `SavedFigure` context manager applies the default "stoner" stylesheet and saves the figure as `example-1.png`. The file will be saved in the specified output directory (`figures`), which must already exist. Ensure to adjust the path as needed for your use case.
 
 .. image:: figures/example-1.png
-  :alt: Example figure formatted with the 'stoner' style sheet.
+   :alt: Sample figure automatically styled using the 'stoner' style sheet.
+   :width: 600px
+   :align: center
 
 Sections
 ========
 
+Explore various aspects of StonerPlots through the following sections:
+
 .. toctree::
    :maxdepth: 2
 
-   User Guide <userguide>
-   Style Gallery <style-gallery>
-   Colours <colours>
-   API <api>
+   User Guide <userguide>       # Basic instructions for using StonerPlots
+   Style Gallery <style-gallery> # Examples of available map styles
+   Colours <colours>             # Full palette of colour options, including shaded variations
+   API <api>                     # Detailed API references
 
 Indices and tables
 ==================
+
+Explore further using the indices and search functionality provided below:
 
 * :ref:`genindex`
 * :ref:`modindex`
