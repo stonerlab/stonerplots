@@ -105,41 +105,44 @@ The package is designed to work by using python context managers to aid plotting
 - DoubleYAxis - setup the righthand y axis for a second scale and optional colour the y-axes differently and merge
   the legend into a single legend.
 
-This package draws heavily on [scienceplots](https://github.com/garrettj403/SciencePlots), so it seems only fair to cite the original work....
+This package draws heavily on [scienceplots](https://github.com/garrettj403/SciencePlots), so it
+seems only fair to cite the original work....::
 
-@software{john_garrett_2023_10206719,
-  author       = {John Garrett and
-                  Echedey Luis and
-                  H.-H. Peng and
-                  Tim Cera and
-                  gobinathj and
-                  Josh Borrow and
-                  Mehmet Keçeci and
-                  Splines and
-                  Suraj Iyer and
-                  Yuming Liu and
-                  cjw and
-                  Mikhail Gasanov},
-  title        = {garrettj403/SciencePlots: 2.1.1},
-  month        = nov,
-  year         = 2023,
-  publisher    = {Zenodo},
-  version      = {2.1.1},
-  doi          = {10.5281/zenodo.10206719},
-  url          = {https://doi.org/10.5281/zenodo.10206719},
-}
+    @software{john_garrett_2023_10206719,
+      author       = {John Garrett and
+                      Echedey Luis and
+                      H.-H. Peng and
+                      Tim Cera and
+                      gobinathj and
+                      Josh Borrow and
+                      Mehmet Keçeci and
+                      Splines and
+                      Suraj Iyer and
+                      Yuming Liu and
+                      cjw and
+                      Mikhail Gasanov},
+      title        = {garrettj403/SciencePlots: 2.1.1},
+      month        = nov,
+      year         = 2023,
+      publisher    = {Zenodo},
+      version      = {2.1.1},
+      doi          = {10.5281/zenodo.10206719},
+      url          = {https://doi.org/10.5281/zenodo.10206719},
+    }
 
 The doi and BibTex reference for stonerplots is:
 
 https://doi.org/10.5281/zenodo.14026874
 
-@software{gavin_burnell_2024_14026874,
-  author       = {Gavin Burnell},
-  title        = {stonerlab/stonerplots},
-  month        = nov,
-  year         = 2024,
-  publisher    = {Zenodo},
-  version      = {v1.5.2},
-  doi          = {10.5281/zenodo.14026874},
-  url          = {https://doi.org/10.5281/zenodo.14026874},
+::
+
+    @software{gavin_burnell_2024_14026874,
+      author       = {Gavin Burnell},
+      title        = {stonerlab/stonerplots},
+      month        = nov,
+      year         = 2024,
+      publisher    = {Zenodo},
+      version      = {v1.5.2},
+      doi          = {10.5281/zenodo.14026874},
+      url          = {https://doi.org/10.5281/zenodo.14026874},
 }
