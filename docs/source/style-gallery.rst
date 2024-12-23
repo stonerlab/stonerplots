@@ -182,7 +182,7 @@ The *poster* style makes everything bigger for printing onto an A0 poster. Shoul
 for final printing.
 
 
-.. image:: ../../examples/figures/fig05b.png
+.. image:: ../../examples/figures/fig05b.svg
   :alt: Poster mode
   :align: center
 
@@ -193,7 +193,7 @@ Presentations
 The *presentation* style switches to a larger style, designed for use as a single graph on a PowerPoint presentation.
 
 
-.. image:: ../../examples/figures/fig05c.png
+.. image:: ../../examples/figures/fig05c.svg
   :alt: Full width presentation mode
   :align: center
 
@@ -201,7 +201,7 @@ The *presentation* style switches to a larger style, designed for use as a singl
 There is a *presnetation_sm* style for when you want two plots on a slide.
 
 
-.. image:: ../../examples/figures/fig05d.png
+.. image:: ../../examples/figures/fig05d.svg
   :alt: Half-width presentation mode
   :align: center
 
@@ -210,7 +210,7 @@ The *stoner_dark* style does make everything look a bit heavier and bolder, so t
 everything up.
 
 
-.. image:: ../../examples/figures/fig05e.png
+.. image:: ../../examples/figures/fig05e.svg
   :alt: Dark presentation mode
   :align: center
 

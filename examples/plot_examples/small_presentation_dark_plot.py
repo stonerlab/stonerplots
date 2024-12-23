@@ -6,7 +6,7 @@ from common import figures, model, pparam, x
 from stonerplots import SavedFigure
 
 with SavedFigure(
-    figures / "fig05e.png",
+    figures / "fig05e.svg",
     style=["stoner", "stoner_dark", "presentation", "presentation_sm", "presentation_dark"],
     autoclose=__name__ != "__main__",
 ):

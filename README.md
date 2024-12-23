@@ -18,7 +18,7 @@ Stoner Plots is a fork of Science Plots with additional features to make plottin
 ## Usage
 
 Before using the new styles you need to import stonerplots - but you will most likely also want to make use of
-one of the context managers - the `SavedFigure` class.::
+one of the context managers - the `SavedFigure` class.
 
     from stonerplots import SavedFigure
 
@@ -46,13 +46,15 @@ Documentation can be found on the [github pages for this repository](https://sto
 
 ## Available Styles
 
+### Core Styles
+
 - stoner - this is the base style sheet
 - poster - makes everything bigger for printing on a poster
 - notebook - makes things a little bigger for a Jupyter notebook - from the original scienceplots package
 - presentation - a style suitable for the main graph on a powerpoint slide
 - thesis - a style that tries to look like the CM Physics group LaTeX thesis template
 
-## Journal Styles
+### Journal Styles
 
 - nature - for Nature group journals - from the original scienceplots package
 - aaas-science - Science single columne style.
@@ -61,7 +63,7 @@ Documentation can be found on the [github pages for this repository](https://sto
 - aip - for AIP journals such as Applied Physics Letters - labels in Serif Fonts
 - iop - for Institute of Physics Journals.
 
-## Modifiers
+### Modifiers
 
 - aps1.5 - Switch to 1.5 column wide format
 - aps2.0 - Switch to 2 column wide format
@@ -73,6 +75,18 @@ Documentation can be found on the [github pages for this repository](https://sto
 - presentation_dark - tweak the weight of elements for dark presnetations.
 - science-2col, science-3col - Science 2 and 3 column width figures
 - thesis-sm - reduces the figure width to make the axes closer to 4/3 aspect ratio.
+
+## Context Managers
+
+The package is designed to work by using python context managers to aid plotting. These include:
+
+- SavedFigure - apply style sheets and then save any resulting figures to disc in one or more formats
+- StackVertical - make a multi-panel plot where the panels are arranged in a vertical stack and pushed together so that
+  the top-x-axis on one frame is the bottom of the next.
+- MultiPanel - a general; purpose miulti-panel plotting helper.
+- InsetPlot - create an inset set of axes.
+- DoubleYAxis - setup the righthand y axis for a second scale and optional colour the y-axes differently and merge
+  the legend into a single legend.
 
 ## Colour Cycles
 
@@ -90,23 +104,13 @@ The default colour cycle is based on the London Underground map colour scheme (w
 - Elizabeth
 - Circle
 
+## Reference
+
 The package adds these as named colours in matplotlib, along with 90,50,70 and 10% shade variants of some of them. See
 the [documentation page on colours](https://stonerlab.github.io/stonerplots/colours.html) for a full list.
 
-## Context Managers
-
-The package is designed to work by using python context managers to aid plotting. These include:
-
-- SavedFigure - apply style sheets and then save any resulting figures to disc in one or more formats
-- StackVertical - make a multi-panel plot where the panels are arranged in a vertical stack and pushed together so that
-  the top-x-axis on one frame is the bottom of the next.
-- MultiPanel - a general; purpose miulti-panel plotting helper.
-- InsetPlot - create an inset set of axes.
-- DoubleYAxis - setup the righthand y axis for a second scale and optional colour the y-axes differently and merge
-  the legend into a single legend.
-
 This package draws heavily on [scienceplots](https://github.com/garrettj403/SciencePlots), so it
-seems only fair to cite the original work....::
+seems only fair to cite the original work....
 
     @software{john_garrett_2023_10206719,
       author       = {John Garrett and
@@ -130,11 +134,7 @@ seems only fair to cite the original work....::
       url          = {https://doi.org/10.5281/zenodo.10206719},
     }
 
-The doi and BibTex reference for stonerplots is:
-
-https://doi.org/10.5281/zenodo.14026874
-
-::
+The doi and BibTex reference for stonerplots is: https://doi.org/10.5281/zenodo.14026874
 
     @software{gavin_burnell_2024_14026874,
       author       = {Gavin Burnell},

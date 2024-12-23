@@ -1,16 +1,25 @@
 # Documentation Template
 
 This template defines the structure and style for functions, class and method documentation.
-Docstrings should be written in ReStructured Text format.
+
+- Docstrings should be written in ReStructured Text format suitable for use with the sphinx documentation
+  package.
+- If the docstring contains any backslash \ characters, then it must be set as a Python raw-string
+  with the letter `r` before the opening quotes.
+- All documentation should be written in British Englsh.
+- The closing quotes should be on a separate line.
+- Lines must be less than 119 characters long.
 
 ## General Structure
 
+1. **One Line Summary**
+
+    - A description of the purpose of the class, function or method written as an imperitive satement in one line.
+    - The on line summary should start on the same line as the openning triple quotes of the docstring.
+
 1. **Short Summary**
 
-    - A brief description of the class or method functionality.
-    - This should include a one line summary written as an imperitive satement,
-      followed by a longer summary of the purpose of the class, function or method.
-    - The on line summary should start on the openning """" of the docstring.
+    - A brief description and explanation of the class, function or method functionality.
 
 1. **Args**
 
@@ -26,10 +35,11 @@ Docstrings should be written in ReStructured Text format.
     - Each keyword parameter should be described following the format:
     - `parameter_name (type): Description of what the parameter represents.`
        and the default value.`
+    - Any astericks * in the parameter name should be escaped with a back slash \.
 
 1. **Attributes**
 
-    - Provide brief explanations for key internal class attributes:
+    - Provide brief explanations for class attributes:
       `attribute_name (type): Description.`
 
 1. **Raises**
@@ -45,13 +55,13 @@ Docstrings should be written in ReStructured Text format.
 1. **Notes**
 
     - Explain important implementation details, gotchas, or assumptions.
-    - THis section may be omitted if there are no important details or gotchas.
+    - This section may be omitted if there are no important details or gotchas.
 
 1. **Examples**
 
     - Include real-world examples of how to use the functionality, both basic and advanced.
-    - This section should be omitted for functions, methods and classes that are not intended
-      for third parties to use - for example, base classes, internal or private functions or methods.
+    - This section should be omitted for functions, methods and classes whose names start with an underscore _
+      as these are private or internal.
 
 ### Example Template for a Class
 
@@ -91,7 +101,8 @@ Notes:
     - Important assumptions or limitations.
 
 Examples:
-    >>> my_instance = MyClass(param1=value1)
+    >>> while my_instance == MyClass(param1=value1)
+    ...     pass
     >>> result = my_instance.some_method()
     >>> print(result)
 """

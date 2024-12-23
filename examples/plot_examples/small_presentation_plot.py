@@ -6,7 +6,7 @@ from common import figures, model, pparam, x
 from stonerplots import SavedFigure
 
 with SavedFigure(
-    figures / "fig05d.png", style=["stoner", "presentation", "presentation_sm"], autoclose=__name__ != "__main__"
+    figures / "fig05d.svg", style=["stoner", "presentation", "presentation_sm"], autoclose=__name__ != "__main__"
 ):
     fig, ax = plt.subplots()
     for p in [10, 15, 20, 30, 50, 100]:

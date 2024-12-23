@@ -171,21 +171,23 @@ Having made your nice figures for your thesis and possibly a paper, you are like
 or poster. Again, the use of stylesheets lets you quickly switch formatting settings to be appropriate. For posters
 and presentations, the main features are that you need to increase the size of all of the plot elements (lines, symbols,
 fonts, etc.). Generally, we use something like PowerPoint to make posters and presentation (you can use LaTeX if you
-have particularly masochistic tendencies!) and the easiest way to import the figures is as `.png` files::
+have particularly masochistic tendencies!). Modern versions of PowerPoint (and other MS Office applications) do not
+support EPS files -- due to some security concerns with the format. The best format to use is `svg` as a vector
+format the graphics will scale and print well at any size. Failing this, a high dpi png file can be used.::
 
-    with SavedFigure(figures / "fig_01.png", style=["stoner", "poster"], autoclose=True):
+    with SavedFigure(figures / "fig_01.svg", style=["stoner", "poster"], autoclose=True):
         fig.ax = plt.subplots()
         ... # all your plotting commands
         ... # But don't plt.close() your figure!
 
-The `poster` stylesheet also increases the dpi of the image so that it will look good when printed on A0, albeit at the
+The `poster` stylesheet also increases the dpi of rasterised formats like png so that it will look good when printed on A0, albeit at the
 expense of rather large images!
 
 Similarly to the `poster` style, there is a `presentation` style that makes figures suitable for placing into a standard
 presentation. The default is to make a plot that occupies the whole slide, but there is a `presentation_sm` style that
 keeps the font sizes, lines, etc., but reduces the size so you can fit two such plots on a slide::
 
-    with SavedFigure(figures / "fig_01.png",
+    with SavedFigure(figures / "fig_01.svg",
                 style=["stoner", "presentation", "presentation_sm"], autoclose=True):
         fig.ax = plt.subplots()
         ... # all your plotting commands
@@ -195,11 +197,15 @@ If you want to have a dark background for your presentation, there is a `stoner_
 appropriately. One feature of dark plots in presentations is that the light-on-dark elements look heavier or bolder
 than dark-on-light, and so `presentation_dark` adjusts elements to make the overall weight look similar::
 
-    with SavedFigure(figures / "fig_01.png",
+    with SavedFigure(figures / "fig_01.svg",
         style=["stoner", "stoner_dark", "presentation", "presentation_dark"], autoclose=True):
         fig.ax = plt.subplots()
         ... # all your plotting commands
         ... # But don't plt.close() your figure!
+
+IF you need to put several graphs on the same presentation slide, then consider using the :py:class:`MultiPanel`
+context manager in conjunction with presentation mode to keep the formatting optimal for presentation viewing --
+do *not* be tempted to make several separate figures and resize them in PowerPoint as your labels will become too small!
 
 Double and Multi-Panel Figures
 ------------------------------
@@ -325,4 +331,5 @@ size relative to the parent axes. See `Inset Plots<insetplot>` for the full expl
    Labelling Ticks <plotlabeller>
    Stacked Plots <stackvertical>
    Multi-Panel Plots <multipanel>
+   Double-Y-Axis Plots <doubleyaxis>
    Inset Plots <insetplot>

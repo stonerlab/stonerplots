@@ -19,15 +19,15 @@ The only required parameter is the number of panels to show. This can be either
 Optional Parameters
 -------------------
 
-The *figure*, *sharex*, *sharey* and *label_panels* work exactly as for the :py:class:`StackVertical` Context manager
+The `figure`, `sharex`, `sharey` and `label_panels` work exactly as for the :py:class:`StackVertical` Context manager
 described above, except that the default is not to share any axes - see `Stacked Plots<stackvertical>` for more
 details.
 
 The `adjust_figsize` parameter allows you to specify a tuple defining distinct expansion factors for width and height. The
 
-default value is to expand the width by exactly the number of columns and the height by the height of one row + 80% of
+The default value is to expand the width by exactly the number of columns and the height by the height of one row + 80% of
 additional rows. Since full-page width figures are more than double a single column, it may be useful to do something
-like:
+like::
 
     with SavedFigure("example.png",stle=["stoner","aip","aip2"]):
         with MultiPanel((1,2),adjust_figsize=(0,0.12)) as axes:
@@ -46,6 +46,27 @@ to shrink the original figure size is when the final aspect ratio will be higher
   :align: centre
 
 
+Use with Presentation Style
+---------------------------
+
+Combining py:class:`MultiPanel` with the `presentation` style sheet is a good way to prepare multiple graphs for
+a single slide. The default behaviour of the `adjust_figsize` is unhelpful as the `presentation` style sheet already
+sets a good figure size to use. You may also not want to label the individual panels.::
+
+    with SavedFigure("fig7e.svg", style="stoner,presentation"):
+        fig = plt.figure()
+        with MultiPanel((2, 2),adjust_figsize=False, label_panels=False) as axes:
+            for ix, ax in enumerate(axes):
+                for p in [10, 30, 100]:
+                    ax.plot(x, model(x, p + ix * 5), label=p + ix * 5, marker="")
+                ...
+
+.. image:: ../../examples/figures/fig7e.svg
+
+  :alt: Using MultiPanel and presentation style sheet together.
+  :align: centre
+
+
 Different Numbers of Plots on Each Row
 --------------------------------------
 
@@ -53,9 +74,9 @@ Different Numbers of Plots on Each Row
 subplots on different rows on the figure. For example, if you want to have three subplots and they don't
 conveniently fit on a single row, you might have 1 and then 2 plots, or 2 and then 1 plot. This can be
 achieved by using a list of plots per row as the first argument in conjunction with an optional
- *same_aspect*.::
+ `same_aspect`.::
 
-    with SavedFigure("3-plot.png",style="stoner,thesis", autoclose=True):
+    with SavedFigure("3-plot.png",style="stoner,thesis"):
         fig=plt.figure("tri-plot")
         with MultiPanel([2,1], adjust_figsize=False) as axes:
             for ix,ax in enumerate(axes):
@@ -75,7 +96,7 @@ aspect ratios of the plots.
 With the optional `transpose` argument, the `MultiPanel` will create a grid of plots, with each column potentially containing a different number of rows.
 of rows is different for each column::
 
-    with SavedFigure("3-plot.png",style="stoner,thesis", autoclose=True):
+    with SavedFigure("3-plot.png",style="stoner,thesis"):
         fig=plt.figure("tri-plot-transpose")
         with MultiPanel([1,2], transpose=True, adjust_figsize=(0,-0.25)) as axes:
             for ix,ax in enumerate(axes):
@@ -92,7 +113,7 @@ The object returned when you enter the context exposes several useful bits of fu
 over the object it will return the individual plot axes - but it will also set pyplot's current axes so that the
 The object returned when you enter the context exposes several useful bits of functionality. Firstly, if you iterate
 over the object it will return the individual polot axes - but it will also set pyplot's current axes so that the
-`matplotlib.pyplot` interactive interface will work and switch between the plots as it iterates:
+`matplotlib.pyplot` interactive interface will work and switch between the plots as it iterates::
 
     fig=plt.figure("tri-plot-b")
     with MultiPanel([2,1], adjust_figsize=False) as panels:
@@ -106,8 +127,8 @@ You can also access the underlying list or array of `matplotlib.axes.Axes` insta
 attribute and the :py:class:`matplotlib.gridspec.gridspec` used for the multi-panel plot. Indexing the context manager
 variable can also give acces to the individual plots (or rows of plots if a single index is given). If the result of
 attribute and the `matplotlib.gridspec.gridspec` used for the multi-panel plot. Indexing the context manager
+variable can also give access to the individual plots (or rows of plots if a single index is given).
 
-variable can also give access to the individual plots (or rows of plots if a single index is given). If the result of
 
     fig=plt.figure("tri-plot-c")
     with MultiPanel([2,1], adjust_figsize=False) as panels:
