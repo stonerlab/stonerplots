@@ -73,6 +73,7 @@ manager::
                 plt.plot(x, np.abs(model(x, p) - 0.5), "--", label=f"$|{p}|$")
             plt.ylabel("2$^\\mathrm{nd}$ Harmonic")
 
+
 .. image:: ../../examples/figures/fig7d.png
    :alt: 2x2 multi-panel plot.
-   :align: centre
+   :align: center

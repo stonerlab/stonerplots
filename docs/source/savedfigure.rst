@@ -133,6 +133,7 @@ filename string like so::
 This will then result in example_0.png and example_1.png, with the "{int}" placeholder being replaced with 0, 1, 2...
 
 As well as the `int` placeholder you can also use:
+
 - `alpha` or `Alpha` for lower and upper case letters (starting from `a`)
 - `roman` or `Roman` for lower or upper case Roman numerals (starting from 'i')
 

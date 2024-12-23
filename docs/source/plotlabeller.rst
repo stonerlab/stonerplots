@@ -33,4 +33,4 @@ This will give a plot somewhat like:
 
 .. image:: ../../examples/figures/fig01c.png
    :alt: A plot with the x and y tick labels formatted in engineering style with SI prefixes.
-   :align: centre
+   :align: center

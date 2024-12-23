@@ -136,4 +136,4 @@ following output:
 
 .. image:: ../../examples/figures/genx_plot.png
    :alt: Two panel fit of XRR data
-   :align: centre
+   :align: center

@@ -21,7 +21,7 @@ The basic stylesheet is the *stoner* stylesheet::
 
 .. image:: ../../examples/figures/fig01a.png
    :alt: Example figure formatted with the 'stoner' style sheet.
-   :align: centre
+   :align: center
 
 LaTeX Rendering
 ~~~~~~~~~~~~~~~
@@ -39,7 +39,7 @@ The basic stoner style uses matplotlib's built-in emulation of LaTeX to render m
 
 .. image:: ../../examples/figures/fig01b.png
    :alt: Example figure formatted with the 'stoner' style sheet.
-   :align: centre
+   :align: center
 
 2. Journal Formats
 ------------------
@@ -50,7 +50,7 @@ There are specific stylesheets for producing plots at the correct size and style
 |                                                     |                                                   |
 | .. image:: ../../examples/figures/fig02a.png        | .. image:: ../../examples/figures/fig02b.png      |
 |    :alt: Example figure in IEEE format              |    :alt: Example figure in APS Format             |
-|    :align: centre                                   |    :align: centre                                 |
+|    :align: center                                   |    :align: center                                 |
 |                                                     |                                                   |
 | Using styles ["stoner", "ieee"]                     | Using styles ["stoner", "aps"]                    |
 |                                                     |                                                   |
@@ -58,7 +58,7 @@ There are specific stylesheets for producing plots at the correct size and style
 |                                                     |                                                   |
 | .. image:: ../../examples/figures/fig02c.png        | .. image:: ../../examples/figures/fig02d.png      |
 |    :alt: Example figure in AIP format               |    :alt: Example figure in IOP Format             |
-|    :align: centre                                   |    :align: centre                                 |
+|    :align: center                                   |    :align: center                                 |
 |                                                     |                                                   |
 | Using styles ["stoner", "aip"]                      | Using styles ["stoner", "iop"]                    |
 |                                                     |                                                   |
@@ -66,7 +66,7 @@ There are specific stylesheets for producing plots at the correct size and style
 |                                                     |                                                   |
 | .. image:: ../../examples/figures/fig02e.png        | .. image:: ../../examples/figures/fig02i_1.png    |
 |    :alt: Example figure in nature format            |   :alt: Example figure in aaas-science format     |
-|    :align: centre                                   |   :align: centre                                  |
+|    :align: center                                   |   :align: center                                  |
 |                                                     |                                                   |
 | Using styles ["stoner", "nature"]                   | Using styles ["stoner", "aaas-science"]           |
 |                                                     |                                                   |
@@ -74,7 +74,7 @@ There are specific stylesheets for producing plots at the correct size and style
 |                                                                                                         |
 | .. image:: ../../examples/figures/fig02f.png                                                            |
 |    :alt: Example figure in APS 1.5 Column format                                                        |
-|    :align: centre                                                                                       |
+|    :align: center                                                                                       |
 |                                                                                                         |
 | Using styles ["stoner", "aps", "aps1.5"]                                                                |
 |                                                                                                         |
@@ -82,7 +82,7 @@ There are specific stylesheets for producing plots at the correct size and style
 |                                                                                                         |
 | .. image:: ../../examples/figures/fig02g.png                                                            |
 |    :alt: Example figure in APS 2 Column format                                                          |
-|    :align: centre                                                                                       |
+|    :align: center                                                                                       |
 |                                                                                                         |
 | Using styles ["stoner", "aps", "aps2"]                                                                  |
 |                                                                                                         |
@@ -90,7 +90,7 @@ There are specific stylesheets for producing plots at the correct size and style
 |                                                                                                         |
 | .. image:: ../../examples/figures/fig02h_0.png                                                          |
 |    :alt: Example plot in thesis template format                                                         |
-|    :align: centre                                                                                       |
+|    :align: center                                                                                       |
 |                                                                                                         |
 | Using styles ["stoner", "thesis"]                                                                       |
 |                                                                                                         |
@@ -98,7 +98,7 @@ There are specific stylesheets for producing plots at the correct size and style
 |                                                                                                         |
 | .. image:: ../../examples/figures/fig02h_1.png                                                          |
 |    :alt: Example twin plot in thesis template format                                                    |
-|    :align: centre                                                                                       |
+|    :align: center                                                                                       |
 |                                                                                                         |
 | Using styles ["stoner", "thesis"] and MultiPanel with manual adjust_figsize=(0, -0.25)                  |
 |                                                                                                         |
@@ -118,7 +118,7 @@ There is a *scatter* plot style that sets up for doing scatter plots.
 |                                                     |                                                   |
 | .. image:: ../../examples/figures/fig04a.png        | .. image:: ../../examples/figures/fig04b.png      |
 |    :alt: Standard colours scheme                    |    :alt: Bright palette colour scheme             |
-|    :align: centre                                   |    :align: centre                                 |
+|    :align: center                                   |    :align: center                                 |
 |                                                     |                                                   |
 | Using styles ["stoner", "std-colours"]              | Using styles ["stoner", "bright"]                 |
 |                                                     |                                                   |
@@ -126,7 +126,7 @@ There is a *scatter* plot style that sets up for doing scatter plots.
 |                                                     |                                                   |
 | .. image:: ../../examples/figures/fig04c.png        | .. image:: ../../examples/figures/fig04d.png      |
 |    :alt: High contrast palette colour scheme        |    :alt: High visibility palette colour scheme    |
-|    :align: centre                                   |    :align: centre                                 |
+|    :align: center                                   |    :align: center                                 |
 |                                                     |                                                   |
 | Using styles ["stoner", "high-contrast"]            | Using styles ["stoner", "high-vis"]               |
 |                                                     |                                                   |
@@ -134,7 +134,7 @@ There is a *scatter* plot style that sets up for doing scatter plots.
 |                                                     |                                                   |
 | .. image:: ../../examples/figures/fig04e.png        | .. image:: ../../examples/figures/fig04f.png      |
 |    :alt: Light palette colour scheme                |    :alt: Muted palette colour scheme              |
-|    :align: centre                                   |    :align: centre                                 |
+|    :align: center                                   |    :align: center                                 |
 |                                                     |                                                   |
 | Using styles ["stoner", "light"]                    | Using styles ["stoner", "muted"]                  |
 |                                                     |                                                   |
@@ -142,7 +142,7 @@ There is a *scatter* plot style that sets up for doing scatter plots.
 |                                                     |                                                   |
 | .. image:: ../../examples/figures/fig04g.png        | .. image:: ../../examples/figures/fig04h.png      |
 |    :alt: Retro palette colour scheme                |    :alt: Vibrant palette colour scheme            |
-|    :align: centre                                   |    :align: centre                                 |
+|    :align: center                                   |    :align: center                                 |
 |                                                     |                                                   |
 | Using styles ["stoner", "retro"]                    | Using styles ["stoner", "vibrant"]                |
 |                                                     |                                                   |
@@ -150,7 +150,7 @@ There is a *scatter* plot style that sets up for doing scatter plots.
 |                                                     |                                                   |
 | .. image:: ../../examples/figures/fig04i.png        |                                                   |
 |    :alt: Dark themed plot figure                    |                                                   |
-|    :align: centre                                   |                                                   |
+|    :align: center                                   |                                                   |
 |                                                     |                                                   |
 | Using styles ["stoner", "stoner-dark"]              |                                                   |
 |                                                     |                                                   |
@@ -169,7 +169,7 @@ The *notebook* style is designed for Jupyter Notebooks.
 
 .. image:: ../../examples/figures/fig05a.png
    :alt: Notebook mode
-   :align: centre
+   :align: center
 
 Posters
 ~~~~~~~
@@ -179,7 +179,7 @@ for final printing.
 
 .. image:: ../../examples/figures/fig05b.svg
    :alt: Poster mode
-   :align: centre
+   :align: center
 
 Presentations
 ~~~~~~~~~~~~~
@@ -188,20 +188,20 @@ The *presentation* style switches to a larger style, designed for use as a singl
 
 .. image:: ../../examples/figures/fig05c.svg
    :alt: Full width presentation mode
-   :align: centre
+   :align: center
 
 There is a *presentation_sm* style for when you want two plots on a slide.
 
 .. image:: ../../examples/figures/fig05d.svg
    :alt: Half-width presentation mode
-   :align: centre
+   :align: center
 
 The *stoner_dark* style does make everything look a bit heavier and bolder, so the *presentation_dark* lightens
 everything up.
 
 .. image:: ../../examples/figures/fig05e.svg
    :alt: Dark presentation mode
-   :align: centre
+   :align: center
 
 Higher Resolution Modes
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -215,14 +215,14 @@ med-res Style
 
 .. image:: ../../examples/figures/fig05g.png
    :alt: 600dpi image mode.
-   :align: centre
+   :align: center
 
 hi-res Style
 ^^^^^^^^^^^^
 
 .. image:: ../../examples/figures/fig05f.png
    :alt: 600dpi image mode.
-   :align: centre
+   :align: center
 
 6. Miscellaneous Tweaks
 -----------------------
@@ -231,7 +231,7 @@ The *grid* style adds an axes grid to the plot.
 
 .. image:: ../../examples/figures/fig06.png
    :alt: Plot with axes grids
-   :align: centre
+   :align: center
 
 This was produced with the style ["stoner", "grid"].
 
@@ -247,7 +247,7 @@ both sets of axes combined.
 
 .. image:: ../../examples/figures/fig7d.png
    :alt: Plot with two separate y-axes.
-   :align: centre
+   :align: center
 
 
 
@@ -259,7 +259,7 @@ It can automatically position the inset(s) to keep clear of each other and the p
 
 .. image:: ../../examples/figures/fig07a.png
    :alt: Plot with an inset in lower right corner and a second in the middle left side.
-   :align: centre
+   :align: center
 
 Stacked Sub-plots
 ~~~~~~~~~~~~~~~~~
@@ -269,7 +269,7 @@ The :py:class:`stonerplots.StackVertical` context manager can be used for this.
 
 .. image:: ../../examples/figures/fig7b.png
    :alt: 3-panel vertically stacked plot
-   :align: centre
+   :align: center
 
 MultiPanel Sub-plots
 ~~~~~~~~~~~~~~~~~~~~
@@ -279,7 +279,7 @@ option. The :py:class:`stonerplots.MultiPanel` context manager makes this a bit 
 
 .. image:: ../../examples/figures/fig7c.png
    :alt: 2x2 multi-panel plot.
-   :align: centre
+   :align: center
 
 Consistent Axes Formatting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -288,4 +288,4 @@ The :py:class:`stonerplots.PlotLabeller` context manager can adjust the axes lab
 
 .. image:: ../../examples/figures/fig01c.png
    :alt: 2x2 multi-panel plot.
-   :align: centre
+   :align: center

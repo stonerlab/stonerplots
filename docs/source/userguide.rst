@@ -242,7 +242,7 @@ of data. See `Double Y-axis plots<doubleyaxis> for further details.
 
 .. image:: ../../examples/figures/fig7d.png
   :alt: Double Y axis plot
-  :align: centre
+  :align: center
 
 StackVertical Context Manager
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -266,7 +266,7 @@ axes, starting from the top of the figure.
 
 .. image:: ../../examples/figures/fig7b.png
   :alt: Stacked Plot
-  :align: centre
+  :align: center
 
 See :doc:`Stacked Plots<stackvertical>` for full details of :py:class:`StackVertical`.
 
@@ -298,7 +298,7 @@ plots to place beside each other), or a tuple of rows, columns of sub-plots.
 
 .. image:: ../../examples/figures/fig7c.png
   :alt: A single row of 2 sub-plots created from MultiPanel
-  :align: centre
+  :align: center
 
 See :doc:`Multi Panel Plots<multipanel>` for full details of the :py:class:`MultiPanel` context manager.
 
