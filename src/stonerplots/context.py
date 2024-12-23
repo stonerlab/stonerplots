@@ -971,25 +971,25 @@ class DoubleYAxis(_PreserveFigureMixin):
             self.ax.tick_params(axis="y", labelcolor=self.colours[0])
             self.ax.yaxis.label.set_color(self.colours[0])
             self.ax.spines["left"].set_color(self.colours[0])
-            self.ax.tick_params(axis='y', which="both", colors=self.colours[0])
+            self.ax.tick_params(axis="y", which="both", colors=self.colours[0])
 
         # Apply colours to the secondary axis
         if self.colours[1] is not None:
             self.ax2.tick_params(axis="y", labelcolor=self.colours[1])
             self.ax2.yaxis.label.set_color(self.colours[1])
             self.ax2.spines["right"].set_color(self.colours[1])
-            self.ax2.tick_params(axis='y', which="both", colors=self.colours[1])
+            self.ax2.tick_params(axis="y", which="both", colors=self.colours[1])
 
         # Merge legends from primary and secondary axes
         if self.legend:
-            if not(lg1:=self.ax.get_legend()):
-                lg1=self.ax.legend()
-            if not(lg2:=self.ax2.get_legend()):
-                lg2=self.ax2.legend()
+            if not (lg1 := self.ax.get_legend()):
+                lg1 = self.ax.legend()
+            if not (lg2 := self.ax2.get_legend()):
+                lg2 = self.ax2.legend()
             handles1, labels1 = self.ax.get_legend_handles_labels()
             handles2, labels2 = self.ax2.get_legend_handles_labels()
-            prop1=lg1.properties()
-            prop2=lg2.properties()
+            prop1 = lg1.properties()
+            prop2 = lg2.properties()
             lg1.remove()
             lg2.remove()
             legend = self.ax.legend(handles1 + handles2, labels1 + labels2, loc=self.loc)
@@ -997,10 +997,7 @@ class DoubleYAxis(_PreserveFigureMixin):
                 self.loc, _ = find_best_position(self.ax, legend)
                 legend.remove()
                 legend = self.ax.legend(handles1 + handles2, labels1 + labels2, loc=self.loc)
-            copy_properties(legend, prop2|prop1)
-
-
-
+            copy_properties(legend, prop2 | prop1)
 
         # Restore the original figure and axes
         if self._switch:
@@ -1239,7 +1236,7 @@ class MultiPanel(_PlotContextSequence, _PreserveFigureMixin):
 
 
 class StackVertical(MultiPanel):
-    """A context manager for generating a vertical stack of subplots with shared x-axes.
+    r"""A context manager for generating a vertical stack of subplots with shared x-axes.
 
     This class creates a vertical stack of subplots, optionally removing the vertical space between them
     for a clean and compact layout. Automatically handles adjustments to the figure height, subplot
