@@ -152,7 +152,7 @@ def roman(number):
 
 
 def counter(value, pattern="({alpha})", **kwargs):
-    """Format an integer as a string using a pattern and various representations.
+    r"""Format an integer as a string using a pattern and various representations.
 
     Args:
         value (int): The integer to format.
@@ -318,23 +318,17 @@ class _PlotContextSequence(Sequence):
     Examples:
         Accessing and iterating over axes:
 
-        ```python
-        sequence = _PlotContextSequence()
-        for ax in sequence:
-            ax.plot([1, 2, 3], [4, 5, 6])
-        ```
+        >>> sequence = _PlotContextSequence()
+        >>> for ax in sequence:
+        >>>     ax.plot([1, 2, 3], [4, 5, 6])
 
         Checking if an axis is in the sequence:
 
-        ```python
-        ax in sequence  # Returns True/False
-        ```
+        >>> ax in sequence  # Returns True/False
 
         Retrieving a specific axis and setting it as the current axis:
 
-        ```python
-        specific_ax = sequence[0]
-        ```
+        >>> specific_ax = sequence[0]
     """
 
     _NO_FIGURES_MSG = "No current figures exist."
@@ -1014,7 +1008,7 @@ class DoubleYAxis(_PreserveFigureMixin):
 
 
 class MultiPanel(_PlotContextSequence, _PreserveFigureMixin):
-    """Context manager for creating multi-panel plots in Matplotlib.
+    r"""Context manager for creating multi-panel plots in Matplotlib.
 
     The `MultiPanel` class simplifies the process of creating and managing multi-panel plots. It supports both regular
     and irregular grids of subplots, automatically adjusts figure sizes, supports shared axes options, and can apply
@@ -1071,14 +1065,14 @@ class MultiPanel(_PlotContextSequence, _PreserveFigureMixin):
         Create a 2x3 grid with shared x-axis and labeled panels:
 
         >>> with MultiPanel((2, 3), sharex=True, label_panels=True) as axes:
-        >>>     for ax in axes:
-        >>>         ax.plot([1, 2, 3], [4, 5, 6])
+        ...     for ax in axes:
+        ...         ax.plot([1, 2, 3], [4, 5, 6])
 
         Create an irregular grid with 2 rows (3 panels in the first row, 1 in the second):
 
         >>> with MultiPanel([3, 1], adjust_figsize=(0.5, 1.0)) as axes:
-        >>>     axes[0].plot([1, 2, 3], [3, 2, 1])
-        >>>     axes[1].scatter([1, 2, 3], [4, 5, 6])
+        ...     axes[0].plot([1, 2, 3], [3, 2, 1])
+        ...     axes[1].scatter([1, 2, 3], [4, 5, 6])
     """
 
     def __init__(
@@ -1298,8 +1292,8 @@ class StackVertical(MultiPanel):
         Create a vertical stack of 3 subplots with shared x-axes:
 
         >>> with StackVertical(3, sharex=True, joined=True) as axes:
-        >>>     for ax in axes:
-        >>>         ax.plot([1, 2, 3], [4, 5, 6])
+        ...     for ax in axes:
+        ...         ax.plot([1, 2, 3], [4, 5, 6])
     """
 
     def __init__(
