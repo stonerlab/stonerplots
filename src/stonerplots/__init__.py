@@ -1,4 +1,13 @@
-"""Build the list of stylesheets and add to matplotlib."""
+"""Main package file of stonerplots.
+
+Importing :py:module`stonerplots` will make the various context managers available, it will also
+modify the lists of matplotlib named colours and update the central matplotlib dictionary of stylesheets.
+
+Attrs:
+    default (settings):
+        A singleton insance of a simple class that stores default values for the styles, formats and filename.
+        These defaults are common for all code that uses stonerplots after it has been first imported.
+"""
 
 from pathlib import Path
 
@@ -12,8 +21,17 @@ from .colours import (
     tube_colours_70,
     tube_colours_90,
 )
-from .context import InsetPlot, MultiPanel, SavedFigure, StackVertical, DoubleYAxis, counter, roman
+from .context import (
+    DoubleYAxis,
+    InsetPlot,
+    MultiPanel,
+    SavedFigure,
+    StackVertical,
+    counter,
+    roman,
+)
 from .format import PlotLabeller, TexEngFormatter, TexFormatter
+from .util import _default
 
 __all__ = [
     "context",
@@ -28,8 +46,12 @@ __all__ = [
     "PlotLabeller",
     "TexFormatter",
     "TexEngFormatter",
+    "default",
 ]
-__version__ = "1.6.0"
+__version__ = "1.6.1"
+
+# Default style handling.
+default = _default()
 
 # register the included stylesheet in the matplotlib style library
 stonerplots_path = Path(__file__).parent

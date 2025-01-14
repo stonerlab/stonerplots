@@ -11,6 +11,7 @@ axes.labelsize: 9
 xtick.labelsize: 7
 ytick.labelsize: 7
 legend.fontsize: 7
+legend.title_fontsize: 7
 figure.labelsize: x-small
 figure.titlesize: 9
 axes.titlesize: 9

@@ -66,3 +66,13 @@ ps.fonttype: 42
 # Use LaTeX for math formatting
 text.usetex : False
 text.latex.preamble : \usepackage{amsmath,amsbsy,amsfonts,amssymb,amsxtra,cmbright}
+
+# Fontsizes
+axes.titlesize: 12.0# Font size of the axes title.
+axes.labelsize: 11.0# Font size of the x and y labels.
+xtick.labelsize: 10.0# Font size of the x tick labels.
+ytick.labelsize: 10.0# Font size of the y tick labels.
+legend.fontsize: 10.0# Font size of the legend.
+legend.title_fontsize: 11.0 # Fontdize for Legend Title
+figure.titlesize: 13.0# Font size of the figure title.
+font.size: 9.0# Base font size for text.

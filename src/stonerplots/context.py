@@ -13,13 +13,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
-from .util import find_best_position, move_inset, new_bbox_for_loc, copy_properties
+from .util import (
+    _default,
+    copy_properties,
+    find_best_position,
+    move_inset,
+    new_bbox_for_loc,
+)
 
 __all__ = ["SavedFigure", "InsetPlot", "StackVertical", "MultiPanel", "counter", "roman"]
 
 # Constants
 _fontargs = ["font", "fontfamily", "fontname", "fontsize", "fontstretch", "fontstyle", "fontvariant", "fontweight"]
 _gsargs = ["left", "bottom", "right", "top", "width_ratios", "height_ratios", "hspace", "wspace", "h_pad", "w_pad"]
+default = _default()
 
 ROMAN_NUMERAL_MAP = {
     1_000_000: "$\\overline{\\mathrm{M}}$",
@@ -495,6 +502,8 @@ class SavedFigure(_TrackNewFiguresAndAxes, _PreserveFigureMixin):
             >>> sf.filename
             PosixPath('plot')
         """
+        if not self._filename:
+            return default.filename
         return self._filename
 
     @filename.setter
@@ -516,6 +525,8 @@ class SavedFigure(_TrackNewFiguresAndAxes, _PreserveFigureMixin):
             if ext and ext not in self.formats:
                 self.formats.append(ext)
             value = value.parent / value.stem
+        else:
+            value = default.filename
         self._filename = value
 
     @property
@@ -530,6 +541,8 @@ class SavedFigure(_TrackNewFiguresAndAxes, _PreserveFigureMixin):
             >>> sf.formats
             ['png', 'pdf']
         """
+        if not self._formats:
+            return default.formats
         return self._formats
 
     @formats.setter
@@ -554,7 +567,7 @@ class SavedFigure(_TrackNewFiguresAndAxes, _PreserveFigureMixin):
             self._formats = list(value)
         elif value is None:
             if not self._formats:  # Use default if formats aren't set
-                self._formats = ["png"]
+                self._formats = default.formats
         else:
             raise TypeError("Invalid type for formats. Expected str, iterable, or None.")
 
@@ -593,7 +606,7 @@ class SavedFigure(_TrackNewFiguresAndAxes, _PreserveFigureMixin):
         elif isinstance(value, Iterable):
             self._style = list(value)
         elif value is None:
-            self._style = ["stoner"]
+            self._style = default.style
         else:
             raise TypeError("Invalid type for style. Expected str, iterable, or None.")
 

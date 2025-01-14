@@ -10,6 +10,13 @@ figure.figsize : 3.3, 2.475
 figure.dpi : 100
 
 # Font sizes
-font.size : 8
+axes.titlesize: 8.0 # Font size of the axes title.
+axes.labelsize: 8.0 # Font size of the x and y labels.
+xtick.labelsize: 8.0 # Font size of the x tick labels.
+ytick.labelsize: 8.0 # Font size of the y tick labels.
+legend.fontsize: 8.0 # Font size of the legend.
+legend.title_fontsize: 8.0 # Fontdize for Legend Title
+figure.titlesize: 8.0 # Font size of the figure title.
+font.size: 8.0 # Base font size for text.
 font.family : serif
 font.serif : Times

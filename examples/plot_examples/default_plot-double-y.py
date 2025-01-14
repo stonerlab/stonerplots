@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from common import figures, model, pparam, x
 
-from stonerplots import SavedFigure, DoubleYAxis
+from stonerplots import DoubleYAxis, SavedFigure
 
 with SavedFigure(figures / "fig7d.png", style="stoner,med-res", autoclose=__name__ != "__main__"):
     fig, ax = plt.subplots()

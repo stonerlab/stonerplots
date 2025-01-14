@@ -10,10 +10,11 @@ axes.labelsize: 10
 xtick.labelsize: 10
 ytick.labelsize: 10
 legend.fontsize: 9
+legend.title_fontsize: 10
 figure.labelsize: medium
 figure.titlesize: 12
 axes.titlesize: 10
-font.size: 10
+font.size: 9
 
 # Font Family
 font.family: Times New Roman

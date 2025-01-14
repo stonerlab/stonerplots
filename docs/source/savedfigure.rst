@@ -116,6 +116,7 @@ Typically this gives:
 - `tiff`: Tagged Image File Format,
 - `webp`: WebP Image Format
 
+
 Multiple Figures and SavedFigure
 --------------------------------
 
@@ -150,11 +151,31 @@ possible to retrospectively style figures, so already open figures will be saved
 
 This will save all of your figures as Figure-0.eps, Figure-0.png, Figure-1.eps, Figure-1.png... in one go.
 
+Setting Default Values
+----------------------
+
+If you are making a lot of figures with similar stylesheet, formats and filename patterns, it can be tedious to keep
+on typing them for each :py:class:`SavedFigure`. One option is to set default values once and have
+:py:class:`SavedFigure` use them each time. You can do this using the :py:attr:`stonerplots.default` settings.::
+
+    from stonerplots import SavedFigure, default
+
+    default.style="stoner, med-res"
+    default.formats="svg"
+    default.filename="default"
+
+    with SavedFigure():
+        ...
+
+:py:attr:`stonerplots.default` is a global setting so once set it will apply to all future instances of SavedFigure -
+not just the ones in the current function or module. If you need to keep settings, but with more control over the
+scaope, then the reuse of the :py:class:`SavedFigure` is going to be the better option.
+
 Reusing the Context Manager
 ---------------------------
 
-If you are using the same settings in SavedFigure context managers over and over again, then you might want to reuse
-the context manager::
+If you are using the same settings in SavedFigure context managers over and over again, but setting a global default
+is not useful, then you might want to reuse the context manager::
 
     cm = SavedFigure(figures / "fig_{label}.png", style=["stoner"])
 

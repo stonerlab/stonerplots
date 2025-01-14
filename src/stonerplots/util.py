@@ -3,6 +3,10 @@
 
 BAsed on code used in matplotlib to automatically position a legend.
 """
+from collections.abc import Iterable
+from copy import copy
+from pathlib import Path
+
 from matplotlib.axes import Axes
 from matplotlib.axes._base import _TransformedBoundsLocator
 from matplotlib.collections import Collection, PolyCollection
@@ -12,6 +16,68 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch, Rectangle
 from matplotlib.text import Text
 from matplotlib.transforms import IdentityTransform
+
+
+class _default(object):
+    """store default style information."""
+
+    _style = ["stoner"]
+    _formats = ["png"]
+    _instance = None
+
+    def __new__(cls):
+        """Return the existing class attribute if it is not None."""
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    @property
+    def style(self):
+        """Return the stylesheets as a list of strings."""
+        return copy(self._style)  # return a copy to avoid inadvertantly changing the default style.
+
+    @style.setter
+    def style(self, value):
+        """Ensure style is stored as a list of strings."""
+        if isinstance(value, str):
+            self._style = [x.strip() for x in value.split(",") if x.strip()]
+        elif isinstance(value, Iterable):
+            self._style = list(value)
+        else:
+            raise TypeError("Invalid type for default style. Expected str, iterable.")
+
+    @property
+    def formats(self):
+        """Return the formats as a list of strings."""
+        return copy(self._formats)
+
+    @formats.setter
+    def formats(self, value):
+        """Store the default formats."""
+        if isinstance(value, str):
+            self._formats = [x.strip() for x in value.split(",") if x.strip()]
+        elif isinstance(value, Iterable):
+            self._formats = list(value)
+        elif value is None:
+            self._formats = ["png"]
+        else:
+            raise TypeError("Invalid type for formats. Expected str, iterable, or None.")
+
+    @property
+    def filename(self):
+        """Return filename as a Path object without extension."""
+        return self._filename
+
+    @filename.setter
+    def filename(self, value):
+        """Set filename and extract its extension if valid."""
+        if value is not None:
+            value = Path(value)
+            ext = value.suffix[1:]
+            if ext and ext not in self.formats:
+                self.formats.append(ext)
+            value = value.parent / value.stem
+        self._filename = value
 
 
 def move_inset(parent, inset_axes, new_bbox):
@@ -88,7 +154,7 @@ def _auto_linset_data(ax, axins, renderer, insets=True):
     inset_axes = _get_inset_axes(ax) if insets else []
 
     for artist in ax.get_children() + inset_axes:
-        _process_artist(artist,renderer, axins, bboxes, lines, offsets)
+        _process_artist(artist, renderer, axins, bboxes, lines, offsets)
 
     return bboxes, lines, offsets
 
@@ -106,7 +172,7 @@ def _process_artist(artist, renderer, axins, bboxes, lines, offsets):
             lines.extend(artist.get_transform().transform_path(path) for path in artist.get_paths())
         case Collection():
             _, transOffset, hoffsets, _ = artist._prepare_points()
-            if hoffsets.size>0:
+            if hoffsets.size > 0:
                 offsets.extend(transOffset.transform(hoffsets))
         case Text():
             bboxes.append(artist.get_window_extent(renderer))
@@ -246,16 +312,15 @@ def find_best_position(ax, axins, renderer=None):
 
     return idx, insetBox
 
-def copy_properties(obj,properties):
+
+def copy_properties(obj, properties):
     """Copy matplotlib properties to an object."""
-    for k,v in properties.items():
-        if attr:=getattr(obj,f"set_{k}",None):
+    for k, v in properties.items():
+        if attr := getattr(obj, f"set_{k}", None):
             match v:
-                case bool()|int()|float()|str():
+                case bool() | int() | float() | str():
                     attr(v)
                 case Text():
-                    attr(v.get_text(),v.get_fontproperties())
+                    attr(v.get_text(), v.get_fontproperties())
                 case _:
                     pass
-
-
