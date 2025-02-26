@@ -235,6 +235,14 @@ The *grid* style adds an axes grid to the plot.
 
 This was produced with the style ["stoner", "grid"].
 
+The *extra* argument to :py:class:`SavedFigure` can be used to do further tweaks. For example here with
+*extra* = {"lines.linestyle":"--"}
+
+.. image:: ../../examples/figures/fig01d.png
+   :alt: Plot with Linestyle = --
+   :align: center
+
+
 7. Insets and Multi-panel plots
 -------------------------------
 

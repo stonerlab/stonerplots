@@ -116,6 +116,23 @@ Typically this gives:
 - `tiff`: Tagged Image File Format,
 - `webp`: WebP Image Format
 
+Overriding individual settings
+------------------------------
+
+Sometimes you might want to tweak a style sheet setting or other Matplotlib rcParams value for a single plot. The
+keyword *extra* argument to :py:class:`SavedFigure` lets you do this. It takes a dictionary of rcParam name and value
+pairs and embeds a call to :py:func:`matplotlib.rc_context` into the :py:class:`SavedFigure` call.::
+
+    with SavedFigure(
+        figures / "fig01d.png",
+        style=["stoner"],
+        extra={"lines.linestyle": "--"}
+    ):
+        fig, ax = plt.subplots()
+        ax.plot(x_data, y_data)
+
+A KeyError exception will be raised if any of the supplied keys to the *extra* dictionary are not valid Matplotlib
+rcParam names.
 
 Multiple Figures and SavedFigure
 --------------------------------

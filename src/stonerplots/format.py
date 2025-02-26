@@ -3,7 +3,7 @@
 import numpy as np
 from matplotlib.ticker import EngFormatter, Formatter, Locator, NullFormatter
 
-from .context import _TrackNewFiguresAndAxes
+from .context.base import TrackNewFiguresAndAxes
 
 
 def _round(value, offset=2):
@@ -113,7 +113,7 @@ class TexEngFormatter(EngFormatter):
         return f"{value:g}"
 
 
-class PlotLabeller(_TrackNewFiguresAndAxes):
+class PlotLabeller(TrackNewFiguresAndAxes):
     """Adjust the x and y axis tick formatters of plots created in the context handler.
 
     Keyword Arguments:

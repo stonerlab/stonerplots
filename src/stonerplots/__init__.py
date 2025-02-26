@@ -21,15 +21,8 @@ from .colours import (
     tube_colours_70,
     tube_colours_90,
 )
-from .context import (
-    DoubleYAxis,
-    InsetPlot,
-    MultiPanel,
-    SavedFigure,
-    StackVertical,
-    counter,
-    roman,
-)
+from .context import DoubleYAxis, InsetPlot, MultiPanel, SavedFigure, StackVertical
+from .counter import counter, roman
 from .format import PlotLabeller, TexEngFormatter, TexFormatter
 from .util import _default
 
@@ -48,7 +41,7 @@ __all__ = [
     "TexEngFormatter",
     "default",
 ]
-__version__ = "1.6.1"
+__version__ = "1.7.0"
 
 # Default style handling.
 default = _default()
