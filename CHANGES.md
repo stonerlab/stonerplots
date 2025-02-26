@@ -1,6 +1,21 @@
 # Changelog
 
+## v1.7.0
+
+New feature
+
+- Added new keyword argument to SavedFigure to allow individual rcParam values to be overriden.
+
+Other
+
+- Split stonerplots.context into separate sub modules for easier maintainence.
+
+## v1.6.1 Release
+
+Minor feature release o implement fontsize for individual elements and also default settings.
+
 ## v1.6.0 Release
+
 
 New features
 
