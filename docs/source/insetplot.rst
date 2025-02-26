@@ -1,7 +1,7 @@
 InsetPlot Context Manager
 =========================
 
-.. currentmodule:: stonerplots.context
+.. currentmodule:: stonerplots.context.inset_plot
 
 Inset plots, where a second set of axes are included within the main axes of a figure, are often used to show either a
 detail of the main figure, or possibly an overview or a related dataset. Unfortunately, generating insets with

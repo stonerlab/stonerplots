@@ -1,7 +1,7 @@
 DoubleYAxis Context Manager
 ===========================
 
-.. currentmodule:: stonerplots.context
+.. currentmodule:: stonerplots.context.double_y
 
 A double-y-axis plot is one where one dataset is plotted referenced to the y-axis on the left of the frame and a second
 dataset is plotted against the y-axis on the right-hand side of the frame. This works well when you want to show two

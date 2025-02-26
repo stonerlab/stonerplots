@@ -1,7 +1,7 @@
 SavedFigure Context Manager
 ============================
 
-.. currentmodule:: stonerplots.context
+.. currentmodule:: stonerplots.context.save_figure
 
 The :py:class:`SavedFigure` is used to apply stylesheets, capture the current figure, and save it to disk. It applies
 stylesheets by wrapping a :py:func:`matplotlib.style.context` context manager around the code. On entry, the context

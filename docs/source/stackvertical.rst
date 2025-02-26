@@ -1,7 +1,7 @@
 StackVertical Context Manager
 =============================
 
-.. currentmodule:: stonerplots.context
+.. currentmodule:: stonerplots.context.multiple_plot
 
 When comparing several quantities that have a common independent variable, using a sequence of vertically stacked
 plots can be effective. Typically, each sub-plot is positioned so that the top x-axis of one panel is the bottom x-axis
