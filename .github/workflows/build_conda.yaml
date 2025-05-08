@@ -35,7 +35,7 @@ jobs:
           export VERSION=`python setup.py --version`
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
       - name: Build and upload the conda packages
-        uses: uibcdf/action-build-and-upload-conda-packages@HEAD
+        uses: uibcdf/action-build-and-upload-conda-packages@4940704d2be7906d3bda5b00e3c3e4472fd7808f
         with:
           meta_yaml_dir: recipe
           python-version: ${{ matrix.python-version }} # Values previously defined in `matrix`
