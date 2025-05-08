@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.7.1 Release
+
+New features
+
+- Added the *use* parameter to SavedFigure to allow a fignure to be returned to in the same or different SavedFigure
+  context manager.
+
+## v1.7/0 Release
+
+New features
+
+- Added the ability to override individual style settings via the *extra* parameter in SavedFigure
+
+
 ## v1.6.0 Release
 
 New features

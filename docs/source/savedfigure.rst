@@ -116,6 +116,14 @@ Typically this gives:
 - `tiff`: Tagged Image File Format,
 - `webp`: WebP Image Format
 
+Not Saving the figure
+---------------------
+
+This might seem a little counter intuitive, but in some scenarios you might want to be able to apply the style sheets
+but not immediately save the figure. By setting the filename arameter to *False* you can skip actually writing the file
+to disk. This can be a useful option when you also want to contnue plotting and then saving a figure elsewhere and so
+want to ensure the style is used consistently.  See the section `Adding to an already existing figure`.
+
 Overriding individual settings
 ------------------------------
 
@@ -167,6 +175,44 @@ possible to retrospectively style figures, so already open figures will be saved
         pass
 
 This will save all of your figures as Figure-0.eps, Figure-0.png, Figure-1.eps, Figure-1.png... in one go.
+
+Adding to an already existing figure
+-------------------------------------
+
+If you have already started a figure and want to be able to add to it and then save the figure, you can do this by
+using the *use* parameter. This is particularly useful in conjunction with providing *False* to the filename.::
+
+    with SavedFigure(False,style="stoner", autoclose=False):
+        fig,ax = plt.subplot()
+        ... # plot stuff with fig
+
+    # Do other stuff and then come back to the figure
+
+    with SavedFigure("figure.png",style="stoner", use=fig)
+        ... # more plotting
+
+    #fig now saved here.
+
+An evemt more compact form can be used by utilising the re-use of the context manager like so::
+
+    resumed_plotting = SavedFigure(False,format="png", style="stoner", autoclose=False)
+
+    with resumed_plotting():
+        fig,ax=plt.subplot()
+        ... # plotting
+
+    # Do other stuff and then come back to the figure
+
+    with resumed_plotting(use=fig):
+        ... # Do more plotting
+
+    # Do other stuff and then come back to the figure
+
+    with resumed_plotting("figure", autoclose=True):
+        ... # Final plotting and then save
+
+This approach has the advantage that the format and style are setup just once and so are consistent between
+reinvocations of the context manager.
 
 Setting Default Values
 ----------------------

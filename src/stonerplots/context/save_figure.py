@@ -38,6 +38,10 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             Specific rcParams to override within the style sheet context manager. Defaults to {}
         include_open (bool):
             If `True`, any figures opened before entering the context are included for saving. Default is `False`.
+        use (Figure):
+            IF set, use this matplotlib figure in the context hander. This is useful in a situation where one partially
+            plots a figure, then run some other code outside the context handler and finally return and finish plotting
+            the figure.
 
     Attributes:
         filename (Path):
@@ -89,9 +93,11 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         - plots/figure_plot3.png
     """
 
-    _keys = ["filename", "style", "autoclose", "formats", "include_open"]
+    _keys = ["filename", "style", "autoclose", "formats", "include_open", "use", "extra"]
 
-    def __init__(self, filename=None, style=None, autoclose=False, formats=None, extra=None, include_open=False):
+    def __init__(
+        self, filename=None, style=None, autoclose=False, formats=None, extra=None, include_open=False, use=None
+    ):
         """Initialize with default settings."""
         # Internal state initialization
         super().__init__(include_open=False)
@@ -108,6 +114,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         self.extra_context = None
         self.formats = formats
         self.extra = extra
+        self.use = use
 
     @property
     def filename(self):
@@ -121,7 +128,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             >>> sf.filename
             PosixPath('plot')
         """
-        if not self._filename:
+        if self._filename is None:
             return default.filename
         return self._filename
 
@@ -138,12 +145,14 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             >>> sf.filename
             PosixPath('plot')
         """
-        if value is not None:
+        if value is not None and value:
             value = Path(value)
             ext = value.suffix[1:]
             if ext and ext not in self.formats:
                 self.formats.append(ext)
             value = value.parent / value.stem
+        elif value is not None and not value:
+            self._filename = None
         else:
             value = default.filename
         self._filename = value
@@ -248,9 +257,14 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
                     raise KeyError(f"{param} is not a valid Matplotlib rcParameter.")
                 self._extra[param] = val
 
-    def __call__(self, **kwargs):
+    def __call__(self, *args, **kwargs):
         """Update settings dynamically and return self."""
         settings = {key: kwargs[key] for key in self._keys if key in kwargs}
+        match args:
+            case (filename,) if isinstance(filename, (str, Path)):
+                settings["filename"] = filename
+            case _:
+                raise ValueError("Only a single positional argument that is either a string or path is supported")
         for key, val in settings.items():
             setattr(self, key, val)
         return self
@@ -264,7 +278,6 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         if self.extra:
             self.extra_context = mpl.rc_context(rc=self.extra)
             self.extra_context.__enter__()
-
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -279,15 +292,20 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         self._existing_open_figs = [ref() for ref in self._existing_open_figs if ref() is not None]
         new_file_counter = 0
 
-        for fig in self.new_figures:
+        new_figures = list(self.new_figures)
+        if self.use:
+            new_figures += [self.use]
+
+        for fig in new_figures:
 
             new_file_counter += 1
             label = fig.get_label()
             filename = self.generate_filename(label, new_file_counter)
 
-            for fmt in self.formats:
-                output_file = f"{filename}.{fmt.lower()}"
-                fig.savefig(output_file)
+            if filename:
+                for fmt in self.formats:
+                    output_file = f"{filename}.{fmt.lower()}"
+                    fig.savefig(output_file)
 
             if self.autoclose:
                 plt.close(fig)
@@ -314,6 +332,8 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             >>> sf.generate_filename("test", 1)
             'plot_test.png'
         """
+        if not self.filename:
+            return None
         if self.filename.is_dir():
             filename: Path = self.filename / "{label}"
         else:

@@ -139,10 +139,10 @@ The doi and BibTex reference for stonerplots is: https://doi.org/10.5281/zenodo.
     @software{gavin_burnell_2024_14026874,
       author       = {Gavin Burnell},
       title        = {stonerlab/stonerplots},
-      month        = nov,
-      year         = 2024,
+      month        = May,
+      year         = 2025,
       publisher    = {Zenodo},
-      version      = {v1.5.2},
+      version      = {v1.7.1},
       doi          = {10.5281/zenodo.14026874},
       url          = {https://doi.org/10.5281/zenodo.14026874},
 }
