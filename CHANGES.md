@@ -2,19 +2,27 @@
 
 ## v1.7.1 Release
 
-New features
+New feature
 
 - Added the *use* parameter to SavedFigure to allow a fignure to be returned to in the same or different SavedFigure
   context manager.
 
-## v1.7/0 Release
+## v1.7.0
 
-New features
+New feature
 
-- Added the ability to override individual style settings via the *extra* parameter in SavedFigure
+- Added new keyword argument to SavedFigure to allow individual rcParam values to be overriden.
 
+Other
+
+- Split stonerplots.context into separate sub modules for easier maintainence.
+
+## v1.6.1 Release
+
+Minor feature release o implement fontsize for individual elements and also default settings.
 
 ## v1.6.0 Release
+
 
 New features
 
