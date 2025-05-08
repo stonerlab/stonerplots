@@ -23,7 +23,6 @@ Minor feature release o implement fontsize for individual elements and also defa
 
 ## v1.6.0 Release
 
-
 New features
 
 - Added the inset autolocator code.
@@ -42,7 +41,7 @@ Some refactoring of the context managers and other code cleanups. No intentional
 
 ## v1.5.0 Release
 
-Iregular grids in MultuPanel now can also do different numbers of rows in each column with the _transpose_ parameter.
+Iregular grids in MultuPanel now can also do different numbers of rows in each column with the *transpose* parameter.
 
 ## v1.4.0 Release
 
