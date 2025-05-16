@@ -263,7 +263,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         match args:
             case (filename,) if isinstance(filename, (str, Path)):
                 settings["filename"] = filename
-            case tuple() if not len(args) and self.filename:
+            case tuple() if not len(args) and self.filename is not None:
                 pass
             case _:
                 raise ValueError("Onl‼y a single positional argument that is either a string or path is supported")

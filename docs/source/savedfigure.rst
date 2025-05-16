@@ -183,7 +183,7 @@ If you have already started a figure and want to be able to add to it and then s
 using the *use* parameter. This is particularly useful in conjunction with providing *False* to the filename.::
 
     with SavedFigure(False,style="stoner", autoclose=False):
-        fig,ax = plt.subplot()
+        fig,ax = plt.subplots()
         ... # plot stuff with fig
 
     # Do other stuff and then come back to the figure
@@ -195,10 +195,10 @@ using the *use* parameter. This is particularly useful in conjunction with provi
 
 An evemt more compact form can be used by utilising the re-use of the context manager like so::
 
-    resumed_plotting = SavedFigure(False,format="png", style="stoner", autoclose=False)
+    resumed_plotting = SavedFigure(False,formats="png", style="stoner", autoclose=False)
 
     with resumed_plotting():
-        fig,ax=plt.subplot()
+        fig,ax=plt.subplots()
         ... # plotting
 
     # Do other stuff and then come back to the figure
