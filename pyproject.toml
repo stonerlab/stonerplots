@@ -39,3 +39,21 @@ version = {attr = "stonerplots.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.black]
+line-length = 119
+target-version = ['py312']
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.eggs
+    | \.git
+    | \.mypy_cache
+    | \.tox
+    | _build
+    | build
+    | dist
+  )/
+)
+'''

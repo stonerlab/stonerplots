@@ -40,7 +40,7 @@ jobs:
           meta_yaml_dir: recipe
           python-version: ${{ matrix.python-version }} # Values previously defined in `matrix`
           user: phygbu
-          label: auto
+          label: main
           overwrite: true
           token: ${{ secrets.ANACONDA }} # Replace with the right name of your secret
       - name: Build and upload wheel
