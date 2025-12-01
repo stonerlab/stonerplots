@@ -7,7 +7,7 @@
 [![Conda Version](https://anaconda.org/phygbu/stonerplots/badges/version.svg)](https://anaconda.org/phygbu/stonerplots)
 ![Not platform specific](https://anaconda.org/phygbu/stonerplots/badges/platforms.svg)
 ![MIT Licensed](https://anaconda.org/phygbu/stonerplots/badges/license.svg)
-[![DOI](https://zenodo.org/badge/776970304.svg)](https://zenodo.org/doi/10.5281/zenodo.10905673)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15446411.svg)](https://doi.org/10.5281/zenodo.15446411)
 
 # Stoner Plots
 
@@ -32,7 +32,7 @@ There are three main parts to this package::
 1. A set of matplotlib style sheets for making lots wih styles suitable for a variety of Physics related journals
    and formats such as presentations and posters as well as reports and theses.
 
-1. A set of Python Content managers designed to help with the process of preparing production quality figures in
+1. A set of Python Context managers designed to help with the process of preparing production quality figures in
   matplotlib.
 
 1. Soem defintitions of colours based on the Transport for London colour palette and inserted as named colours into
@@ -146,3 +146,4 @@ The doi and BibTex reference for stonerplots is: https://doi.org/10.5281/zenodo.
       doi          = {10.5281/zenodo.14026874},
       url          = {https://doi.org/10.5281/zenodo.14026874},
 }
+
