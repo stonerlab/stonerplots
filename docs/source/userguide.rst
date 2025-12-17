@@ -206,6 +206,21 @@ If you need to put several graphs on the same presentation slide, then consider 
 context manager in conjunction with presentation mode to keep the formatting optimal for presentation viewing -- do
 *not* be tempted to make several separate figures and resize them in PowerPoint as your labels will become too small!
 
+Centred Axes
+------------
+
+Although the norm is to make figures with a frame containing ticks and axes labels, it might be that you want to
+make a plot where the axes pass through the origin (or some other specific point), and in these cases you also
+usually don't put a frame around the figure. The :py:class:`CentredAxes` context manage can do this for you::
+
+    with CentredAxes(x=xc,y=yc):
+        fig.ax = plt.subplots()
+        ... # all your plotting commands
+
+:py:class:`CentredAxes` will relocate the axes at the specified co-ordinate for all new plot (sets of A0
+matplotlib axes) created with the context manager. Thetick labels at the axes crossing points (typically
+the origin) are removed and the axes labels are moved to the right and top.
+
 Double and Multi-Panel Figures
 ------------------------------
 
@@ -325,6 +340,7 @@ size relative to the parent axes. See `Inset Plots<insetplot>` for the full expl
 
    Saving Figures <savedfigure>
    Labelling Ticks <plotlabeller>
+   Centred Axes <centredaxes>
    Stacked Plots <stackvertical>
    Multi-Panel Plots <multipanel>
    Double-Y-Axis Plots <doubleyaxis>

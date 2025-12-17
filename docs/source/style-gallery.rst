@@ -110,6 +110,8 @@ There are specific stylesheets for producing plots at the correct size and style
 There is a *scatter* plot style that sets up for doing scatter plots.
 
 .. image:: ../../examples/figures/fig03.png
+   :alt: Scatter graph
+   :align: center
 
 4. Different Colour Schemes
 ---------------------------

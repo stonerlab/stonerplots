@@ -21,13 +21,14 @@ from .colours import (
     tube_colours_70,
     tube_colours_90,
 )
-from .context import DoubleYAxis, InsetPlot, MultiPanel, SavedFigure, StackVertical
+from .context import DoubleYAxis, InsetPlot, MultiPanel, SavedFigure, StackVertical, CentredAxes
 from .counter import counter, roman
 from .format import PlotLabeller, TexEngFormatter, TexFormatter
 from .util import _default
 
 __all__ = [
     "context",
+    "CentredAxes",
     "SavedFigure",
     "InsetPlot",
     "StackVertical",

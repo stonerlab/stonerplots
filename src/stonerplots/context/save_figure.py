@@ -256,7 +256,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             case Mapping() if len(value) == 0:
                 self._extra = {}
             case Mapping():
-                if bad := mpl.rcParams.keys() - value.keys():
+                if bad := value.keys() - mpl.rcParams.keys():
                     raise KeyError(f"{','.join(bad)} are not vliad Matplotlib rcParameters.")
                 for param, val in value.items():
                     self._extra[param] = val
