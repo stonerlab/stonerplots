@@ -39,7 +39,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         include_open (bool):
             If `True`, any figures opened before entering the context are included for saving. Default is `False`.
         use (Figure):
-            IF set, use this matplotlib figure in the context hander. This is useful in a situation where one partially
+            If set, use this matplotlib figure in the context hander. This is useful in a situation where one partially
             plots a figure, then run some other code outside the context handler and finally return and finish plotting
             the figure.
 
@@ -100,7 +100,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
     ):
         """Initialize with default settings."""
         # Internal state initialization
-        super().__init__(include_open=False)
+        super().__init__(include_open=include_open)
         self._filename = None
         self._formats = []
         self._style = []
@@ -145,16 +145,19 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             >>> sf.filename
             PosixPath('plot')
         """
-        if value is not None and value:
-            value = Path(value)
-            ext = value.suffix[1:]
-            if ext and ext not in self.formats:
-                self.formats.append(ext)
-            value = value.parent / value.stem
-        elif value is not None and not value:
-            self._filename = None
-        else:
-            value = default.filename
+        match value:
+            case None:  # use default filename
+                value = default.filename
+            case _ if not value:  # do not save the gihure
+                self._filename = None
+            case str() | Path():
+                value = Path(value)
+                ext = value.suffix[1:]
+                if ext and ext not in self.formats:
+                    self.formats.append(ext)
+                value = value.parent / value.stem
+            case _:
+                raise TypeError(f"Cannot interpet {value} as a filename.")
         self._filename = value
 
     @property
@@ -189,15 +192,15 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             >>> sf.formats
             ['png', 'pdf']
         """
-        if isinstance(value, str):
-            self._formats = [x.strip() for x in value.split(",") if x.strip()]
-        elif isinstance(value, Iterable):
-            self._formats = list(value)
-        elif value is None:
-            if not self._formats:  # Use default if formats aren't set
+        match value:
+            case str():
+                self._formats = [x.strip() for x in value.split(",") if x.strip()]
+            case Iterable() if all(isinstance(x, str) for x in value):
+                self._formats = list(value)
+            case None if not self._formats:  # Use default if formats aren't set
                 self._formats = default.formats
-        else:
-            raise TypeError("Invalid type for formats. Expected str, iterable, or None.")
+            case _:
+                raise TypeError(f"Invalid formats specified {value}. Expected str, iterable, or None.")
 
     @property
     def style(self):
@@ -229,14 +232,15 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             >>> sf.style
             ['default', 'ggplot']
         """
-        if isinstance(value, str):
-            self._style = [x.strip() for x in value.split(",") if x.strip()]
-        elif isinstance(value, Iterable):
-            self._style = list(value)
-        elif value is None:
-            self._style = default.style
-        else:
-            raise TypeError("Invalid type for style. Expected str, iterable, or None.")
+        match value:
+            case str():
+                self._style = [x.strip() for x in value.split(",") if x.strip()]
+            case Iterable() if all(isinstance(x, str) for x in value):
+                self._style = list(value)
+            case None:
+                self._style = default.style
+            case _:
+                raise TypeError(f"Invalid style: {value}. Expected str, iterable, or None.")
 
     @property
     def extra(self):
@@ -246,16 +250,16 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
     @extra.setter
     def extra(self, value):
         """Ensure we set extra with valid rc_parameters."""
-        if value is None:  # clear the dictionary
-            self._extra = {}
-        if isinstance(value, Mapping):
-            if len(value) == 0:
+        match value:
+            case None:
                 self._extra = {}
-                return
-            for param, val in value.items():
-                if param not in mpl.rcParams.keys():
-                    raise KeyError(f"{param} is not a valid Matplotlib rcParameter.")
-                self._extra[param] = val
+            case Mapping() if len(value) == 0:
+                self._extra = {}
+            case Mapping():
+                if bad := mpl.rcParams.keys() - value.keys():
+                    raise KeyError(f"{','.join(bad)} are not vliad Matplotlib rcParameters.")
+                for param, val in value.items():
+                    self._extra[param] = val
 
     def __call__(self, *args, **kwargs):
         """Update settings dynamically and return self."""
