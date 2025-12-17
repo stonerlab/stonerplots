@@ -81,6 +81,7 @@ Documentation can be found on the [github pages for this repository](https://sto
 The package is designed to work by using python context managers to aid plotting. These include:
 
 - SavedFigure - apply style sheets and then save any resulting figures to disc in one or more formats
+- CentredAxes - makes a plot where the axes cross at the origin and there is no outside frame.
 - StackVertical - make a multi-panel plot where the panels are arranged in a vertical stack and pushed together so that
   the top-x-axis on one frame is the bottom of the next.
 - MultiPanel - a general; purpose miulti-panel plotting helper.
@@ -146,4 +147,3 @@ The doi and BibTex reference for stonerplots is: https://doi.org/10.5281/zenodo.
       doi          = {10.5281/zenodo.14026874},
       url          = {https://doi.org/10.5281/zenodo.14026874},
 }
-

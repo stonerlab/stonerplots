@@ -244,6 +244,12 @@ The *extra* argument to :py:class:`SavedFigure` can be used to do further tweaks
    :alt: Plot with Linestyle = --
    :align: center
 
+The :py:class:`CentredAxes` can be used to remove the external frame of a plot and place the axes
+crossing at the origin.
+
+.. image:: ../../examples/figures/fig01g.png
+   :alt: Plot with centred axes
+   :align: center
 
 7. Insets and Multi-panel plots
 -------------------------------

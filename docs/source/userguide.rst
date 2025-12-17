@@ -33,6 +33,8 @@ or to temporarily apply stylesheets (:py:func:`matplotlib.style.context`).
 Using Stoner Plots to Make Thesis Figures
 -----------------------------------------
 
+.. currentmodule:: stonerplots.context.save_figure
+
 A common task that this package is aimed towards is preparing figures for a project report, dissertation, or thesis.
 The task here is to try and make the figures look as consistent as possible so that your report/dissertation/thesis
 looks professional. You want to make all the plots have a similar format in terms of size, fonts, colours, and for
@@ -96,6 +98,8 @@ For the full details see the :doc:`SavedFigure Guide<savedfigure>`.
 
 Ensuring Axes Label Formatting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. currentmodule:: stonerplots.format
 
 Sometimes one wishes to plot very small or very large quantities. Labelling an axis with a number with too many
 digits or too many 0s before the significant figures can make it very difficult to judge the actual order of magnitude
@@ -209,6 +213,8 @@ context manager in conjunction with presentation mode to keep the formatting opt
 Centred Axes
 ------------
 
+.. currentmodule:: stonerplots.context.nofrmae
+
 Although the norm is to make figures with a frame containing ticks and axes labels, it might be that you want to
 make a plot where the axes pass through the origin (or some other specific point), and in these cases you also
 usually don't put a frame around the figure. The :py:class:`CentredAxes` context manage can do this for you::
@@ -217,12 +223,18 @@ usually don't put a frame around the figure. The :py:class:`CentredAxes` context
         fig.ax = plt.subplots()
         ... # all your plotting commands
 
+.. image:: ../../examples/figures/fig01g.png
+  :alt: Centred Axes Plot
+  :align: center
+
 :py:class:`CentredAxes` will relocate the axes at the specified co-ordinate for all new plot (sets of A0
 matplotlib axes) created with the context manager. Thetick labels at the axes crossing points (typically
 the origin) are removed and the axes labels are moved to the right and top.
 
 Double and Multi-Panel Figures
 ------------------------------
+
+.. currentmodule:: stonerplots.context.multiple_plot
 
 When you want your reader/examiner to compare two related datasets with different y-ranges, you can use a double y
 axis plot. With this, you place both quantities on the same plot, but one is referred to a left hand y-axis and the
@@ -319,6 +331,8 @@ See :doc:`Multi Panel Plots<multipanel>` for full details of the :py:class:`Mult
 
 Inset Plots
 -----------
+
+.. currentmodule:: stonerplots.context,inset_plot
 
 The final scenario where you might need to show related datasets is where an inset is required to show a detail, or
 perhaps an overview of the main plot axes. This again can be a fiddle with matplotlib to get insets that are placed
