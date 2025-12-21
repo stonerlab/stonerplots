@@ -2,6 +2,7 @@
 """Context Manager for Double Y axis plots."""
 
 from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
 
 from ..util import copy_properties, find_best_position
 from .base import PreserveFigureMixin
@@ -105,13 +106,16 @@ class DoubleYAxis(PreserveFigureMixin):
         self.ax = None
 
         # Configure legend location
-        if isinstance(loc, str):
-            loc = loc.lower().replace("-", " ").strip()
-            if loc not in self.locations:
-                raise ValueError(f"Location '{loc}' not recognised!")
-            loc = self.locations[loc]
-        if not isinstance(loc, int):
-            raise TypeError(f"Legend location must be of type str or int, got {type(loc)}.")
+        match loc:
+            case str():
+                loc = loc.lower().replace("-", " ").strip()
+                if loc not in self.locations:
+                    raise ValueError(f"Location '{loc}' not recognised!")
+                loc = self.locations[loc]
+            case int():
+                pass
+            case _:
+                raise TypeError(f"Legend location must be of type str or int, got {type(loc)}.")
         self.loc = loc
         self.legend = legend
 
@@ -136,7 +140,9 @@ class DoubleYAxis(PreserveFigureMixin):
                 The secondary Y-axis created through `twinx()`.
         """
         self._store_current_figure_and_axes()
-        self.ax = plt.gca() if self._ax is None else self._ax
+        if isinstance(getattr(self._ax,"ax",None),Axes):
+            self._ax=self._ax.ax
+        self.ax = self._ax if isinstance(self._ax,Axes) else plt.gca()
         self.ax2 = self.ax.twinx()
         if self._switch:
             plt.sca(self.ax2)  # Set the secondary axis as the current axis

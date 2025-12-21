@@ -4,6 +4,7 @@ import warnings
 
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.figure import Figure
 
 from ..counter import counter
 from .base import PlotContextSequence, PreserveFigureMixin, RavelList
@@ -149,11 +150,17 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
     def _set_figure(self):
         """Set the figure based on the provided figure argument or the current figure."""
         self.figure = self._fig_arg or plt.gcf()
-        if isinstance(self.figure, int):
-            self.figure = plt.figure(self.figure)
-        elif isinstance(self.figure, str):
-            self.figure = plt.figure(self.figure)
-        plt.figure(self.figure)
+        match self.figure:
+            case int()|str():
+                self.figure = plt.figure(self.figure)
+            case _ if isinstance(getattr(self.figure,"figure",None),Figure):
+                self.figure=self.figure.figure
+            case _ if hasattr(self.figure,"number"):
+                self.figure = plt.figure(self.figure.number)
+            case Figure():
+                return
+            case _:
+                raise TypeError("Unable to interpret {self.figure} as a figure.")
 
     def _adjust_figure_size(self):
         """Adjust the figure size if necessary."""
@@ -167,21 +174,22 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
 
     def _create_gridspec(self):
         """Create the gridspec for the subplots."""
-        if isinstance(self.panels, int):
-            self._create_subplots((1, self.panels) if not self.transpose else (self.panels, 1))
-        elif isinstance(self.panels, list):
-            self._create_subplots(
-                (
-                    (len(self.panels), np.prod(np.unique(self.panels)))
-                    if not self.transpose
-                    else (np.prod(np.unique(self.panels)), len(self.panels))
-                ),
-                self.panels,
-            )
-        elif isinstance(self.panels, tuple):
-            self._create_subplots(self.panels)
-        else:
-            raise TypeError(f"Unable to interpret the number of panels to create: {self.panels}")
+        match self.panels:
+            case int():
+                self._create_subplots((1, self.panels) if not self.transpose else (self.panels, 1))
+            case list():
+                self._create_subplots(
+                    (
+                        (len(self.panels), np.prod(np.unique(self.panels)))
+                        if not self.transpose
+                        else (np.prod(np.unique(self.panels)), len(self.panels))
+                    ),
+                    self.panels,
+                )
+            case tuple():
+                self._create_subplots(self.panels)
+            case _:
+                raise TypeError(f"Unable to interpret the number of panels to create: {self.panels}")
         if self.adjust_figsize:
             self._do_figure_adjustment()
 

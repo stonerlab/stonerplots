@@ -2,6 +2,7 @@
 """InsetPlot context manager."""
 
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 from ..util import find_best_position, move_inset, new_bbox_for_loc
@@ -102,11 +103,9 @@ class InsetPlot(PreserveFigureMixin):
 
     def __enter__(self):
         """Create the inset axes using the axes_grid toolkit."""
-        self._store_current_figure_and_axes()  # Note the current figure and axes safely
-        if self._ax is None:  # Use current axes if not passed explicitly
-            self.ax = plt.gca()
-        else:
-            self.ax = self.ax
+        if isinstance(getattr(self._ax,"ax",None),Axes):
+            self.ax=self._ax.ax
+        self.ax=self._ax if isinstance(self._ax,Axes) else plt.gca()
         if not isinstance(self._loc, int):
             self.loc = self.locations.get(str(self._loc).lower().replace("-", " "), 1)
         else:
