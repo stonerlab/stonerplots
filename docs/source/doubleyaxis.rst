@@ -59,19 +59,18 @@ Example
 This illustrates the use of the :py:class:`DoubleYAxis` in conjunction with the :py:class:`SavedFigure` context
 manager::
 
-    with SavedFigure("fig7d.png", style="stoner,med-res"):
-        fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
 
-        # Do First (left-hand y-axis) plot.
+    # Do First (left-hand y-axis) plot.
+    for p in [10, 20, 50]:
+        ax.plot(x, model(x, p), label=p, marker="")
+    ax.legend(title="Order", fontsize=6, ncols=2)
+
+    # Now do plotting of the second (right) y-axis.
+    with DoubleYAxis(colours="central,piccadilly"):
         for p in [10, 20, 50]:
-            ax.plot(x, model(x, p), label=p, marker="")
-        ax.legend(title="Order", fontsize=6, ncols=2)
-
-        # Now do plotting of the second (right) y-axis.
-        with DoubleYAxis(colours="central,piccadilly"):
-            for p in [10, 20, 50]:
-                plt.plot(x, np.abs(model(x, p) - 0.5), "--", label=f"$|{p}|$")
-            plt.ylabel("2$^\\mathrm{nd}$ Harmonic")
+            plt.plot(x, np.abs(model(x, p) - 0.5), "--", label=f"$|{p}|$")
+        plt.ylabel("2$^\\mathrm{nd}$ Harmonic")
 
 
 .. image:: ../../examples/figures/fig7d.png

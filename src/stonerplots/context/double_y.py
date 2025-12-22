@@ -125,12 +125,27 @@ class DoubleYAxis(PreserveFigureMixin):
         if isinstance(colours, (list, tuple)):
             if len(colours) < 2:
                 colours = [None] * (2 - len(colours)) + list(colours)
-            if len(colours) > 2:
+            elif len(colours) > 2:
                 colours = list(colours[:2])
+            else:
+                colours=list(colours)
         elif colours is not None:
             raise TypeError(f"Colours must be a list, tuple, or string, not {type(colours)}.")
         self.colours = colours
         self._switch = switch_to_y2
+
+    def good_colour(self, axis):
+        """Return True if we have a colours defined for this axis."""
+        axis=int(axis)
+        match self.colours:
+            case list() if -len(self.colours)<axis<len(self.colours):
+                return True
+            case str() if -len(self.colours)<axis<len(self.colours):
+                return True
+            case _:
+                return False
+
+
 
     def __enter__(self):
         """Handle context entry for managing temporary switchable axes in a Matplotlib figure.
@@ -177,14 +192,14 @@ class DoubleYAxis(PreserveFigureMixin):
         self.ax.yaxis.tick_left()
 
         # Apply colours to the primary axis
-        if self.colours[0] is not None:
+        if self.good_colour(0):
             self.ax.tick_params(axis="y", labelcolor=self.colours[0])
             self.ax.yaxis.label.set_color(self.colours[0])
             self.ax.spines["left"].set_color(self.colours[0])
             self.ax.tick_params(axis="y", which="both", colors=self.colours[0])
 
         # Apply colours to the secondary axis
-        if self.colours[1] is not None:
+        if self.good_colour(1):
             self.ax2.tick_params(axis="y", labelcolor=self.colours[1])
             self.ax2.yaxis.label.set_color(self.colours[1])
             self.ax2.spines["right"].set_color(self.colours[1])
