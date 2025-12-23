@@ -397,7 +397,7 @@ class StackVertical(MultiPanel):
         fig = self.figure
         fnt_pts = ax.yaxis.get_ticklabels()[0].get_fontsize()
         ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
-        dy = fnt_pts / ax_height  # Space needed in axes units for labels.
+        dy = 1.33*fnt_pts / ax_height  # Space needed in axes units for labels 4/3 font size.
         ylim = list(ax.get_ylim())
         tr = ax.transData + ax.transAxes.inverted()  # Transform data to axes units
         yticks = [tr.transform((0, x))[1] for x in ax.get_yticks()]  # Tick positions in axes units.

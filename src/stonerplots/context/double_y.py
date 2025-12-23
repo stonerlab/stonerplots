@@ -134,12 +134,12 @@ class DoubleYAxis(PreserveFigureMixin):
         self.colours = colours
         self._switch = switch_to_y2
 
-    def good_colour(self, axis):
+    def good_colour(self,axis ):
         """Return True if we have a colours defined for this axis."""
         axis=int(axis)
         match self.colours:
             case list() if -len(self.colours)<axis<len(self.colours):
-                return True
+                return self.colours[axis] is not None
             case str() if -len(self.colours)<axis<len(self.colours):
                 return True
             case _:
