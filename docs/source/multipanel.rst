@@ -95,7 +95,7 @@ containing a different number of rows::
                 ax.plot(x_data[ix], y_data[ix], marker="")
                 ...
 
-.. image:: ../../examples/figures/trriplot2.png
+.. image:: ../../examples/figures/triplot2.png
    :alt: A triple panel sub-plot in 2 columns.
    :align: center
 
