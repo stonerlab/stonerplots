@@ -12,7 +12,7 @@ from .base import locations as _locations
 class DoubleYAxis(PreserveFigureMixin):
     """Context manager to facilitate plotting with dual Y-axes on a Matplotlib figure.
 
-    This class simplifies creating plots with primary and secondary Y-axes, allowing customized
+    This class simplifies creating plots with primary and secondary Y-axes, allowing customised
     axes properties, legend merging, and seamless integration with Matplotlib's context management.
 
     Args:
@@ -128,15 +128,15 @@ class DoubleYAxis(PreserveFigureMixin):
             elif len(colours) > 2:
                 colours = list(colours[:2])
             else:
-                colours=list(colours)
+                colours = list(colours)
         elif colours is not None:
             raise TypeError(f"Colours must be a list, tuple, or string, not {type(colours)}.")
         self.colours = colours
         self._switch = switch_to_y2
 
-    def good_colour(self,axis ):
+    def good_colour(self, axis):
         """Return True if we have a colours defined for this axis."""
-        axis=int(axis)
+        axis = int(axis)
         match self.colours:
             case list() if -len(self.colours)<axis<len(self.colours):
                 return self.colours[axis] is not None
@@ -168,7 +168,7 @@ class DoubleYAxis(PreserveFigureMixin):
 
         Customise axis properties, legends, and restoring the original figure and axes.
 
-        This method ensures dual Y-axes share customizable colour properties and adjusts their
+        This method ensures dual Y-axes share customisable colour properties and adjusts their
         visibility. Legends from both axes are merged and updated to their defined location.
 
         Args:

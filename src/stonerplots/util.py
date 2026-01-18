@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Utility functions to support the Context managers.
 
-BAsed on code used in matplotlib to automatically position a legend.
+Based on code used in matplotlib to automatically position a legend.
 """
 from collections.abc import Iterable
 from copy import copy
@@ -34,7 +34,7 @@ class _default(object):
     @property
     def style(self):
         """Return the stylesheets as a list of strings."""
-        return copy(self._style)  # return a copy to avoid inadvertantly changing the default style.
+        return copy(self._style)  # return a copy to avoid inadvertently changing the default style.
 
     @style.setter
     def style(self, value):
@@ -224,7 +224,7 @@ def calculate_position(inset_bbox, parent__bbox, loc=1):
 
 
 def new_bbox_for_loc(axins, ax, loc=1, padding=(0.02, 0.02)):
-    """Calcualte a new  axesbounding box for a given location.
+    """Calculate a new axes bounding box for a given location.
 
     Args:
         axins (Axes):
@@ -233,7 +233,7 @@ def new_bbox_for_loc(axins, ax, loc=1, padding=(0.02, 0.02)):
             The parent axes to locate relative to.
         loc (int):
             A location code (1-10) - as per matplotlib legend locations.
-        padding (Tuple[flota, float]):
+        padding (Tuple[float, float]):
             Additional padding (in Axes co-ordinates) to add around the tight bounding box of the inset.
 
     Returns:

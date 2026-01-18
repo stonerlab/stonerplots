@@ -14,7 +14,7 @@ class CentredAxes(TrackNewFiguresAndAxes, PreserveFigureMixin):
         x (float, default 0):
             x co-ordinate of the vertical (y) axis.
         y (float, default 0):
-            y co=ordinate of the horizontal (x) axis.
+            y co-ordinate of the horizontal (x) axis.
         include_open (bool):
             If `True`, any figures opened before entering the context are included for adjusting. Default is `False`.
         use (Figure):
@@ -35,7 +35,7 @@ class CentredAxes(TrackNewFiguresAndAxes, PreserveFigureMixin):
         self.x = self.x if x is None else x
         self.y = self.y if y is None else y
         self.include_open = self.include_open if include_open is None else include_open
-        self.yse = self.use if use is None else use
+        self.use = self.use if use is None else use
         return self
 
     def __enter__(self):
@@ -45,7 +45,7 @@ class CentredAxes(TrackNewFiguresAndAxes, PreserveFigureMixin):
             plt.figure(getattr(self.use,"number",None))
 
     def __exit__(self, exc_type, exc_value, traceback):
-        """Adjust allt he figure axes."""
+        """Adjust all the figure axes."""
         super().__exit__(exc_type, exc_value, traceback)
         for ax in self.new_axes:
             # Ensure (self.x,self.y) is inside the visible range
