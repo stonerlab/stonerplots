@@ -120,10 +120,10 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
         # Adjust fig size can be a tuple
         self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
         self.kwargs = kwargs
-        self.same_aspect = "height_ratios" not in kwargs and "wdith_ratios" not in kwargs and same_aspect
+        self.same_aspect = "height_ratios" not in kwargs and "width_ratios" not in kwargs and same_aspect
         if "nplots" in self.kwargs:
             warnings.warn(
-                "nplots aregument is depricated. Pass the same value directly as the number of panels now.",
+                "nplots argument is deprecated. Pass the same value directly as the number of panels now.",
                 DeprecationWarning,
             )
             self.panels = self.kwargs.pop("nplots")
@@ -397,7 +397,7 @@ class StackVertical(MultiPanel):
         fig = self.figure
         fnt_pts = ax.yaxis.get_ticklabels()[0].get_fontsize()
         ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
-        dy = 1.33*fnt_pts / ax_height  # Space needed in axes units for labels 4/3 font size.
+        dy = 1.33 * fnt_pts / ax_height  # Space needed in axes units for labels 4/3 font size.
         ylim = list(ax.get_ylim())
         tr = ax.transData + ax.transAxes.inverted()  # Transform data to axes units
         yticks = [tr.transform((0, x))[1] for x in ax.get_yticks()]  # Tick positions in axes units.

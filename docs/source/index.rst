@@ -34,7 +34,7 @@ StonerPlots requires **Python 3.10 or later** and depends on `matplotlib`, which
 Example
 ~~~~~~~
 
-The easiest way to get started is by using the `SavedFigure` context maager.
+The easiest way to get started is by using the `SavedFigure` context manager.
 This automatically applies the requested styles and collects any new figures, saving them to disk::
 
     import numpy as np
