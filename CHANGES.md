@@ -4,22 +4,22 @@
 
 New feature
 
-- Added the *use* parameter to SavedFigure to allow a fignure to be returned to in the same or different SavedFigure
+- Added the *use* parameter to SavedFigure to allow a figure to be returned to in the same or different SavedFigure
   context manager.
 
 ## v1.7.0
 
 New feature
 
-- Added new keyword argument to SavedFigure to allow individual rcParam values to be overriden.
+- Added new keyword argument to SavedFigure to allow individual rcParam values to be overridden.
 
 Other
 
-- Split stonerplots.context into separate sub modules for easier maintainence.
+- Split stonerplots.context into separate sub modules for easier maintenance.
 
 ## v1.6.1 Release
 
-Minor feature release o implement fontsize for individual elements and also default settings.
+Minor feature release to implement fontsize for individual elements and also default settings.
 
 ## v1.6.0 Release
 
@@ -41,11 +41,11 @@ Some refactoring of the context managers and other code cleanups. No intentional
 
 ## v1.5.0 Release
 
-Iregular grids in MultuPanel now can also do different numbers of rows in each column with the *transpose* parameter.
+Irregular grids in MultiPanel now can also do different numbers of rows in each column with the *transpose* parameter.
 
 ## v1.4.0 Release
 
-Iregullar grids in MultiPanel that support different numbers of plots in each row.
+Irregular grids in MultiPanel that support different numbers of plots in each row.
 
 ## v1.3.2 Release
 
@@ -82,7 +82,7 @@ Add New stylesheets to the package
 - Add IOP styles
 - Get package building running
 
-## v1.0.0 (developement)
+## v1.0.0 (development)
 
 Initial fork from scienceplots 2.1.1
 

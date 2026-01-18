@@ -29,16 +29,16 @@ one of the context managers - the `SavedFigure` class.
 
 There are three main parts to this package::
 
-1. A set of matplotlib style sheets for making lots wih styles suitable for a variety of Physics related journals
+1. A set of matplotlib style sheets for making plots with styles suitable for a variety of Physics related journals
    and formats such as presentations and posters as well as reports and theses.
 
 1. A set of Python Context managers designed to help with the process of preparing production quality figures in
   matplotlib.
 
-1. Soem defintitions of colours based on the Transport for London colour palette and inserted as named colours into
+1. Some definitions of colours based on the Transport for London colour palette and inserted as named colours into
    the matplotlib colour tables.
 
-The package is fully documented (see link below) and comes with a set of examples that also server as unit tests.
+The package is fully documented (see link below) and comes with a set of examples that also serve as unit tests.
 
 ## Documentation
 
@@ -57,7 +57,7 @@ Documentation can be found on the [github pages for this repository](https://sto
 ### Journal Styles
 
 - nature - for Nature group journals - from the original scienceplots package
-- aaas-science - Science single columne style.
+- aaas-science - Science single column style.
 - ieee - for IEEE Transactions journals - from the original scienceplots package
 - aps - for American Physical Society Journals (like Phys Rev Lett etc.)
 - aip - for AIP journals such as Applied Physics Letters - labels in Serif Fonts
@@ -72,7 +72,7 @@ Documentation can be found on the [github pages for this repository](https://sto
 - hi-res - Switches to 600dpi plotting (but using eps, pdf or svg is generally a better option)
 - med-res - like hi-res, but switches to 300dpi plotting.
 - presentation_sm - a style for making 1/2 width graphs.
-- presentation_dark - tweak the weight of elements for dark presnetations.
+- presentation_dark - tweak the weight of elements for dark presentations.
 - science-2col, science-3col - Science 2 and 3 column width figures
 - thesis-sm - reduces the figure width to make the axes closer to 4/3 aspect ratio.
 
@@ -84,7 +84,7 @@ The package is designed to work by using python context managers to aid plotting
 - CentredAxes - makes a plot where the axes cross at the origin and there is no outside frame.
 - StackVertical - make a multi-panel plot where the panels are arranged in a vertical stack and pushed together so that
   the top-x-axis on one frame is the bottom of the next.
-- MultiPanel - a general; purpose miulti-panel plotting helper.
+- MultiPanel - a general-purpose multi-panel plotting helper.
 - InsetPlot - create an inset set of axes.
 - DoubleYAxis - setup the righthand y axis for a second scale and optional colour the y-axes differently and merge
   the legend into a single legend.

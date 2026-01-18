@@ -24,7 +24,7 @@ class TexFormatter(Formatter):
     """
 
     def __call__(self, value, pos=None):
-        """Return the value ina  suitable texable format."""
+        """Return the value in a suitable texable format."""
         if value is None or np.isnan(value):
             ret = ""
         elif value != 0.0:
@@ -78,7 +78,7 @@ class TexEngFormatter(EngFormatter):
     }
 
     def __call__(self, value, pos=None):
-        """Return the value ina  suitable texable format."""
+        """Return the value in a suitable texable format."""
         if value is None or np.isnan(value):
             ret = ""
         elif value != 0.0:
@@ -118,10 +118,10 @@ class PlotLabeller(TrackNewFiguresAndAxes):
 
     Keyword Arguments:
         x,y,z (Formatter,Locator or tuple or list of Formatter or Locator):
-            Ticker formatter and locator classes or isntances.
+            Ticker formatter and locator classes or instances.
 
     Notes:
-        The PlotLabeller Context handerl will apply any given axis tick locators and formatters to
+        The PlotLabeller Context handler will apply any given axis tick locators and formatters to
         any plots created inside the context handler. If Formatter/Locator classes are passed in, these
         are instantiated with default parameters. If the minor formatter/locator is set, the same locator and
         formatter are applied as for the major formatter/locator.
@@ -130,7 +130,7 @@ class PlotLabeller(TrackNewFiguresAndAxes):
         renders the labels with LaTeX codes to allow proper micro signs.
 
     Todo:
-        This needs proper handling of minor/major fomatting.
+        This needs proper handling of minor/major formatting.
 
 
 

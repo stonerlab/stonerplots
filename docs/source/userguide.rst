@@ -44,7 +44,7 @@ preferably in a vector format that can be easily imported into your document pre
 
 We'll assume that you already have a script that uses `matplotlib <https://matplotlib.org/>`_ to make your figures.
 First, you probably want to collate all the lines involved in plotting the same figure together so they can be
-nserted into a block.
+inserted into a block.
 
 First of all, we need to import the things we're going to need::
 
@@ -213,7 +213,7 @@ context manager in conjunction with presentation mode to keep the formatting opt
 Centred Axes
 ------------
 
-.. currentmodule:: stonerplots.context.nofrmae
+.. currentmodule:: stonerplots.context.noframe
 
 Although the norm is to make figures with a frame containing ticks and axes labels, it might be that you want to
 make a plot where the axes pass through the origin (or some other specific point), and in these cases you also
@@ -227,8 +227,8 @@ usually don't put a frame around the figure. The :py:class:`CentredAxes` context
   :alt: Centred Axes Plot
   :align: center
 
-:py:class:`CentredAxes` will relocate the axes at the specified co-ordinate for all new plot (sets of A0
-matplotlib axes) created with the context manager. Thetick labels at the axes crossing points (typically
+:py:class:`CentredAxes` will relocate the axes at the specified co-ordinate for all new plot (sets of
+matplotlib axes) created with the context manager. The tick labels at the axes crossing points (typically
 the origin) are removed and the axes labels are moved to the right and top.
 
 Double and Multi-Panel Figures
@@ -265,7 +265,7 @@ The :py:class:`SavedFigure` context manager is doing its usual thing here (note 
 string). The inner :py:class:`DoubleYAxis` context manager creates a second set of axes which share the x-axis of the
 original plot. On exit from the context manager, it can optionally colour the left and right axes and by default will
 also merge legends for the two sets of data and try to locate them in the best location, taking account of both sets
-of data. See `Double Y-axis plots<doubleyaxis> for further details.
+of data. See :doc:`Double Y-axis plots<doubleyaxis>` for further details.
 
 .. image:: ../../examples/figures/fig7d.png
   :alt: Double Y axis plot
@@ -332,7 +332,7 @@ See :doc:`Multi Panel Plots<multipanel>` for full details of the :py:class:`Mult
 Inset Plots
 -----------
 
-.. currentmodule:: stonerplots.context,inset_plot
+.. currentmodule:: stonerplots.context.inset_plot
 
 The final scenario where you might need to show related datasets is where an inset is required to show a detail, or
 perhaps an overview of the main plot axes. This again can be a fiddle with matplotlib to get insets that are placed

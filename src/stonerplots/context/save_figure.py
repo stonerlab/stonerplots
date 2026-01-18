@@ -34,7 +34,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         formats (str, list[str], None):
             The output file formats for saved figures (e.g., "png", "pdf"). Can be a comma-separated string,
             a list of strings, or `None` (default: ["png"]).
-        extra (dictm None):
+        extra (dict, None):
             Specific rcParams to override within the style sheet context manager. Defaults to {}
         include_open (bool):
             If `True`, any figures opened before entering the context are included for saving. Default is `False`.
@@ -148,7 +148,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         match value:
             case None:  # use default filename
                 value = default.filename
-            case _ if not value:  # do not save the gihure
+            case _ if not value:  # do not save the figure
                 self._filename = None
             case str() | Path():
                 value = Path(value)
@@ -244,7 +244,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
 
     @property
     def extra(self):
-        """Resturn the extra rcParams dictionary."""
+        """Return the extra rcParams dictionary."""
         return self._extra
 
     @extra.setter
@@ -257,7 +257,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
                 self._extra = {}
             case Mapping():
                 if bad := value.keys() - mpl.rcParams.keys():
-                    raise KeyError(f"{','.join(bad)} are not vliad Matplotlib rcParameters.")
+                    raise KeyError(f"{','.join(bad)} are not valid Matplotlib rcParameters.")
                 for param, val in value.items():
                     self._extra[param] = val
 
@@ -270,7 +270,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             case tuple() if not len(args) and self.filename is not None:
                 pass
             case _:
-                raise ValueError("Onl‼y a single positional argument that is either a string or path is supported")
+                raise ValueError("Only a single positional argument that is either a string or path is supported")
         for key, val in settings.items():
             setattr(self, key, val)
         return self

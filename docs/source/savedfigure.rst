@@ -120,8 +120,8 @@ Not Saving the figure
 ---------------------
 
 This might seem a little counter intuitive, but in some scenarios you might want to be able to apply the style sheets
-but not immediately save the figure. By setting the filename arameter to *False* you can skip actually writing the file
-to disk. This can be a useful option when you also want to contnue plotting and then saving a figure elsewhere and so
+but not immediately save the figure. By setting the filename parameter to *False* you can skip actually writing the file
+to disk. This can be a useful option when you also want to continue plotting and then saving a figure elsewhere and so
 want to ensure the style is used consistently.  See the section `Adding to an already existing figure`.
 
 Overriding individual settings
@@ -193,7 +193,7 @@ using the *use* parameter. This is particularly useful in conjunction with provi
 
     #fig now saved here.
 
-An evemt more compact form can be used by utilising the re-use of the context manager like so::
+An even more compact form can be used by utilising the re-use of the context manager like so::
 
     resumed_plotting = SavedFigure(False,formats="png", style="stoner", autoclose=False)
 
@@ -232,7 +232,7 @@ on typing them for each :py:class:`SavedFigure`. One option is to set default va
 
 :py:attr:`stonerplots.default` is a global setting so once set it will apply to all future instances of SavedFigure -
 not just the ones in the current function or module. If you need to keep settings, but with more control over the
-scaope, then the reuse of the :py:class:`SavedFigure` is going to be the better option.
+scope, then the reuse of the :py:class:`SavedFigure` is going to be the better option.
 
 Reusing the Context Manager
 ---------------------------
