@@ -2,6 +2,14 @@
 
 This document contains issues and bugs discovered during a comprehensive code review of the stonerplots repository.
 
+## Fixed Issues
+
+### Issue 15 & 16: Weakref Comparison Bugs (HIGH SEVERITY) ✓ FIXED
+**Files:** `src/stonerplots/context/base.py:284` and `src/stonerplots/context/base.py:305`
+**Description:** The code was comparing actual figure/axes objects directly against lists/dicts containing weakrefs, which would always return False. This broke the filtering logic in the `new_figures` and `new_axes` properties.
+**Fix Applied:** Modified both properties to properly dereference weakrefs before comparison. Also handles the case where items might already be dereferenced (for reusable context managers).
+**Date Fixed:** 2026-01-19
+
 ## Documentation Issues
 
 ### Issue 1: Typo in __init__.py Docstring
@@ -91,18 +99,6 @@ This document contains issues and bugs discovered during a comprehensive code re
 **Description:** Uses `getattr(self.use,"number",None)` which could return None and plt.figure(None) has specific behaviour (gets current figure).
 **Severity:** Low (edge case handling)
 **Test:** Verify behaviour when use.number is None
-
-### Issue 15: List Comparison in base.py
-**File:** `src/stonerplots/context/base.py:285`
-**Description:** Line checks `if fig in self._existing_open_figs:` but `_existing_open_figs` contains weakrefs, not direct figure references.
-**Severity:** High (potential bug)
-**Fix:** Should check `if weakref.ref(fig) in self._existing_open_figs:` or dereference the weakrefs for comparison
-
-### Issue 16: Dictionary Key Check on List
-**File:** `src/stonerplots/context/base.py:305`
-**Description:** Similar issue - `if ax in self._existing_open_axes:` but `_existing_open_axes` is a dict of figure numbers to weakref lists.
-**Severity:** High (potential bug)
-**Fix:** Need to check against the actual weakrefs in the dict values
 
 ### Issue 17: Unsafe Division in format.py
 **File:** `src/stonerplots/format.py:91-92`
@@ -242,18 +238,18 @@ Consider adding logging (using Python's logging module) instead of or in additio
 
 ## Summary
 
-**Total Issues Found: 32**
-- High Severity: 2
+**Total Issues Found: 30**
+- High Severity: 0 (2 fixed)
 - Medium Severity: 11
 - Low Severity: 17
 - Info: 2
 
 **Priority Fixes:**
-1. Issue #15 & #16: Fix weakref comparison bugs in base.py
+1. ~~Issue #15 & #16: Fix weakref comparison bugs in base.py~~ ✓ FIXED
 2. Issue #18: Add renderer None handling in util.py
 3. Issue #19: Add bounds checking in StackVertical
 4. Issue #8: Review matplotlib private API usage
 5. Issue #31: Improve test coverage
 
-**Code Quality Score: 7.5/10**
-The codebase is generally well-structured with good use of modern Python features (match/case, context managers). Main areas for improvement are documentation completeness, type hints, test coverage, and fixing the identified bugs.
+**Code Quality Score: 8.0/10**
+The codebase is generally well-structured with good use of modern Python features (match/case, context managers). Main areas for improvement are documentation completeness, type hints, test coverage, and fixing the remaining identified bugs.

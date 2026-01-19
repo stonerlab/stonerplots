@@ -279,9 +279,22 @@ class TrackNewFiguresAndAxes:
             >>> list(tracker.new_figures)
             [<Figure size ...>]
         """
+        # Dereference weakrefs to get actual figure objects for comparison
+        # Handle both cases: list of weakrefs or list of already-dereferenced figures
+        existing_figs = []
+        for item in self._existing_open_figs:
+            if isinstance(item, weakref.ref):
+                # Item is a weakref, dereference it
+                fig = item()
+                if fig is not None:
+                    existing_figs.append(fig)
+            else:
+                # Item is already a dereferenced figure
+                existing_figs.append(item)
+        
         for num in plt.get_fignums():
             fig = plt.figure(num)
-            if fig in self._existing_open_figs:  # Skip figures opened before context
+            if fig in existing_figs:  # Skip figures opened before context
                 continue
             yield fig
 
@@ -299,10 +312,24 @@ class TrackNewFiguresAndAxes:
             >>> list(tracker.new_axes)
             [<AxesSubplot:...>]
         """
+        # Dereference all weakrefs from all figures to get actual axes objects for comparison
+        # Handle both cases: weakrefs or already-dereferenced axes objects
+        existing_axes = []
+        for fig_num, axes_refs in self._existing_open_axes.items():
+            for item in axes_refs:
+                if isinstance(item, weakref.ref):
+                    # Item is a weakref, dereference it
+                    ax = item()
+                    if ax is not None:
+                        existing_axes.append(ax)
+                else:
+                    # Item is already a dereferenced axes
+                    existing_axes.append(item)
+        
         for num in plt.get_fignums():
             fig = plt.figure(num)
             for ax in fig.axes:
-                if ax in self._existing_open_axes:  # Skip figures opened before context
+                if ax in existing_axes:  # Skip axes opened before context
                     continue
                 yield ax
 
