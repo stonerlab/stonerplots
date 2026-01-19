@@ -97,12 +97,13 @@ All previously documented issues have been fixed as of 2026-01-19:
 
 ## Code Style Issues
 
-### Issue 21: Inconsistent Import Grouping
-**File:** Multiple files
-**Description:** Some files don't follow the documented import grouping standard (stdlib, well-known third-party, other third-party, local).
-**Example:** `src/stonerplots/format.py` has imports not grouped according to standard
-**Severity:** Low (code style)
-**Fix:** Reorganise imports according to documented standard
+### Issue 21: Inconsistent Import Grouping ✓ FIXED
+**Files:** `src/stonerplots/context/double_y.py`, `src/stonerplots/context/inset_plot.py`, `src/stonerplots/context/__init__.py`
+**Description:** Some files didn't follow the documented import grouping standard (stdlib, well-known third-party, other third-party, local). Multiple imports from the same module were not combined into one statement, and imports were not sorted alphabetically within groups.
+**Fix Applied:** 
+- Combined duplicate imports from `.base` module in `double_y.py` and `inset_plot.py`
+- Sorted imports alphabetically in `context/__init__.py`
+**Date Fixed:** 2026-01-19
 
 ### Issue 22: Line Length Exceeds Standards
 **File:** `src/stonerplots/util.py:155-156`
