@@ -278,7 +278,7 @@ def find_best_position(ax, axins, renderer=None):
         This uses a variation on the algorithm used to auto locate matplotlib legends - except it
         takes account of the legend location (!) and any overlapping axes such as other insets. It is
         a rather simple algorithm that just counts the number of collisions with data points, lines, text items
-        and the legend and contents of insets. Possibly it should give some weighting to some of there components.
+        and the legend and contents of insets. Possibly it should give some weighting to some of these components.
 
     Examples:
         >>> import matplotlib.pyplot as plt
