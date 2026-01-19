@@ -27,7 +27,7 @@ one of the context managers - the `SavedFigure` class.
         plt.plot(x,y,label="Dataset")
         ...
 
-There are three main parts to this package::
+There are three main parts to this package:
 
 1. A set of matplotlib style sheets for making plots with styles suitable for a variety of Physics related journals
    and formats such as presentations and posters as well as reports and theses.

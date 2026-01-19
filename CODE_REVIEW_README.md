@@ -35,34 +35,38 @@ Contains for each issue:
 - Recommended fix
 
 **Categories:**
+
 1. Documentation Issues (Issues #1-7)
-2. Code Quality Issues (Issues #8-13)
-3. Potential Bugs (Issues #14-20)
-4. Code Style Issues (Issues #21-24)
-5. Performance Issues (Issues #25-26)
-6. Security Issues (Issues #27-28)
-7. Missing Functionality (Issues #29-30)
-8. Testing Issues (Issues #31-32)
+1. Code Quality Issues (Issues #8-13)
+1. Potential Bugs (Issues #14-20)
+1. Code Style Issues (Issues #21-24)
+1. Performance Issues (Issues #25-26)
+1. Security Issues (Issues #27-28)
+1. Missing Functionality (Issues #29-30)
+1. Testing Issues (Issues #31-32)
 
 ## How to Use This Review
 
 ### For Project Maintainers
+
 1. Read CODE_REVIEW_SUMMARY.md for an overview
-2. Focus on "Critical Issues Requiring Immediate Attention"
-3. Review BUGS.md for detailed information on each issue
-4. Create GitHub issues for items you want to track
-5. Prioritize based on the severity and your roadmap
+1. Focus on "Critical Issues Requiring Immediate Attention"
+1. Review BUGS.md for detailed information on each issue
+1. Create GitHub issues for items you want to track
+1. Prioritize based on the severity and your roadmap
 
 ### For Contributors
+
 1. Check BUGS.md before starting work on an area
-2. Reference issue numbers when fixing bugs
-3. Use the documented standards for new code
-4. When an issue is fixed, remove it from BUGS.md
+1. Reference issue numbers when fixing bugs
+1. Use the documented standards for new code
+1. When an issue is fixed, remove it from BUGS.md
 
 ### For Code Reviewers
+
 1. Use BUGS.md as a checklist for similar issues in PRs
-2. Ensure new code doesn't introduce similar problems
-3. Verify fixes actually address the documented issues
+1. Ensure new code doesn't introduce similar problems
+1. Verify fixes actually address the documented issues
 
 ## Priority Action Items
 
@@ -89,12 +93,12 @@ Contains for each issue:
 This review was conducted by systematically analyzing:
 
 1. ✅ All Python source files in `src/stonerplots/`
-2. ✅ Test files in `tests/`
-3. ✅ Configuration files (pyproject.toml, setup.py)
-4. ✅ Documentation and docstrings
-5. ✅ Compliance with project coding standards
-6. ✅ Security considerations
-7. ✅ Test coverage
+1. ✅ Test files in `tests/`
+1. ✅ Configuration files (pyproject.toml, setup.py)
+1. ✅ Documentation and docstrings
+1. ✅ Compliance with project coding standards
+1. ✅ Security considerations
+1. ✅ Test coverage
 
 **Review Scope:** Complete codebase  
 **Review Date:** January 19, 2026  

@@ -141,24 +141,27 @@ The repository does not handle untrusted input in security-critical ways. The ma
 ## Recommendations
 
 ### Immediate Actions (This Sprint)
+
 1. ✅ **Fix weakref comparison bugs** in base.py (Issues #15, #16)
-2. ✅ **Add renderer None handling** in util.py (Issue #18)
-3. ✅ **Add bounds checking** in StackVertical (Issue #19)
-4. ✅ **Add unit tests** for critical functionality
+1. ✅ **Add renderer None handling** in util.py (Issue #18)
+1. ✅ **Add bounds checking** in StackVertical (Issue #19)
+1. ✅ **Add unit tests** for critical functionality
 
 ### Short Term (Next Sprint)
-5. Review and address matplotlib private API usage (Issue #8)
-6. Complete missing docstring sections
-7. Fix typos and documentation inaccuracies
-8. Add type hints to public APIs
-9. Run black formatter across codebase
+
+1. Review and address matplotlib private API usage (Issue #8)
+1. Complete missing docstring sections
+1. Fix typos and documentation inaccuracies
+1. Add type hints to public APIs
+1. Run black formatter across codebase
 
 ### Long Term (Next Quarter)
-10. Achieve 85%+ test coverage
-11. Add comprehensive type hints
-12. Set up pre-commit hooks for code quality
-13. Document matplotlib version compatibility
-14. Consider adding py.typed for better IDE support
+
+1. Achieve 85%+ test coverage
+1. Add comprehensive type hints
+1. Set up pre-commit hooks for code quality
+1. Document matplotlib version compatibility
+1. Consider adding py.typed for better IDE support
 
 ## Code Review Checklist
 
