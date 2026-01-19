@@ -14,6 +14,7 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 **Code Quality Score: 7.5/10**
 
 ### Strengths
+
 - ✅ Modern Python features (match/case, context managers, type hints in some places)
 - ✅ Well-organised package structure
 - ✅ Good separation of concerns with context managers
@@ -22,6 +23,7 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 - ✅ Good use of matplotlib's style system
 
 ### Areas for Improvement
+
 - ⚠️ Critical bugs in weakref handling (base.py)
 - ⚠️ Limited test coverage (only example execution tests)
 - ⚠️ Missing type hints in most functions
@@ -41,6 +43,7 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 ## Critical Issues Requiring Immediate Attention
 
 ### 1. Weakref Comparison Bugs (High Severity)
+
 **Files:** `src/stonerplots/context/base.py:285, 305`
 - Direct comparison of figures/axes with weakref lists will always fail
 - Affects tracking of new figures and axes in context managers
@@ -48,6 +51,7 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 - **Fix Required:** Dereference weakrefs before comparison
 
 ### 2. Missing Renderer Parameter Handling (High Severity)
+
 **File:** `src/stonerplots/util.py:266-290`
 - Function accepts `renderer=None` but doesn't handle None case
 - Could cause NoneType errors when renderer is not provided
@@ -57,24 +61,28 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 ## Medium Priority Issues
 
 ### Documentation & API Issues (5 issues)
+
 - Incomplete docstrings missing Examples sections
 - Incorrect function signatures in documentation
 - Todo comments indicating incomplete features
 - Typos in API documentation
 
 ### Potential Runtime Errors (4 issues)
+
 - Missing bounds checking in StackVertical (IndexError risk)
 - Unsafe division in format.py (overflow/underflow risk)
 - None reference handling in multiple files
 - No input validation for file paths
 
 ### Code Quality (2 issues)
+
 - Access to private matplotlib API (`_colors_full_map`)
 - Deprecated parameter without removal version
 
 ## Low Priority Issues
 
 ### Code Style & Consistency (10 issues)
+
 - Inconsistent import organisation
 - Line length violations
 - Mixed None-checking patterns
@@ -82,6 +90,7 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 - Magic numbers without documentation
 
 ### Performance & Maintainability (7 issues)
+
 - Redundant list creation in loops
 - Multiple canvas draws
 - Complex nested logic
@@ -90,12 +99,14 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 ## Test Coverage Analysis
 
 ### Current State
+
 - ✅ Example script execution tests exist
 - ❌ No unit tests for individual functions/classes
 - ❌ No tests for error conditions
 - ❌ No tests for edge cases
 
 ### Recommended Test Additions
+
 1. Unit tests for format classes (TexFormatter, TexEngFormatter)
 2. Tests for utility functions (calculate_position, new_bbox_for_loc)
 3. Context manager tests with various parameter combinations
@@ -108,6 +119,7 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 ## Compliance with Project Standards
 
 ### Docstring Compliance
+
 | Requirement | Status | Notes |
 |------------|--------|-------|
 | British English | ⚠️ Partial | Some inconsistencies found |
@@ -118,6 +130,7 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 | Examples sections | ❌ Poor | Often missing |
 
 ### Code Formatting
+
 | Requirement | Status | Notes |
 |------------|--------|-------|
 | Line length (119 chars) | ⚠️ Partial | Some violations |
@@ -128,6 +141,7 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 ## Security Analysis
 
 ### Findings
+
 - ✅ No SQL injection risks (no database access)
 - ✅ No command injection risks (limited subprocess use)
 - ⚠️ File path validation needed if accepting user input
@@ -177,6 +191,7 @@ The repository does not handle untrusted input in security-critical ways. The ma
 ## Files Reviewed
 
 ### Source Files (12 Python files)
+
 - `src/stonerplots/__init__.py`
 - `src/stonerplots/colours.py`
 - `src/stonerplots/counter.py`
@@ -191,9 +206,11 @@ The repository does not handle untrusted input in security-critical ways. The ma
 - `src/stonerplots/context/save_figure.py`
 
 ### Test Files (1 Python file)
+
 - `tests/stonerplots/test_examples.py`
 
 ### Configuration Files
+
 - `pyproject.toml`
 - `setup.py`
 - `.github/workflows/pytest.yaml`
