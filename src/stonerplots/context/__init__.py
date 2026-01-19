@@ -6,5 +6,5 @@ __all__ = ["SavedFigure", "InsetPlot", "DoubleYAxis", "StackVertical", "MultiPan
 from .double_y import DoubleYAxis
 from .inset_plot import InsetPlot
 from .multiple_plot import MultiPanel, StackVertical
-from .save_figure import SavedFigure
 from .noframe import CentredAxes
+from .save_figure import SavedFigure
