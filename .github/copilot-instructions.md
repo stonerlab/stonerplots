@@ -34,3 +34,11 @@ Within each group, sort imports alphabetically. Where possible combine imports f
 If a new issue or bug is discovered during editing or creating other features, place a descritpion of the issue in BUGS.md. Describe the ussye/bug in a way that will make it most easy for a future copilot session to correct the problem.
 
 If an issue or bug in BUGS.md is fixed, remove the issue report from the BUGS.md file.
+
+# Markdown Formatting
+
+## Blank Lines
+
+- Ensure that lists are surrounded by a single blank line
+- Ensure a single blank line between headings at different levels and between headings and the following text.
+- Enumerated lists should always use 1. for each item marker.
