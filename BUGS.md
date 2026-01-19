@@ -25,6 +25,14 @@ All previously documented issues have been fixed as of 2026-01-19:
 **Status:** Not an issue
 **Note:** The code uses "colours" parameter name (British) but matplotlib uses "color" (American) - this is intentional for API consistency.
 
+### Issue 9: Inconsistent Type Checking Pattern
+**Status:** Not an issue
+**Note:** The code uses `isinstance(index, tuple)` check in `base.py:83-88`. While the codebase also uses match/case statements elsewhere, both patterns are valid Python and serve different purposes. `isinstance()` is appropriate for simple type checks, while match/case is better for structural pattern matching. The general coding standards don't mandate one pattern over the other, and both coexist legitimately in the codebase.
+
+### Issue 11: Potential None Reference in double_y.py
+**Status:** Not an issue
+**Note:** The code `getattr(self._ax,"ax",None)` in `double_y.py:158` is correctly implemented. Python's `getattr()` handles None as the first argument gracefully - it returns the default value (None in this case) without raising an AttributeError. The subsequent `isinstance()` check then correctly evaluates to False, so the code flow is safe.
+
 ## Code Quality Issues
 
 ### Issue 8: Accessing Private matplotlib API
@@ -34,22 +42,11 @@ All previously documented issues have been fixed as of 2026-01-19:
 **Risk:** Private APIs can change without warning
 **Recommendation:** Consider using public matplotlib colour registration methods if available
 
-### Issue 9: Inconsistent Type Checking Pattern
-**File:** `src/stonerplots/context/base.py:83-88`
-**Description:** Uses `isinstance(index, tuple)` check, but could benefit from more consistent use of match/case statements used elsewhere in the codebase.
-**Severity:** Low (code style consistency)
-
 ### Issue 10: Complex Nested Logic in util.py
 **File:** `src/stonerplots/util.py:162-186`
 **Description:** The `_process_artist` function has deeply nested match/case logic that could be simplified or split into smaller functions.
 **Severity:** Low (maintainability)
 **Recommendation:** Consider extracting some cases into separate handler functions
-
-### Issue 11: Potential None Reference in double_y.py
-**File:** `src/stonerplots/context/double_y.py:158-160`
-**Description:** Complex nested getattr access `getattr(self._ax,"ax",None)` could fail if _ax is None.
-**Severity:** Low (defensive programming)
-**Context:** The code does handle this, but the pattern is repeated and could be extracted to a helper
 
 ### Issue 12: Magic Numbers in counter.py
 **File:** `src/stonerplots/counter.py:6-32`
@@ -209,10 +206,10 @@ Consider adding logging (using Python's logging module) instead of or in additio
 
 ## Summary
 
-**Total Issues Found: 30**
+**Total Issues Found: 28** (2 issues reclassified as "Not an Issue")
 - High Severity: 0 (2 fixed)
 - Medium Severity: 11
-- Low Severity: 17
+- Low Severity: 15
 - Info: 2
 
 **Priority Fixes:**
