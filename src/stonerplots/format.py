@@ -7,7 +7,15 @@ from .context.base import TrackNewFiguresAndAxes
 
 
 def _round(value, offset=2):
-    """Round numbers for the TexFormatters to avoid crazy numbers of decimal places."""
+    """Round numbers for the TexFormatters to avoid crazy numbers of decimal places.
+
+    Args:
+        value (float): The numerical value to round.
+        offset (int): Additional decimal places to consider in the rounding threshold.
+
+    Returns:
+        float: The rounded value.
+    """
     for i in range(5):
         vt = np.round(value, i)
         if np.abs(value - vt) < 10 ** (-i - offset):
@@ -19,8 +27,16 @@ def _round(value, offset=2):
 class TexFormatter(Formatter):
     r"""An axis tick label formatter that emits Tex formula mode code.
 
-    Formatting is set so that large numbers are registered as :math`\times 10^{power}`
+    Formatting is set so that large numbers are registered as :math:`\times 10^{power}`
     rather than using E notation.
+
+    Examples:
+        >>> import matplotlib.pyplot as plt
+        >>> from stonerplots.format import TexFormatter
+        >>> fig, ax = plt.subplots()
+        >>> ax.yaxis.set_major_formatter(TexFormatter())
+        >>> ax.plot([0, 1e6, 2e6], [0, 1, 2])
+        >>> plt.show()
     """
 
     def __call__(self, value, pos=None):
@@ -123,17 +139,21 @@ class PlotLabeller(TrackNewFiguresAndAxes):
     Notes:
         The PlotLabeller Context handler will apply any given axis tick locators and formatters to
         any plots created inside the context handler. If Formatter/Locator classes are passed in, these
-        are instantiated with default parameters. If the minor formatter/locator is set, the same locator and
-        formatter are applied as for the major formatter/locator.
+        are instantiated with default parameters.
+
+        Both major and minor formatters/locators are handled: if a minor formatter/locator is already set
+        (i.e., not NullFormatter), the same formatter/locator will be applied to it as well.
 
         The default is to not change the Locator and set the Formatters to use the TexEngFormatter that
         renders the labels with LaTeX codes to allow proper micro signs.
 
-    Todo:
-        This needs proper handling of minor/major formatting.
-
-
-
+    Examples:
+        >>> import matplotlib.pyplot as plt
+        >>> from stonerplots.format import PlotLabeller, TexFormatter
+        >>> with PlotLabeller(x=TexFormatter, y=TexFormatter):
+        ...     fig, ax = plt.subplots()
+        ...     ax.plot([1e6, 2e6, 3e6], [1, 2, 3])
+        >>> plt.show()
     """
 
     def __init__(self, *args, x=TexEngFormatter, y=TexEngFormatter, z=TexEngFormatter, **kargs):
