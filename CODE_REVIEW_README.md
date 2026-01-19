@@ -114,9 +114,9 @@ This review was conducted by systematically analyzing:
 If you have questions about any of the findings or disagree with an assessment:
 
 1. Check the detailed description in BUGS.md
-2. Review the file and line numbers mentioned
-3. Consider the severity and context
-4. Discuss with the team before making changes
+1. Review the file and line numbers mentioned
+1. Consider the severity and context
+1. Discuss with the team before making changes
 
 Remember: This review is meant to improve code quality, not criticize. All codebases have areas for improvement!
 
@@ -125,7 +125,8 @@ Remember: This review is meant to improve code quality, not criticize. All codeb
 ## Updates
 
 When issues are fixed:
+
 1. Remove the issue from BUGS.md
-2. Note the fix in commit messages
-3. Update this README if major sections change
-4. Consider re-running parts of the review after significant changes
+1. Note the fix in commit messages
+1. Update this README if major sections change
+1. Consider re-running parts of the review after significant changes

@@ -108,10 +108,10 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 ### Recommended Test Additions
 
 1. Unit tests for format classes (TexFormatter, TexEngFormatter)
-2. Tests for utility functions (calculate_position, new_bbox_for_loc)
-3. Context manager tests with various parameter combinations
-4. Error condition tests (ValueError, TypeError scenarios)
-5. Integration tests for complex multi-panel layouts
+1. Tests for utility functions (calculate_position, new_bbox_for_loc)
+1. Context manager tests with various parameter combinations
+1. Error condition tests (ValueError, TypeError scenarios)
+1. Integration tests for complex multi-panel layouts
 
 **Current Coverage:** ~30% (estimated based on example tests only)  
 **Recommended Coverage:** 85%+
@@ -228,8 +228,9 @@ With the recommended improvements, particularly around test coverage and bug fix
 ---
 
 **Next Steps:**
+
 1. Review this summary with the development team
-2. Prioritise issues based on team bandwidth
-3. Create GitHub issues for critical bugs
-4. Plan sprint work for high and medium priority items
-5. Consider this review when planning the next release
+1. Prioritise issues based on team bandwidth
+1. Create GitHub issues for critical bugs
+1. Plan sprint work for high and medium priority items
+1. Consider this review when planning the next release

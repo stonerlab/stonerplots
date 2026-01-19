@@ -244,11 +244,12 @@ Consider adding logging (using Python's logging module) instead of or in additio
 - Info: 2
 
 **Priority Fixes:**
+
 1. ~~Issue #15 & #16: Fix weakref comparison bugs in base.py~~ ✓ FIXED
-2. Issue #18: Add renderer None handling in util.py
-3. Issue #19: Add bounds checking in StackVertical
-4. Issue #8: Review matplotlib private API usage
-5. Issue #31: Improve test coverage
+1. Issue #18: Add renderer None handling in util.py
+1. Issue #19: Add bounds checking in StackVertical
+1. Issue #8: Review matplotlib private API usage
+1. Issue #31: Improve test coverage
 
 **Code Quality Score: 8.0/10**
 The codebase is generally well-structured with good use of modern Python features (match/case, context managers). Main areas for improvement are documentation completeness, type hints, test coverage, and fixing the remaining identified bugs.
