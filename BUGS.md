@@ -12,47 +12,18 @@ This document contains issues and bugs discovered during a comprehensive code re
 
 ## Documentation Issues
 
-### Issue 1: Typo in __init__.py Docstring
-**File:** `src/stonerplots/__init__.py:8`
-**Description:** The word "insance" should be "instance" in the Attributes section.
-**Severity:** Low (typo)
-**Fix:** Change "insance" to "instance"
-
-### Issue 2: Incorrect reStructuredText Syntax in __init__.py
-**File:** `src/stonerplots/__init__.py:3`
-**Description:** The docstring uses `:py:module\`stonerplots\`` which has incorrect backtick syntax. Should use proper reStructuredText role syntax.
-**Severity:** Low (documentation formatting)
-**Fix:** Change to `:py:mod:`stonerplots``
-
-### Issue 3: Inconsistent Docstring Style in format.py
-**File:** `src/stonerplots/format.py:19-39`
-**Description:** The `TexFormatter` class docstring uses British English ("Formatting is set...") but lacks proper structure according to the project's documented standards. Missing Examples section for a public class.
-**Severity:** Medium (documentation completeness)
-**Fix:** Add Examples section to demonstrate usage
-
-### Issue 4: Missing Docstring for _round Function
-**File:** `src/stonerplots/format.py:9-16`
-**Description:** The `_round` function has a docstring but it's incomplete - missing Args and Returns sections according to project standards.
-**Severity:** Low (private function, but called from multiple places)
-**Fix:** Complete docstring with Args and Returns sections
-
-### Issue 5: Incomplete Docstring in format.py
-**File:** `src/stonerplots/format.py:132-133`
-**Description:** The Todo section mentions "This needs proper handling of minor/major formatting" which suggests incomplete implementation.
-**Severity:** Medium (potential functionality gap)
-**Action:** Review if minor/major formatting is properly handled or if this is still pending
+All previously documented issues have been fixed as of 2026-01-19:
+- ✓ Issue 1: Fixed typo "insance" → "instance" in `__init__.py`
+- ✓ Issue 2: Fixed reStructuredText syntax in `__init__.py`
+- ✓ Issue 3: Added Examples section to `TexFormatter` class
+- ✓ Issue 4: Completed `_round` function docstring with Args and Returns sections
+- ✓ Issue 5: Updated and clarified minor/major formatting documentation in `PlotLabeller`
+- ✓ Issue 7: Fixed `find_best_position` docstring to match actual function signature
+- ✓ Issue 12: Added comment explaining overline LaTeX syntax in `counter.py`
 
 ### Issue 6: Docstring has Non-British English Spelling
-**File:** `src/stonerplots/context/multiple_plot.py:31`
-**Description:** Throughout the codebase, check for American spellings like "color" vs "colour".
-**Severity:** Low (consistency)
+**Status:** Not an issue
 **Note:** The code uses "colours" parameter name (British) but matplotlib uses "color" (American) - this is intentional for API consistency.
-
-### Issue 7: Incomplete Documentation in util.py
-**File:** `src/stonerplots/util.py:267-290`
-**Description:** The `find_best_position` docstring has incorrect parameter list - mentions `loc` and `padding` parameters that don't exist in the function signature.
-**Severity:** Medium (documentation accuracy)
-**Fix:** Update docstring to match actual function signature (ax, axins, renderer=None)
 
 ## Code Quality Issues
 

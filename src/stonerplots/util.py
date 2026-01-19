@@ -267,26 +267,24 @@ def find_best_position(ax, axins, renderer=None):
     """Calculate a new axes bounding box for a given location.
 
     Args:
-        axins (Axes): The inset axes to relocate.
         ax (Axes): The parent axes to locate relative to.
-        loc (int): A location code (1-10) - as per matplotlib legend locations.
-        padding (Tuple[float, float]):
-            Additional padding (in Axes coordinates) to add around the tight
-            bounding box of the inset.
+        axins (Axes): The inset axes to relocate.
+        renderer (RendererBase): The matplotlib renderer to use for calculating positions.
 
     Returns:
         Bbox: The new bounding box for the axes.
 
     Notes:
-        This uses a variation on the algorithm used to auto locate matplolotlib legends - except it
+        This uses a variation on the algorithm used to auto locate matplotlib legends - except it
         takes account of the legend location (!) and any overlapping axes such as other insets. It is
         a rather simple algorithm that just counts the number of collisions with data points, lines, text items
-        and the legend and contents of insets. Possibly it should give some weighting to some of there components.
+        and the legend and contents of insets. Possibly it should give some weighting to some of these components.
 
     Examples:
+        >>> import matplotlib.pyplot as plt
         >>> fig, ax = plt.subplots()
         >>> axins = fig.add_axes([0.1, 0.1, 0.3, 0.3])
-        >>> new_bbox_for_loc(axins, ax, loc=1)
+        >>> find_best_position(ax, axins)
         Bbox(...)
     """
     ax.figure.canvas.draw()  # render the figure

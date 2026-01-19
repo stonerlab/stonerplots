@@ -1,11 +1,11 @@
 """Main package file of stonerplots.
 
-Importing :py:module`stonerplots` will make the various context managers available, it will also
+Importing :py:mod:`stonerplots` will make the various context managers available, it will also
 modify the lists of matplotlib named colours and update the central matplotlib dictionary of stylesheets.
 
 Attributes:
     default (settings):
-        A singleton insance of a simple class that stores default values for the styles, formats and filename.
+        A singleton instance of a simple class that stores default values for the styles, formats and filename.
         These defaults are common for all code that uses stonerplots after it has been first imported.
 """
 

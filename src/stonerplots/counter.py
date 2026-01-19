@@ -3,6 +3,9 @@
 
 __all__ = ["counter"]
 
+# Roman numeral map for converting integers to Roman numerals.
+# The overline (\overline{}) in LaTeX represents multiplication by 1,000 in Roman numerals,
+# allowing representation of numbers >= 4,000 (e.g., \overline{V} = 5,000).
 ROMAN_NUMERAL_MAP = {
     1_000_000: "$\\overline{\\mathrm{M}}$",
     900_000: "$\\overline{\\mathrm{CM}}$",
