@@ -5,8 +5,7 @@ from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 
 from ..util import copy_properties, find_best_position
-from .base import PreserveFigureMixin
-from .base import locations as _locations
+from .base import PreserveFigureMixin, locations as _locations
 
 
 class DoubleYAxis(PreserveFigureMixin):

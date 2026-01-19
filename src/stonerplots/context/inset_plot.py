@@ -6,8 +6,7 @@ from matplotlib.axes import Axes
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 from ..util import find_best_position, move_inset, new_bbox_for_loc
-from .base import PreserveFigureMixin
-from .base import locations as _locations
+from .base import PreserveFigureMixin, locations as _locations
 
 
 class InsetPlot(PreserveFigureMixin):
