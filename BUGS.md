@@ -36,9 +36,9 @@ This document contains issues and bugs discovered during a comprehensive code re
 
 ### Issue 6: Docstring has Non-British English Spelling
 **File:** `src/stonerplots/context/multiple_plot.py:31`
-**Description:** Uses "simplifies" which is correct, but throughout the codebase, check for American spellings like "color" vs "colour"
+**Description:** Throughout the codebase, check for American spellings like "color" vs "colour".
 **Severity:** Low (consistency)
-**Note:** The code uses "colours" parameter name (British) but matplotlib uses "color" (American) - this is intentional for API consistency
+**Note:** The code uses "colours" parameter name (British) but matplotlib uses "color" (American) - this is intentional for API consistency.
 
 ### Issue 7: Incomplete Documentation in util.py
 **File:** `src/stonerplots/util.py:267-290`
@@ -175,7 +175,7 @@ This document contains issues and bugs discovered during a comprehensive code re
 **File:** `src/stonerplots/context/save_figure.py:136-161`
 **Description:** The filename setter accepts any string/Path without validation for directory traversal or invalid characters.
 **Severity:** Low (depends on usage context)
-**Recommendation:** Add path validation if accepting user input
+**Recommendation:** Add path validation if accepting user input.
 
 ### Issue 28: Arbitrary Code Execution in test_examples.py
 **File:** `tests/stonerplots/test_examples.py:25`
