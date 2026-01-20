@@ -25,7 +25,6 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 ### Areas for Improvement
 
 - ⚠️ Critical bugs in weakref handling (base.py)
-- ⚠️ Limited test coverage (only example execution tests)
 - ⚠️ Missing type hints in most functions
 - ⚠️ Incomplete documentation in some areas
 - ⚠️ Use of private matplotlib APIs
@@ -35,10 +34,10 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 | Severity | Count | Priority |
 |----------|-------|----------|
 | High     | 2     | **Critical** - Fix immediately |
-| Medium   | 11    | Important - Address soon |
+| Medium   | 9     | Important - Address soon |
 | Low      | 17    | Nice to have - Address over time |
 | Info     | 2     | Awareness only |
-| **Total** | **32** | |
+| **Total** | **30** | |
 
 ## Critical Issues Requiring Immediate Attention
 
@@ -102,21 +101,47 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 
 ### Current State
 
-- ✅ Example script execution tests exist
+- ✅ Example script execution tests exist (47 examples)
+- ✅ Examples provide comprehensive coverage of the codebase
 - ❌ No unit tests for individual functions/classes
 - ❌ No tests for error conditions
 - ❌ No tests for edge cases
 
-### Recommended Test Additions
+### Coverage Results
 
-1. Unit tests for format classes (TexFormatter, TexEngFormatter)
-1. Tests for utility functions (calculate_position, new_bbox_for_loc)
-1. Context manager tests with various parameter combinations
-1. Error condition tests (ValueError, TypeError scenarios)
+**Actual Coverage: 85.81%** (923 statements, 131 missed)
+
+The initial estimate of ~30% coverage was incorrect. Running pytest with coverage shows that the example tests effectively exercise most code paths in the library.
+
+**Coverage by Module:**
+- `__init__.py`: 100.00%
+- `colours.py`: 100.00%
+- `context/__init__.py`: 100.00%
+- `context/inset_plot.py`: 95.12%
+- `context/multiple_plot.py`: 92.39%
+- `util.py`: 90.79%
+- `context/save_figure.py`: 88.54%
+- `context/double_y.py`: 83.72%
+- `context/noframe.py`: 81.40%
+- `context/base.py`: 70.83%
+- `format.py`: 70.93%
+- `counter.py`: 93.75%
+
+### Assessment
+
+✅ **Coverage Goal Met:** The current 85.81% coverage exceeds the recommended 85% threshold.
+
+### Recommended Test Additions (Optional)
+
+While current coverage is good, these additions would further improve test quality:
+
+1. Unit tests for error conditions (ValueError, TypeError scenarios)
+1. Tests for edge cases in format classes
+1. Tests for utility functions with unusual inputs
 1. Integration tests for complex multi-panel layouts
 
-**Current Coverage:** ~30% (estimated based on example tests only)
-**Recommended Coverage:** 85%+
+**Current Coverage:** 85.81% (exceeds 85% target)
+**Recommended Coverage:** Maintain 85%+
 
 ## Compliance with Project Standards
 
@@ -173,7 +198,7 @@ The repository does not handle untrusted input in security-critical ways. The ma
 
 ### Long Term (Next Quarter)
 
-1. Achieve 85%+ test coverage
+1. Add unit tests for error conditions and edge cases
 1. Add comprehensive type hints
 1. Set up pre-commit hooks for code quality
 1. Document matplotlib version compatibility
