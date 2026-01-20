@@ -50,12 +50,13 @@ If an issue or bug in BUGS.md is fixed, remove the issue report from the BUGS.md
 
 ## Markdown Formatting
 
-### Blank Lines
-
-- Ensure that lists are surrounded by a single blank line
-- Ensure a single blank line between headings at different levels and between headings and the following text.
-- Enumerated lists should always use 1. for each item marker.
+- User markdownlint to identify errors in markdown formatting and fix.
+- Use a maximum line length of 119 characters.
+- Use British English spellings in text except where code requires differently.
+- Pay particular attention to spacing around lists and headers.
 
 ## Line length
 
-- Keep the lines to 119 characters
+- Keep the lines to 119 characters in code.
+- Avoid line splits that are not compativle with the versions of python
+  specified in the package building scripts.
