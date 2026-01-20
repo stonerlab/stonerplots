@@ -291,7 +291,7 @@ class TrackNewFiguresAndAxes:
             else:
                 # Item is already a dereferenced figure
                 existing_figs.append(item)
-        
+
         for num in plt.get_fignums():
             fig = plt.figure(num)
             if fig in existing_figs:  # Skip figures opened before context
@@ -315,7 +315,7 @@ class TrackNewFiguresAndAxes:
         # Dereference all weakrefs from all figures to get actual axes objects for comparison
         # Handle both cases: weakrefs or already-dereferenced axes objects
         existing_axes = []
-        for fig_num, axes_refs in self._existing_open_axes.items():
+        for _, axes_refs in self._existing_open_axes.items():
             for item in axes_refs:
                 if isinstance(item, weakref.ref):
                     # Item is a weakref, dereference it
@@ -325,7 +325,7 @@ class TrackNewFiguresAndAxes:
                 else:
                     # Item is already a dereferenced axes
                     existing_axes.append(item)
-        
+
         for num in plt.get_fignums():
             fig = plt.figure(num)
             for ax in fig.axes:

@@ -371,6 +371,5 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         # Append counter if filename lacks placeholders and multiple files
         if "{label}" not in str(self.filename) and "{number}" not in str(self.filename) and counter > 1:
             parts = filename.rsplit(".", 1)
-            filename = f"{parts[0]}-{counter}.{parts[1]
-                                               }" if len(parts) > 1 else f"{filename}-{counter}"
+            filename = f"{parts[0]}-{counter}.{parts[1]}" if len(parts) > 1 else f"{filename}-{counter}"
         return filename
