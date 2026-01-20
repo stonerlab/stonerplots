@@ -12,7 +12,7 @@ Attributes:
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-from matplotlib.colors import _colors_full_map
+from matplotlib.colors import get_named_colors_mapping
 
 from .colours import (
     tube_colours,
@@ -64,8 +64,8 @@ for inode in styles_path.rglob("*"):
 plt.style.core.update_nested_dict(plt.style.library, stylesheets)
 plt.style.core.available[:] = sorted(plt.style.library.keys())
 
-_colors_full_map.update(tube_colours)
-_colors_full_map.update(tube_colours_90)
-_colors_full_map.update(tube_colours_70)
-_colors_full_map.update(tube_colours_50)
-_colors_full_map.update(tube_colours_10)
+get_named_colors_mapping().update(tube_colours)
+get_named_colors_mapping().update(tube_colours_90)
+get_named_colors_mapping().update(tube_colours_70)
+get_named_colors_mapping().update(tube_colours_50)
+get_named_colors_mapping().update(tube_colours_10)

@@ -40,13 +40,42 @@ All previously documented issues have been fixed as of 2026-01-19:
 
 ## Code Quality Issues
 
-### Issue 8: Accessing Private matplotlib API
+### Issue 8: Accessing Private matplotlib API ✓ PARTIALLY FIXED
 
-**File:** `src/stonerplots/__init__.py:15`
-**Description:** Imports `_colors_full_map` from `matplotlib.colors` which is a private API (indicated by leading underscore).
-**Severity:** Medium (potential breaking change in future matplotlib versions)
-**Risk:** Private APIs can change without warning
-**Recommendation:** Consider using public matplotlib colour registration methods if available
+**Status:** Fix implemented on 2026-01-20
+
+**Files:**
+- ~~`src/stonerplots/__init__.py:15, 67-71` - Uses `_colors_full_map`~~ ✓ FIXED
+- `src/stonerplots/util.py:11, 110` - Uses `_TransformedBoundsLocator`
+- `src/stonerplots/context/double_y.py:153` - References `_subplots.AxesSubplot` in docstring
+
+**Description:** The codebase uses three private matplotlib APIs (indicated by leading underscores).
+
+**Severity:** Low-Medium (potential breaking change in future matplotlib versions)
+
+**Detailed Report:** See [CODE_REVIEW_README.md - Issue #8 Detailed Report](#issue-8-matplotlib-private-api-usage---detailed-report) for comprehensive analysis.
+
+**Key Findings:**
+
+1. ~~`_colors_full_map`~~ ✓ **FIXED** - Replaced with `get_named_colors_mapping()`
+1. `_TransformedBoundsLocator` - **No public alternative:** Used internally by matplotlib, low risk (LOW priority)
+1. `_subplots.AxesSubplot` - **Documentation only:** Use `Axes` type instead (MEDIUM priority)
+
+**Fix Applied:**
+
+Replaced all uses of `_colors_full_map` with the public API `get_named_colors_mapping()` in `__init__.py`:
+- Changed import from `from matplotlib.colors import _colors_full_map` to `from matplotlib.colors import get_named_colors_mapping`
+- Updated color registration calls to use `get_named_colors_mapping().update(...)`
+
+**Verification:** Testing confirms the public API works correctly and all custom tube colours are successfully registered.
+
+**Remaining Recommendations:**
+
+1. Update type annotation in `double_y.py` docstring to use `matplotlib.axes.Axes`
+1. Keep `_TransformedBoundsLocator` but add documentation explaining the usage
+1. Monitor matplotlib releases for any breaking changes
+
+**Risk:** Low for remaining private APIs
 
 ### Issue 10: Complex Nested Logic in util.py
 
