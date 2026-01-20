@@ -12,6 +12,19 @@ from .base import PreserveFigureMixin, TrackNewFiguresAndAxes
 default = _default()
 
 
+def _make_path(output_file):
+    """Ensure that output_file is going into a path that exists."""
+    match output_file:
+        case str():
+            output_dir = Path(output_file).parent
+        case Path():
+            output_dir = output_file.parent
+        case _:
+            raise TypeError(f"output filename should be a string or pathlib.Path not a {
+                            type(output_file)}")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+
 class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
     """A context manager for applying plotting styles and saving matplotlib figures.
 
@@ -93,7 +106,8 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         - plots/figure_plot3.png
     """
 
-    _keys = ["filename", "style", "autoclose", "formats", "include_open", "use", "extra"]
+    _keys = ["filename", "style", "autoclose",
+             "formats", "include_open", "use", "extra"]
 
     def __init__(
         self, filename=None, style=None, autoclose=False, formats=None, extra=None, include_open=False, use=None
@@ -194,13 +208,15 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         """
         match value:
             case str():
-                self._formats = [x.strip() for x in value.split(",") if x.strip()]
+                self._formats = [x.strip()
+                                 for x in value.split(",") if x.strip()]
             case Iterable() if all(isinstance(x, str) for x in value):
                 self._formats = list(value)
             case None if not self._formats:  # Use default if formats aren't set
                 self._formats = default.formats
             case _:
-                raise TypeError(f"Invalid formats specified {value}. Expected str, iterable, or None.")
+                raise TypeError(f"Invalid formats specified {
+                                value}. Expected str, iterable, or None.")
 
     @property
     def style(self):
@@ -234,13 +250,15 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         """
         match value:
             case str():
-                self._style = [x.strip() for x in value.split(",") if x.strip()]
+                self._style = [x.strip()
+                               for x in value.split(",") if x.strip()]
             case Iterable() if all(isinstance(x, str) for x in value):
                 self._style = list(value)
             case None:
                 self._style = default.style
             case _:
-                raise TypeError(f"Invalid style: {value}. Expected str, iterable, or None.")
+                raise TypeError(f"Invalid style: {
+                                value}. Expected str, iterable, or None.")
 
     @property
     def extra(self):
@@ -257,7 +275,8 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
                 self._extra = {}
             case Mapping():
                 if bad := value.keys() - mpl.rcParams.keys():
-                    raise KeyError(f"{','.join(bad)} are not valid Matplotlib rcParameters.")
+                    raise KeyError(
+                        f"{','.join(bad)} are not valid Matplotlib rcParameters.")
                 for param, val in value.items():
                     self._extra[param] = val
 
@@ -270,7 +289,8 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             case tuple() if not len(args) and self.filename is not None:
                 pass
             case _:
-                raise ValueError("Only a single positional argument that is either a string or path is supported")
+                raise ValueError(
+                    "Only a single positional argument that is either a string or path is supported")
         for key, val in settings.items():
             setattr(self, key, val)
         return self
@@ -278,8 +298,8 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
     def __enter__(self):
         """Record existing open figures and enter style context (if any)."""
         super().__enter__()
-        if self.use: # Set the current figure to be that given by use.
-            plt.figure(getattr(self.use,"number",None))
+        if self.use:  # Set the current figure to be that given by use.
+            plt.figure(getattr(self.use, "number", None))
         if self.style:
             self.style_context = mpl.style.context(self.style)
             self.style_context.__enter__()
@@ -297,7 +317,8 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             self.style_context.__exit__(exc_type, exc_value, traceback)
             self.style_context = None
 
-        self._existing_open_figs = [ref() for ref in self._existing_open_figs if ref() is not None]
+        self._existing_open_figs = [
+            ref() for ref in self._existing_open_figs if ref() is not None]
         new_file_counter = 0
 
         new_figures = list(self.new_figures)
@@ -313,6 +334,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             if filename:
                 for fmt in self.formats:
                     output_file = f"{filename}.{fmt.lower()}"
+                    _make_path(output_file)
                     fig.savefig(output_file)
 
             if self.autoclose:
@@ -345,11 +367,13 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         if self.filename.is_dir():
             filename: Path = self.filename / "{label}"
         else:
-            filename: Path = self.filename if self.filename is not None else Path("{label}")
+            filename: Path = self.filename if self.filename is not None else Path(
+                "{label}")
 
         filename = str(filename).format(label=label, number=counter)
         # Append counter if filename lacks placeholders and multiple files
         if "{label}" not in str(self.filename) and "{number}" not in str(self.filename) and counter > 1:
             parts = filename.rsplit(".", 1)
-            filename = f"{parts[0]}-{counter}.{parts[1]}" if len(parts) > 1 else f"{filename}-{counter}"
+            filename = f"{parts[0]}-{counter}.{parts[1]
+                                               }" if len(parts) > 1 else f"{filename}-{counter}"
         return filename
