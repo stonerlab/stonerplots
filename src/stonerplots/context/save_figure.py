@@ -214,8 +214,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             case None if not self._formats:  # Use default if formats aren't set
                 self._formats = default.formats
             case _:
-                raise TypeError(f"Invalid formats specified {
-                                value}. Expected str, iterable, or None.")
+                raise TypeError(f"Invalid formats specified {value}. Expected str, iterable, or None.")
 
     @property
     def style(self):
