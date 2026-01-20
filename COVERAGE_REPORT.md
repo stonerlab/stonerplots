@@ -5,32 +5,33 @@
 
 ## Executive Summary
 
-The initial code review estimated test coverage at ~30%. However, this estimate was **incorrect**. 
+The initial code review estimated test coverage at ~30%. However, this estimate was **incorrect**.
 
-**Actual Coverage: 85.81%**
+### Actual Coverage: 85.81%
 
 This was verified by running pytest with coverage reporting:
+
 ```bash
 pytest tests/ --cov=src/stonerplots --cov-report=term
 ```
 
 ## Coverage by Module
 
-| Module | Statements | Missed | Coverage |
-|--------|-----------|--------|----------|
-| `__init__.py` | 26 | 0 | 100.00% |
-| `colours.py` | 6 | 0 | 100.00% |
-| `context/__init__.py` | 6 | 0 | 100.00% |
-| `context/inset_plot.py` | 41 | 2 | 95.12% |
-| `counter.py` | 16 | 1 | 93.75% |
-| `context/multiple_plot.py` | 184 | 14 | 92.39% |
-| `util.py` | 152 | 14 | 90.79% |
-| `context/save_figure.py` | 157 | 18 | 88.54% |
-| `context/double_y.py` | 86 | 14 | 83.72% |
-| `context/noframe.py` | 43 | 8 | 81.40% |
-| `format.py` | 86 | 25 | 70.93% |
-| `context/base.py` | 120 | 35 | 70.83% |
-| **TOTAL** | **923** | **131** | **85.81%** |
+| Module                     | Statements | Missed | Coverage  |
+|----------------------------|------------|--------|-----------|
+| `__init__.py`              | 26         | 0      | 100.00%   |
+| `colours.py`               | 6          | 0      | 100.00%   |
+| `context/__init__.py`      | 6          | 0      | 100.00%   |
+| `context/inset_plot.py`    | 41         | 2      | 95.12%    |
+| `counter.py`               | 16         | 1      | 93.75%    |
+| `context/multiple_plot.py` | 184        | 14     | 92.39%    |
+| `util.py`                  | 152        | 14     | 90.79%    |
+| `context/save_figure.py`   | 157        | 18     | 88.54%    |
+| `context/double_y.py`      | 86         | 14     | 83.72%    |
+| `context/noframe.py`       | 43         | 8      | 81.40%    |
+| `format.py`                | 86         | 25     | 70.93%    |
+| `context/base.py`          | 120        | 35     | 70.83%    |
+| **TOTAL**                  | **923**    | **131**| **85.81%**|
 
 ## Why the Initial Estimate Was Wrong
 
@@ -75,6 +76,7 @@ If resources permit, the following would further improve test quality:
 To ensure accurate coverage reporting in the future, the following configurations have been added:
 
 ### `pyproject.toml`
+
 ```toml
 [tool.coverage.run]
 source = ["src/stonerplots"]
@@ -95,6 +97,7 @@ directory = "htmlcov"
 ### CI Workflow (`.github/workflows/pytest.yaml`)
 
 Updated to include coverage reporting:
+
 - Added `pytest-cov` to environment dependencies
 - Added `--cov=src/stonerplots --cov-report=term --cov-report=html` to pytest arguments
 
