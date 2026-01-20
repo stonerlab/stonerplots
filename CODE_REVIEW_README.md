@@ -177,11 +177,13 @@ The StonerPlots codebase currently uses three private matplotlib APIs (indicated
 
 ### Private API Usage Identified
 
-#### 1. `matplotlib.colors._colors_full_map` (EASY FIX AVAILABLE)
+#### 1. `matplotlib.colors._colors_full_map` ✓ FIXED
 
 **Location:** `src/stonerplots/__init__.py:15` and `lines 67-71`
 
-**Current Code:**
+**Status:** Fixed on 2026-01-20
+
+**Previous Code:**
 
 ```python
 from matplotlib.colors import _colors_full_map
@@ -193,16 +195,7 @@ _colors_full_map.update(tube_colours_50)
 _colors_full_map.update(tube_colours_10)
 ```
 
-**Purpose:** Registers custom colour names (tube_colours) into matplotlib's global colour registry so they can be used in plots.
-
-**Risk Level:** Low-Medium
-
-- Private API, but widely used pattern in matplotlib ecosystem
-- Unlikely to change drastically, but could break in major matplotlib versions
-
-**Public API Alternative:** ✓ **Available**
-
-Use `matplotlib.colors.get_named_colors_mapping()` instead:
+**Updated Code:**
 
 ```python
 from matplotlib.colors import get_named_colors_mapping
@@ -214,9 +207,15 @@ get_named_colors_mapping().update(tube_colours_50)
 get_named_colors_mapping().update(tube_colours_10)
 ```
 
-**Verification:** Testing confirms that `get_named_colors_mapping()` returns the exact same object as `_colors_full_map`, making this a drop-in replacement with zero risk.
+**Purpose:** Registers custom colour names (tube_colours) into matplotlib's global colour registry so they can be used in plots.
 
-**Recommendation:** ✅ **Replace with public API** - This is a straightforward one-line change that eliminates dependency on private API with no risk or functional change.
+**Risk Level:** ~~Low-Medium~~ **Eliminated** (now using public API)
+
+**Public API Alternative:** ✓ **Implemented**
+
+The public API `matplotlib.colors.get_named_colors_mapping()` has been implemented, completely eliminating the dependency on the private `_colors_full_map` API.
+
+**Verification:** Testing confirms that `get_named_colors_mapping()` returns the exact same object as `_colors_full_map`, making this a drop-in replacement with zero risk. All custom tube colours are successfully registered and accessible.
 
 ---
 
@@ -347,18 +346,19 @@ def __enter__(self):
 
 ### Summary and Recommendations
 
-| API | Location | Risk | Action | Priority |
-|-----|----------|------|--------|----------|
-| `_colors_full_map` | `__init__.py:15, 67-71` | Low-Medium | Replace with `get_named_colors_mapping()` | HIGH |
-| `_TransformedBoundsLocator` | `util.py:11, 110` | Low | Keep with documentation | LOW |
-| `_subplots.AxesSubplot` | `double_y.py:153` | Very Low | Update docstring to use `Axes` | MEDIUM |
+| API | Location | Risk | Action | Priority | Status |
+|-----|----------|------|--------|----------|--------|
+| `_colors_full_map` | `__init__.py:15, 67-71` | ~~Low-Medium~~ Eliminated | ✓ Replaced with `get_named_colors_mapping()` | ~~HIGH~~ **DONE** | ✅ FIXED |
+| `_TransformedBoundsLocator` | `util.py:11, 110` | Low | Keep with documentation | LOW | Open |
+| `_subplots.AxesSubplot` | `double_y.py:153` | Very Low | Update docstring to use `Axes` | MEDIUM | Open |
 
 ### Implementation Plan
 
-1. **High Priority:** Replace `_colors_full_map` with `get_named_colors_mapping()`
-   - Simple one-line change in `__init__.py`
-   - Zero risk, fully compatible
-   - Eliminates one private API dependency
+1. ~~**High Priority:** Replace `_colors_full_map` with `get_named_colors_mapping()`~~ ✅ **COMPLETED**
+   - ✓ Changed import in `__init__.py` line 15
+   - ✓ Updated all color registration calls (lines 67-71)
+   - ✓ Tested and verified functionality
+   - ✓ Zero risk, fully compatible
 
 1. **Medium Priority:** Update type annotation in `double_y.py`
    - Documentation-only change

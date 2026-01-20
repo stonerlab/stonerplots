@@ -40,12 +40,12 @@ All previously documented issues have been fixed as of 2026-01-19:
 
 ## Code Quality Issues
 
-### Issue 8: Accessing Private matplotlib API ✓ REVIEWED
+### Issue 8: Accessing Private matplotlib API ✓ PARTIALLY FIXED
 
-**Status:** Comprehensive review completed on 2026-01-20
+**Status:** Fix implemented on 2026-01-20
 
 **Files:**
-- `src/stonerplots/__init__.py:15, 67-71` - Uses `_colors_full_map`
+- ~~`src/stonerplots/__init__.py:15, 67-71` - Uses `_colors_full_map`~~ ✓ FIXED
 - `src/stonerplots/util.py:11, 110` - Uses `_TransformedBoundsLocator`
 - `src/stonerplots/context/double_y.py:153` - References `_subplots.AxesSubplot` in docstring
 
@@ -57,18 +57,25 @@ All previously documented issues have been fixed as of 2026-01-19:
 
 **Key Findings:**
 
-1. `_colors_full_map` - **Public alternative available:** Use `get_named_colors_mapping()` (HIGH priority)
+1. ~~`_colors_full_map`~~ ✓ **FIXED** - Replaced with `get_named_colors_mapping()`
 1. `_TransformedBoundsLocator` - **No public alternative:** Used internally by matplotlib, low risk (LOW priority)
 1. `_subplots.AxesSubplot` - **Documentation only:** Use `Axes` type instead (MEDIUM priority)
 
-**Recommendations:**
+**Fix Applied:**
 
-1. Replace `_colors_full_map` with `matplotlib.colors.get_named_colors_mapping()` (verified functionally identical)
+Replaced all uses of `_colors_full_map` with the public API `get_named_colors_mapping()` in `__init__.py`:
+- Changed import from `from matplotlib.colors import _colors_full_map` to `from matplotlib.colors import get_named_colors_mapping`
+- Updated color registration calls to use `get_named_colors_mapping().update(...)`
+
+**Verification:** Testing confirms the public API works correctly and all custom tube colours are successfully registered.
+
+**Remaining Recommendations:**
+
 1. Update type annotation in `double_y.py` docstring to use `matplotlib.axes.Axes`
 1. Keep `_TransformedBoundsLocator` but add documentation explaining the usage
 1. Monitor matplotlib releases for any breaking changes
 
-**Risk:** Low for `_TransformedBoundsLocator` (used by matplotlib internally), Low-Medium for `_colors_full_map` (but has public alternative)
+**Risk:** Low for remaining private APIs
 
 ### Issue 10: Complex Nested Logic in util.py
 
