@@ -7,7 +7,10 @@
 
 ## Executive Summary
 
-This comprehensive code review analysed the entire StonerPlots repository, examining Python source files, documentation, test coverage, and adherence to project coding standards. The codebase is generally well-structured and makes good use of modern Python features, but several issues were identified that should be addressed to improve code quality, maintainability, and reliability.
+This comprehensive code review analysed the entire StonerPlots repository, examining Python source files,
+documentation, test coverage, and adherence to project coding standards. The codebase is generally
+well-structured and makes good use of modern Python features, but several issues were identified that should be
+addressed to improve code quality, maintainability, and reliability.
 
 ## Overall Assessment
 
@@ -111,7 +114,8 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 
 **Actual Coverage: 85.81%** (923 statements, 131 missed)
 
-The initial estimate of ~30% coverage was incorrect. Running pytest with coverage shows that the example tests effectively exercise most code paths in the library.
+The initial estimate of ~30% coverage was incorrect. Running pytest with coverage shows that the example tests
+effectively exercise most code paths in the library.
 
 **Coverage by Module:**
 - `__init__.py`: 100.00%
@@ -177,7 +181,8 @@ While current coverage is good, these additions would further improve test quali
 
 **Security Risk Level:** Low
 
-The repository does not handle untrusted input in security-critical ways. The main risk is future compatibility with matplotlib updates.
+The repository does not handle untrusted input in security-critical ways. The main risk is future compatibility
+with matplotlib updates.
 
 ## Recommendations
 
@@ -244,13 +249,17 @@ The repository does not handle untrusted input in security-critical ways. The ma
 
 ## Detailed Findings
 
-For a complete list of all 32 issues with detailed descriptions, file locations, severity assessments, and recommended fixes, please refer to the **BUGS.md** file in the repository root.
+For a complete list of all 32 issues with detailed descriptions, file locations, severity assessments, and
+recommended fixes, please refer to the **BUGS.md** file in the repository root.
 
 ## Conclusion
 
-The StonerPlots repository is a well-designed matplotlib extension with useful functionality for scientific plotting. The identified issues are manageable and mostly fall into documentation and testing categories. The critical bugs should be addressed promptly, but they don't fundamentally compromise the package's utility.
+The StonerPlots repository is a well-designed matplotlib extension with useful functionality for scientific
+plotting. The identified issues are manageable and mostly fall into documentation and testing categories. The
+critical bugs should be addressed promptly, but they don't fundamentally compromise the package's utility.
 
-With the recommended improvements, particularly around test coverage and bug fixes, the codebase quality could easily reach 9/10.
+With the recommended improvements, particularly around test coverage and bug fixes, the codebase quality could
+easily reach 9/10.
 
 ---
 

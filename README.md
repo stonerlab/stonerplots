@@ -1,10 +1,17 @@
-﻿[![GitHub version](https://badge.fury.io/gh/stonerlab%2Fstonerplots.svg)](https://badge.fury.io/gh/stonerlab%2Fstonerplots)
-[![pytest](https://github.com/stonerlab/stonerplots/actions/workflows/pytest.yaml/badge.svg)](https://github.com/stonerlab/stonerplots/actions/workflows/pytest.yaml)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/bc7404ac3cbf432184a13b6c3cb88ea4)](https://app.codacy.com/gh/stonerlab/stonerplots/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+﻿[![GitHub version](https://badge.fury.io/gh/stonerlab%2Fstonerplots.svg)](
+https://badge.fury.io/gh/stonerlab%2Fstonerplots)
+[![pytest](https://github.com/stonerlab/stonerplots/actions/workflows/pytest.yaml/badge.svg)](
+https://github.com/stonerlab/stonerplots/actions/workflows/pytest.yaml)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/bc7404ac3cbf432184a13b6c3cb88ea4)](
+https://app.codacy.com/gh/stonerlab/stonerplots/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_
+campaign=Badge_grade)
 [![PyPI version](https://badge.fury.io/py/StonerPlots.svg)](https://badge.fury.io/py/StonerPlots)
-[![Build Docs](https://github.com/stonerlab/stonerplots/actions/workflows/publish_sphinx.yaml/badge.svg)](https://stonerlab.github.io/stonerplots/)
-[![Conda](https://github.com/stonerlab/stonerplots/actions/workflows/build_conda.yaml/badge.svg)](https://github.com/stonerlab/stonerplots/actions/workflows/build_conda.yaml)
-[![Conda Version](https://anaconda.org/phygbu/stonerplots/badges/version.svg)](https://anaconda.org/phygbu/stonerplots)
+[![Build Docs](https://github.com/stonerlab/stonerplots/actions/workflows/publish_sphinx.yaml/badge.svg)](
+https://stonerlab.github.io/stonerplots/)
+[![Conda](https://github.com/stonerlab/stonerplots/actions/workflows/build_conda.yaml/badge.svg)](
+https://github.com/stonerlab/stonerplots/actions/workflows/build_conda.yaml)
+[![Conda Version](https://anaconda.org/phygbu/stonerplots/badges/version.svg)](
+https://anaconda.org/phygbu/stonerplots)
 ![Not platform specific](https://anaconda.org/phygbu/stonerplots/badges/platforms.svg)
 ![MIT Licensed](https://anaconda.org/phygbu/stonerplots/badges/license.svg)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15446411.svg)](https://doi.org/10.5281/zenodo.15446411)
@@ -13,7 +20,8 @@
 
 Stoner Plots is a fork of Science Plots with additional features to make plotting of scientific plots easier.
 
-<img src="https://raw.githubusercontent.com/stonerlab/stonerplots/main/examples/figures/fig05a.png" width=640 alt="Presentation Style Image"/>
+<img src="https://raw.githubusercontent.com/stonerlab/stonerplots/main/examples/figures/fig05a.png" width=640
+alt="Presentation Style Image"/>
 
 ## Usage
 
@@ -42,7 +50,8 @@ The package is fully documented (see link below) and comes with a set of example
 
 ## Documentation
 
-Documentation can be found on the [github pages for this repository](https://stonerlab.github.io/stonerplots/index.html).
+Documentation can be found on the [github pages for this repository](
+https://stonerlab.github.io/stonerplots/index.html).
 
 ## Available Styles
 
@@ -82,12 +91,12 @@ The package is designed to work by using python context managers to aid plotting
 
 - SavedFigure - apply style sheets and then save any resulting figures to disc in one or more formats
 - CentredAxes - makes a plot where the axes cross at the origin and there is no outside frame.
-- StackVertical - make a multi-panel plot where the panels are arranged in a vertical stack and pushed together so that
-  the top-x-axis on one frame is the bottom of the next.
+- StackVertical - make a multi-panel plot where the panels are arranged in a vertical stack and pushed together
+  so that the top-x-axis on one frame is the bottom of the next.
 - MultiPanel - a general-purpose multi-panel plotting helper.
 - InsetPlot - create an inset set of axes.
-- DoubleYAxis - setup the righthand y axis for a second scale and optional colour the y-axes differently and merge
-  the legend into a single legend.
+- DoubleYAxis - setup the righthand y axis for a second scale and optional colour the y-axes differently and
+  merge the legend into a single legend.
 
 ## Colour Cycles
 
@@ -107,8 +116,9 @@ The default colour cycle is based on the London Underground map colour scheme (w
 
 ## Reference
 
-The package adds these as named colours in matplotlib, along with 90,50,70 and 10% shade variants of some of them. See
-the [documentation page on colours](https://stonerlab.github.io/stonerplots/colours.html) for a full list.
+The package adds these as named colours in matplotlib, along with 90,50,70 and 10% shade variants of some of
+them. See the [documentation page on colours](https://stonerlab.github.io/stonerplots/colours.html) for a
+full list.
 
 This package draws heavily on [scienceplots](https://github.com/garrettj403/SciencePlots), so it
 seems only fair to cite the original work....

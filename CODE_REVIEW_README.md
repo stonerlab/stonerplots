@@ -173,7 +173,10 @@ Issues #6, #9, and #11 were reviewed and determined to not be actual issues - th
 
 ### Executive Summary
 
-The StonerPlots codebase currently uses three private matplotlib APIs (indicated by leading underscores). While these APIs work correctly, they pose a risk of breaking in future matplotlib versions since private APIs can change without notice. This report documents each usage, assesses the risk, and provides recommendations for public API alternatives where available.
+The StonerPlots codebase currently uses three private matplotlib APIs (indicated by leading underscores). While
+these APIs work correctly, they pose a risk of breaking in future matplotlib versions since private APIs can
+change without notice. This report documents each usage, assesses the risk, and provides recommendations for
+public API alternatives where available.
 
 ### Private API Usage Identified
 
@@ -207,15 +210,19 @@ get_named_colors_mapping().update(tube_colours_50)
 get_named_colors_mapping().update(tube_colours_10)
 ```
 
-**Purpose:** Registers custom colour names (tube_colours) into matplotlib's global colour registry so they can be used in plots.
+**Purpose:** Registers custom colour names (tube_colours) into matplotlib's global colour registry so they can
+be used in plots.
 
 **Risk Level:** ~~Low-Medium~~ **Eliminated** (now using public API)
 
 **Public API Alternative:** ✓ **Implemented**
 
-The public API `matplotlib.colors.get_named_colors_mapping()` has been implemented, completely eliminating the dependency on the private `_colors_full_map` API.
+The public API `matplotlib.colors.get_named_colors_mapping()` has been implemented, completely eliminating the
+dependency on the private `_colors_full_map` API.
 
-**Verification:** Testing confirms that `get_named_colors_mapping()` returns the exact same object as `_colors_full_map`, making this a drop-in replacement with zero risk. All custom tube colours are successfully registered and accessible.
+**Verification:** Testing confirms that `get_named_colors_mapping()` returns the exact same object as
+`_colors_full_map`, making this a drop-in replacement with zero risk. All custom tube colours are successfully
+registered and accessible.
 
 ---
 
@@ -234,7 +241,8 @@ def move_inset(parent, inset_axes, new_bbox):
     inset_axes.set_axes_locator(locator)
 ```
 
-**Purpose:** Creates a callable locator object that positions inset axes at a specific location using a transform. This is used by the `move_inset()` utility function to reposition inset axes.
+**Purpose:** Creates a callable locator object that positions inset axes at a specific location using a
+transform. This is used by the `move_inset()` utility function to reposition inset axes.
 
 **Risk Level:** Low
 
@@ -245,7 +253,8 @@ def move_inset(parent, inset_axes, new_bbox):
 
 **Public API Alternative:** ⚠️ **Partial alternatives available**
 
-**Option A:** Use `Axes.inset_axes()` instead of manually creating and positioning axes (RECOMMENDED if applicable):
+**Option A:** Use `Axes.inset_axes()` instead of manually creating and positioning axes (RECOMMENDED if
+applicable):
 
 ```python
 # Instead of:
@@ -340,7 +349,8 @@ def __enter__(self):
     """
 ```
 
-**Recommendation:** ✅ **Replace with public API** - Simple documentation fix that uses the base class type which is more accurate and publicly documented.
+**Recommendation:** ✅ **Replace with public API** - Simple documentation fix that uses the base class type
+which is more accurate and publicly documented.
 
 ---
 
@@ -348,7 +358,8 @@ def __enter__(self):
 
 | API | Location | Risk | Action | Priority | Status |
 |-----|----------|------|--------|----------|--------|
-| `_colors_full_map` | `__init__.py:15, 67-71` | ~~Low-Medium~~ Eliminated | ✓ Replaced with `get_named_colors_mapping()` | ~~HIGH~~ **DONE** | ✅ FIXED |
+| `_colors_full_map` | `__init__.py:15, 67-71` | ~~Low-Medium~~ Eliminated | ✓ Replaced with
+`get_named_colors_mapping()` | ~~HIGH~~ **DONE** | ✅ FIXED |
 | `_TransformedBoundsLocator` | `util.py:11, 110` | Low | Keep with documentation | LOW | Open |
 | `_subplots.AxesSubplot` | `double_y.py:153` | Very Low | Update docstring to use `Axes` | MEDIUM | Open |
 
