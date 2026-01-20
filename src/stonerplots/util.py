@@ -288,6 +288,8 @@ def find_best_position(ax, axins, renderer=None):
         Bbox(...)
     """
     ax.figure.canvas.draw()  # render the figure
+    if renderer is None:
+        renderer = ax.figure.canvas.get_renderer()
     bboxes, lines, offsets = _auto_linset_data(ax, axins, renderer)
 
     candidates = []
