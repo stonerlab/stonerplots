@@ -20,8 +20,7 @@ def _make_path(output_file):
         case Path():
             output_dir = output_file.parent
         case _:
-            raise TypeError(f"output filename should be a string or pathlib.Path not a {
-                            type(output_file)}")
+            raise TypeError(f"output filename should be a string or pathlib.Path not a {type(output_file)}")
     output_dir.mkdir(parents=True, exist_ok=True)
 
 
