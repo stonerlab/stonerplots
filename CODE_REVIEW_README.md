@@ -145,7 +145,7 @@ Remember: This review is meant to improve code quality, not criticize. All codeb
 
 **Documentation Improvements:**
 
-- ✓ Fixed all typos in __init__.py (Issues #1, #2)
+- ✓ Fixed all typos in **init**.py (Issues #1, #2)
 - ✓ Added Examples section to TexFormatter class (Issue #3)
 - ✓ Completed _round function docstring (Issue #4)
 - ✓ Updated PlotLabeller formatting documentation (Issue #5)
@@ -156,7 +156,7 @@ Remember: This review is meant to improve code quality, not criticize. All codeb
 
 Issues #6, #9, and #11 were reviewed and determined to not be actual issues - they represent valid design choices.
 
-### When issues are fixed:
+### When issues are fixed
 
 1. Mark as fixed in BUGS.md with date
 1. Note the fix in commit messages
@@ -357,11 +357,10 @@ which is more accurate and publicly documented.
 ### Summary and Recommendations
 
 | API | Location | Risk | Action | Priority | Status |
-|-----|----------|------|--------|----------|--------|
-| `_colors_full_map` | `__init__.py:15, 67-71` | ~~Low-Medium~~ Eliminated | ✓ Replaced with
-`get_named_colors_mapping()` | ~~HIGH~~ **DONE** | ✅ FIXED |
-| `_TransformedBoundsLocator` | `util.py:11, 110` | Low | Keep with documentation | LOW | Open |
-| `_subplots.AxesSubplot` | `double_y.py:153` | Very Low | Update docstring to use `Axes` | MEDIUM | Open |
+| --- | --- | --- | --- | --- | --- |
+| `_colors_full_map` | `__init__.py:15, 67-71` | ~~Low-Medium~~ | Use public API | ~~HIGH~~ | ✅ FIXED |
+| `_TransformedBoundsLocator` | `util.py:11, 110` | Low | Document usage | LOW | Open |
+| `_subplots.AxesSubplot` | `double_y.py:153` | Very Low | Update docs | MEDIUM | Open |
 
 ### Implementation Plan
 

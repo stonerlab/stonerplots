@@ -55,6 +55,7 @@ code flow is safe.
 **Status:** Fix implemented on 2026-01-20
 
 **Files:**
+
 - ~~`src/stonerplots/__init__.py:15, 67-71` - Uses `_colors_full_map`~~ ✓ FIXED
 - `src/stonerplots/util.py:11, 110` - Uses `_TransformedBoundsLocator`
 - `src/stonerplots/context/double_y.py:153` - References `_subplots.AxesSubplot` in docstring
@@ -63,8 +64,8 @@ code flow is safe.
 
 **Severity:** Low-Medium (potential breaking change in future matplotlib versions)
 
-**Detailed Report:** See [CODE_REVIEW_README.md - Issue #8 Detailed Report](
-#issue-8-matplotlib-private-api-usage---detailed-report) for comprehensive analysis.
+**Detailed Report:** See CODE_REVIEW_README.md - Issue #8 Detailed Report
+(<#issue-8-matplotlib-private-api-usage---detailed-report>) for comprehensive analysis.
 
 **Key Findings:**
 
@@ -75,6 +76,7 @@ code flow is safe.
 **Fix Applied:**
 
 Replaced all uses of `_colors_full_map` with the public API `get_named_colors_mapping()` in `__init__.py`:
+
 - Changed import from `from matplotlib.colors import _colors_full_map` to
   `from matplotlib.colors import get_named_colors_mapping`
 - Updated color registration calls to use `get_named_colors_mapping().update(...)`
@@ -252,10 +254,13 @@ comprehensive coverage of the codebase.
 **Severity:** Low (test coverage is actually good at ~86%)
 **Status:** Re-evaluated - coverage is adequate
 **Note:** The initial estimate of ~30% coverage was incorrect. Running pytest with coverage shows:
+
 - **Actual coverage: 85.81%** (923 statements, 131 missed)
 - Example tests exercise most code paths effectively
 - Coverage exceeds the recommended 85% threshold
+
 **Recommendation:** Current test coverage is satisfactory. Future improvements could include:
+
 - Unit tests for edge cases and error conditions
 - Tests for the remaining uncovered code paths (primarily error handling)
 

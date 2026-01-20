@@ -1,4 +1,6 @@
-﻿[![GitHub version](https://badge.fury.io/gh/stonerlab%2Fstonerplots.svg)](https://badge.fury.io/gh/stonerlab%2Fstonerplots)
+# Stoner Plots
+
+[![GitHub version](https://badge.fury.io/gh/stonerlab%2Fstonerplots.svg)](https://badge.fury.io/gh/stonerlab%2Fstonerplots)
 [![pytest](https://github.com/stonerlab/stonerplots/actions/workflows/pytest.yaml/badge.svg)](https://github.com/stonerlab/stonerplots/actions/workflows/pytest.yaml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/bc7404ac3cbf432184a13b6c3cb88ea4)](https://app.codacy.com/gh/stonerlab/stonerplots/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![PyPI version](https://badge.fury.io/py/StonerPlots.svg)](https://badge.fury.io/py/StonerPlots)
@@ -9,12 +11,9 @@
 ![MIT Licensed](https://anaconda.org/phygbu/stonerplots/badges/license.svg)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15446411.svg)](https://doi.org/10.5281/zenodo.15446411)
 
-# Stoner Plots
-
 Stoner Plots is a fork of Science Plots with additional features to make plotting of scientific plots easier.
 
-<img src="https://raw.githubusercontent.com/stonerlab/stonerplots/main/examples/figures/fig05a.png" width=640
-alt="Presentation Style Image"/>
+![Presentation Style Image](https://raw.githubusercontent.com/stonerlab/stonerplots/main/examples/figures/fig05a.png)
 
 ## Usage
 
@@ -150,4 +149,3 @@ The doi and BibTex reference for stonerplots is: <https://doi.org/10.5281/zenodo
       doi          = {10.5281/zenodo.14026874},
       url          = {https://doi.org/10.5281/zenodo.14026874},
 }
-
