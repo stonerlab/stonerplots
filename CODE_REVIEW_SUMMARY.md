@@ -1,8 +1,8 @@
 # Code Review Summary - StonerPlots Repository
 
-**Review Date:** January 19, 2026  
-**Repository:** stonerlab/stonerplots  
-**Reviewer:** GitHub Copilot  
+**Review Date:** January 19, 2026
+**Repository:** stonerlab/stonerplots
+**Reviewer:** GitHub Copilot
 **Scope:** Complete repository code review
 
 ## Executive Summary
@@ -45,6 +45,7 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 ### 1. Weakref Comparison Bugs (High Severity)
 
 **Files:** `src/stonerplots/context/base.py:285, 305`
+
 - Direct comparison of figures/axes with weakref lists will always fail
 - Affects tracking of new figures and axes in context managers
 - **Impact:** Core functionality may not work as intended
@@ -53,6 +54,7 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 ### 2. Missing Renderer Parameter Handling (High Severity)
 
 **File:** `src/stonerplots/util.py:266-290`
+
 - Function accepts `renderer=None` but doesn't handle None case
 - Could cause NoneType errors when renderer is not provided
 - **Impact:** Crashes when auto-positioning insets
@@ -113,7 +115,7 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 1. Error condition tests (ValueError, TypeError scenarios)
 1. Integration tests for complex multi-panel layouts
 
-**Current Coverage:** ~30% (estimated based on example tests only)  
+**Current Coverage:** ~30% (estimated based on example tests only)
 **Recommended Coverage:** 85%+
 
 ## Compliance with Project Standards
