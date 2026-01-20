@@ -40,13 +40,35 @@ All previously documented issues have been fixed as of 2026-01-19:
 
 ## Code Quality Issues
 
-### Issue 8: Accessing Private matplotlib API
+### Issue 8: Accessing Private matplotlib API ✓ REVIEWED
 
-**File:** `src/stonerplots/__init__.py:15`
-**Description:** Imports `_colors_full_map` from `matplotlib.colors` which is a private API (indicated by leading underscore).
-**Severity:** Medium (potential breaking change in future matplotlib versions)
-**Risk:** Private APIs can change without warning
-**Recommendation:** Consider using public matplotlib colour registration methods if available
+**Status:** Comprehensive review completed on 2026-01-20
+
+**Files:**
+- `src/stonerplots/__init__.py:15, 67-71` - Uses `_colors_full_map`
+- `src/stonerplots/util.py:11, 110` - Uses `_TransformedBoundsLocator`
+- `src/stonerplots/context/double_y.py:153` - References `_subplots.AxesSubplot` in docstring
+
+**Description:** The codebase uses three private matplotlib APIs (indicated by leading underscores).
+
+**Severity:** Low-Medium (potential breaking change in future matplotlib versions)
+
+**Detailed Report:** See [CODE_REVIEW_README.md - Issue #8 Detailed Report](#issue-8-matplotlib-private-api-usage---detailed-report) for comprehensive analysis.
+
+**Key Findings:**
+
+1. `_colors_full_map` - **Public alternative available:** Use `get_named_colors_mapping()` (HIGH priority)
+1. `_TransformedBoundsLocator` - **No public alternative:** Used internally by matplotlib, low risk (LOW priority)
+1. `_subplots.AxesSubplot` - **Documentation only:** Use `Axes` type instead (MEDIUM priority)
+
+**Recommendations:**
+
+1. Replace `_colors_full_map` with `matplotlib.colors.get_named_colors_mapping()` (verified functionally identical)
+1. Update type annotation in `double_y.py` docstring to use `matplotlib.axes.Axes`
+1. Keep `_TransformedBoundsLocator` but add documentation explaining the usage
+1. Monitor matplotlib releases for any breaking changes
+
+**Risk:** Low for `_TransformedBoundsLocator` (used by matplotlib internally), Low-Medium for `_colors_full_map` (but has public alternative)
 
 ### Issue 10: Complex Nested Logic in util.py
 
