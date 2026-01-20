@@ -34,7 +34,8 @@ pytest tests/ --cov=src/stonerplots --cov-report=term
 
 ## Why the Initial Estimate Was Wrong
 
-The initial review assumed that because only example execution tests exist (in `test_examples.py`), coverage would be low. However:
+The initial review assumed that because only example execution tests exist (in `test_examples.py`), coverage
+would be low. However:
 
 1. **47 example scripts** are run as parametrised tests
 1. These examples exercise nearly all code paths in the library
@@ -57,7 +58,8 @@ The modules with coverage below 85%:
 
 ### Current Status: Satisfactory
 
-The current test coverage is **adequate and exceeds industry standards**. No immediate action is required to improve coverage.
+The current test coverage is **adequate and exceeds industry standards**. No immediate action is required to
+improve coverage.
 
 ### Optional Future Improvements
 
@@ -65,7 +67,8 @@ If resources permit, the following would further improve test quality:
 
 1. **Error condition tests**: Add tests that verify appropriate exceptions are raised for invalid inputs
 1. **Edge case tests**: Add unit tests for boundary conditions in format classes
-1. **Explicit unit tests**: While examples provide good integration testing, explicit unit tests can make expected behaviour more clear
+1. **Explicit unit tests**: While examples provide good integration testing, explicit unit tests can make
+   expected behaviour more clear
 
 ## Configuration Updates
 
@@ -97,6 +100,8 @@ Updated to include coverage reporting:
 
 ## Conclusion
 
-The test coverage for StonerPlots is **excellent at 85.81%**, significantly better than initially estimated. The example-based testing approach provides comprehensive coverage of real-world usage patterns. The code review documentation has been updated to reflect these accurate findings.
+The test coverage for StonerPlots is **excellent at 85.81%**, significantly better than initially estimated. The
+example-based testing approach provides comprehensive coverage of real-world usage patterns. The code review
+documentation has been updated to reflect these accurate findings.
 
 **Status**: ✅ Coverage goal achieved (85.81% ≥ 85%)
