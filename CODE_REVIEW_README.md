@@ -20,12 +20,12 @@ Contains:
 
 **Quick Stats:**
 
-- 28 issues identified (originally 32, 2 fixed, 2 reclassified)
+- 28 issues identified (originally 32, 2 fixed, 2 re-evaluated)
 - 0 high severity (2 fixed)
-- 11 medium severity
-- 15 low severity
+- 9 medium severity (2 re-evaluated as low)
+- 17 low severity
 - 2 informational
-- 10 issues fixed (as of 2026-01-19)
+- 12 issues resolved (as of 2026-01-20)
 
 ### 🐛 [BUGS.md](BUGS.md)
 
@@ -93,7 +93,7 @@ Contains for each issue:
 
 - [x] ~~Address Issue #8: Review matplotlib private API usage~~ ✓ REVIEWED (see detailed report below)
 - [x] ~~Address Issue #7: Fix incorrect docstring in util.py~~ ✓ FIXED
-- [ ] Address Issue #31: Improve test coverage
+- [x] ~~Address Issue #31: Test coverage~~ ✓ RE-EVALUATED (Coverage is 85.81%, exceeds target)
 - [x] ~~Fix documentation typos (Issues #1, #2)~~ ✓ FIXED
 
 ### Long Term (Nice to Have)

@@ -31,6 +31,7 @@ jobs:
             numpy
             pytest-md
             pytest-emoji
+            pytest-cov
             matplotlib
       - name: Run pytest
         uses: pavelzw/pytest-action@510c5e90c360a185039bea56ce8b3e7e51a16507
@@ -38,6 +39,6 @@ jobs:
           verbose: true
           emoji: true
           job-summary: true
-          custom-arguments: '-q'
+          custom-arguments: '-q --cov=src/stonerplots --cov-report=term --cov-report=html'
           click-to-expand: true
           report-title: 'Test Report'

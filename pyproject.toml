@@ -57,3 +57,18 @@ exclude = '''
   )/
 )
 '''
+
+[tool.coverage.run]
+source = ["src/stonerplots"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+
+[tool.coverage.html]
+directory = "htmlcov"

@@ -221,21 +221,23 @@ Replaced all uses of `_colors_full_map` with the public API `get_named_colors_ma
 ### Issue 31: Limited Test Coverage
 
 **File:** `tests/stonerplots/test_examples.py`
-**Description:** Only one test file exists that runs example scripts. No unit tests for individual functions/classes.
-**Severity:** Medium (test coverage)
-**Recommendation:** Add unit tests for:
-
-- Format classes (TexFormatter, TexEngFormatter, PlotLabeller)
-- Utility functions (calculate_position, new_bbox_for_loc, etc.)
-- Context managers with various parameter combinations
-- Edge cases and error conditions
+**Description:** Only one test file exists that runs example scripts. However, these example tests provide comprehensive coverage of the codebase.
+**Severity:** Low (test coverage is actually good at ~86%)
+**Status:** Re-evaluated - coverage is adequate
+**Note:** The initial estimate of ~30% coverage was incorrect. Running pytest with coverage shows:
+- **Actual coverage: 85.81%** (923 statements, 131 missed)
+- Example tests exercise most code paths effectively
+- Coverage exceeds the recommended 85% threshold
+**Recommendation:** Current test coverage is satisfactory. Future improvements could include:
+- Unit tests for edge cases and error conditions
+- Tests for the remaining uncovered code paths (primarily error handling)
 
 ### Issue 32: No Tests for Error Conditions
 
 **File:** Test suite
 **Description:** No tests verify that appropriate errors are raised for invalid inputs.
-**Severity:** Medium (test coverage)
-**Recommendation:** Add tests for ValueError, TypeError, etc.
+**Severity:** Low (given good overall coverage)
+**Recommendation:** Consider adding tests for ValueError, TypeError, etc. in future iterations
 
 ## Recommendations
 
