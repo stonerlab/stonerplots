@@ -14,6 +14,7 @@ This document contains issues and bugs discovered during a comprehensive code re
 ## Documentation Issues
 
 All previously documented issues have been fixed as of 2026-01-19:
+
 - ✓ Issue 1: Fixed typo "insance" → "instance" in `__init__.py`
 - ✓ Issue 2: Fixed reStructuredText syntax in `__init__.py`
 - ✓ Issue 3: Added Examples section to `TexFormatter` class
@@ -111,7 +112,8 @@ All previously documented issues have been fixed as of 2026-01-19:
 
 **Files:** `src/stonerplots/context/double_y.py`, `src/stonerplots/context/inset_plot.py`, `src/stonerplots/context/__init__.py`
 **Description:** Some files didn't follow the documented import grouping standard (stdlib, well-known third-party, other third-party, local). Multiple imports from the same module were not combined into one statement, and imports were not sorted alphabetically within groups.
-**Fix Applied:** 
+**Fix Applied:**
+
 - Combined duplicate imports from `.base` module in `double_y.py` and `inset_plot.py`
 - Sorted imports alphabetically in `context/__init__.py`
 **Date Fixed:** 2026-01-19
@@ -193,6 +195,7 @@ All previously documented issues have been fixed as of 2026-01-19:
 **Description:** Only one test file exists that runs example scripts. No unit tests for individual functions/classes.
 **Severity:** Medium (test coverage)
 **Recommendation:** Add unit tests for:
+
 - Format classes (TexFormatter, TexEngFormatter, PlotLabeller)
 - Utility functions (calculate_position, new_bbox_for_loc, etc.)
 - Context managers with various parameter combinations
@@ -214,6 +217,7 @@ Consider adding a py.typed marker and type stubs (.pyi files) for better IDE sup
 ### Recommendation 2: Add Pre-commit Hooks
 
 Set up pre-commit hooks for:
+
 - black (code formatting)
 - isort (import sorting)
 - flake8 or ruff (linting)
@@ -238,6 +242,7 @@ Consider adding logging (using Python's logging module) instead of or in additio
 ## Summary
 
 **Total Issues Found: 28** (2 issues reclassified as "Not an Issue")
+
 - High Severity: 0 (2 fixed)
 - Medium Severity: 11
 - Low Severity: 15

@@ -135,7 +135,7 @@ seems only fair to cite the original work....
       url          = {https://doi.org/10.5281/zenodo.10206719},
     }
 
-The doi and BibTex reference for stonerplots is: https://doi.org/10.5281/zenodo.14026874
+The doi and BibTex reference for stonerplots is: <https://doi.org/10.5281/zenodo.14026874>
 
     @software{gavin_burnell_2024_14026874,
       author       = {Gavin Burnell},

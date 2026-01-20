@@ -255,8 +255,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             case None:
                 self._style = default.style
             case _:
-                raise TypeError(f"Invalid style: {
-                                value}. Expected str, iterable, or None.")
+                raise TypeError(f"Invalid style: {value}. Expected str, iterable, or None.")
 
     @property
     def extra(self):
