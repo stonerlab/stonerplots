@@ -1,4 +1,6 @@
-# Docstring Formatting
+# Copilot general instructions
+
+## Docstring Formatting
 
 All docstrings for python functions, classes, methods should confirm to the following:
 
@@ -21,7 +23,7 @@ All docstrings for python functions, classes, methods should confirm to the foll
   - If the function or method is called outside of the same scope (e.g. in an inherited class or different module) then it should be documented as a publuc method or function
   - Otherwise, only the summary needs to be probided and other sections are optional.
 
-# Code formatting
+## Code formatting
 
 For user examples, the line length is 79 characters, for all other code use 119 characters.
 Otherwise folow black coding standards.
@@ -34,16 +36,20 @@ Group ipmorts as follows:
 
 Within each group, sort imports alphabetically. Where possible combine imports from the same module into one statement.
 
-# Issues and Bugs discovered during copilot operations
+## Issues and Bugs discovered during copilot operations
 
 If a new issue or bug is discovered during editing or creating other features, place a descritpion of the issue in BUGS.md. Describe the ussye/bug in a way that will make it most easy for a future copilot session to correct the problem.
 
 If an issue or bug in BUGS.md is fixed, remove the issue report from the BUGS.md file.
 
-# Markdown Formatting
+## Markdown Formatting
 
-## Blank Lines
+### Blank Lines
 
 - Ensure that lists are surrounded by a single blank line
 - Ensure a single blank line between headings at different levels and between headings and the following text.
 - Enumerated lists should always use 1. for each item marker.
+
+## Line length
+
+- Keep the lines to 119 characters
