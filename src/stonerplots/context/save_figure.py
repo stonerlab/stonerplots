@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """SavedFigure context manager."""
+
 from collections.abc import Iterable, Mapping
+from contextlib import ExitStack
 from pathlib import Path
 
 import matplotlib as mpl
@@ -105,8 +107,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         - plots/figure_plot3.png
     """
 
-    _keys = ["filename", "style", "autoclose",
-             "formats", "include_open", "use", "extra"]
+    _keys = ["filename", "style", "autoclose", "formats", "include_open", "use", "extra"]
 
     def __init__(
         self, filename=None, style=None, autoclose=False, formats=None, extra=None, include_open=False, use=None
@@ -118,13 +119,12 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         self._formats = []
         self._style = []
         self._extra = {}
+        self._context_stack = None
 
         # Parameter assignment
         self.filename = filename
         self.style = style
         self.autoclose = autoclose
-        self.style_context = None
-        self.extra_context = None
         self.formats = formats
         self.extra = extra
         self.use = use
@@ -207,8 +207,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         """
         match value:
             case str():
-                self._formats = [x.strip()
-                                 for x in value.split(",") if x.strip()]
+                self._formats = [x.strip() for x in value.split(",") if x.strip()]
             case Iterable() if all(isinstance(x, str) for x in value):
                 self._formats = list(value)
             case None if not self._formats:  # Use default if formats aren't set
@@ -248,8 +247,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         """
         match value:
             case str():
-                self._style = [x.strip()
-                               for x in value.split(",") if x.strip()]
+                self._style = [x.strip() for x in value.split(",") if x.strip()]
             case Iterable() if all(isinstance(x, str) for x in value):
                 self._style = list(value)
             case None:
@@ -272,8 +270,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
                 self._extra = {}
             case Mapping():
                 if bad := value.keys() - mpl.rcParams.keys():
-                    raise KeyError(
-                        f"{','.join(bad)} are not valid Matplotlib rcParameters.")
+                    raise KeyError(f"{','.join(bad)} are not valid Matplotlib rcParameters.")
                 for param, val in value.items():
                     self._extra[param] = val
 
@@ -286,8 +283,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             case tuple() if not len(args) and self.filename is not None:
                 pass
             case _:
-                raise ValueError(
-                    "Only a single positional argument that is either a string or path is supported")
+                raise ValueError("Only a single positional argument that is either a string or path is supported")
         for key, val in settings.items():
             setattr(self, key, val)
         return self
@@ -297,25 +293,26 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         super().__enter__()
         if self.use:  # Set the current figure to be that given by use.
             plt.figure(getattr(self.use, "number", None))
+
+        # Use ExitStack to manage multiple context managers cleanly
+        self._context_stack = ExitStack()
+        self._context_stack.__enter__()
+
         if self.style:
-            self.style_context = mpl.style.context(self.style)
-            self.style_context.__enter__()
+            self._context_stack.enter_context(mpl.style.context(self.style))
         if self.extra:
-            self.extra_context = mpl.rc_context(rc=self.extra)
-            self.extra_context.__enter__()
+            self._context_stack.enter_context(mpl.rc_context(rc=self.extra))
+
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         """Exit style context, save new figures, and optionally close them."""
-        if self.extra_context:
-            self.extra_context.__exit__(exc_type, exc_value, traceback)
-            self.extra_context = None
-        if self.style_context:
-            self.style_context.__exit__(exc_type, exc_value, traceback)
-            self.style_context = None
+        # Exit all contexts managed by ExitStack
+        if self._context_stack is not None:
+            self._context_stack.__exit__(exc_type, exc_value, traceback)
+            self._context_stack = None
 
-        self._existing_open_figs = [
-            ref() for ref in self._existing_open_figs if ref() is not None]
+        self._existing_open_figs = [ref() for ref in self._existing_open_figs if ref() is not None]
         new_file_counter = 0
 
         new_figures = list(self.new_figures)
@@ -339,7 +336,6 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
 
         # Reset state
         super().__exit__(exc_type, exc_value, traceback)
-        self.style_context = None
 
     def generate_filename(self, label, counter):
         """Help generate filenames based on `filename` and placeholders.
@@ -364,8 +360,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         if self.filename.is_dir():
             filename: Path = self.filename / "{label}"
         else:
-            filename: Path = self.filename if self.filename is not None else Path(
-                "{label}")
+            filename: Path = self.filename if self.filename is not None else Path("{label}")
 
         filename = str(filename).format(label=label, number=counter)
         # Append counter if filename lacks placeholders and multiple files
