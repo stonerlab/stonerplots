@@ -2,52 +2,6 @@
 
 This document contains issues and bugs discovered during a comprehensive code review of the stonerplots repository.
 
-## Fixed Issues
-
-### Issue 15 & 16: Weakref Comparison Bugs (HIGH SEVERITY) ✓ FIXED
-
-**Files:** `src/stonerplots/context/base.py:284` and `src/stonerplots/context/base.py:305`
-**Description:** The code was comparing actual figure/axes objects directly against lists/dicts containing
-weakrefs, which would always return False. This broke the filtering logic in the `new_figures` and `new_axes`
-properties.
-**Fix Applied:** Modified both properties to properly dereference weakrefs before comparison. Also handles the
-case where items might already be dereferenced (for reusable context managers).
-**Date Fixed:** 2026-01-19
-
-## Documentation Issues
-
-All previously documented issues have been fixed as of 2026-01-19:
-
-- ✓ Issue 1: Fixed typo "insance" → "instance" in `__init__.py`
-- ✓ Issue 2: Fixed reStructuredText syntax in `__init__.py`
-- ✓ Issue 3: Added Examples section to `TexFormatter` class
-- ✓ Issue 4: Completed `_round` function docstring with Args and Returns sections
-- ✓ Issue 5: Updated and clarified minor/major formatting documentation in `PlotLabeller`
-- ✓ Issue 7: Fixed `find_best_position` docstring to match actual function signature
-- ✓ Issue 12: Added comment explaining overline LaTeX syntax in `counter.py`
-
-### Issue 6: Docstring has Non-British English Spelling
-
-**Status:** Not an issue
-**Note:** The code uses "colours" parameter name (British) but matplotlib uses "color" (American) - this is
-intentional for API consistency.
-
-### Issue 9: Inconsistent Type Checking Pattern
-
-**Status:** Not an issue
-**Note:** The code uses `isinstance(index, tuple)` check in `base.py:83-88`. While the codebase also uses
-match/case statements elsewhere, both patterns are valid Python and serve different purposes. `isinstance()` is
-appropriate for simple type checks, while match/case is better for structural pattern matching. The general coding
-standards don't mandate one pattern over the other, and both coexist legitimately in the codebase.
-
-### Issue 11: Potential None Reference in double_y.py
-
-**Status:** Not an issue
-**Note:** The code `getattr(self._ax,"ax",None)` in `double_y.py:158` is correctly implemented. Python's
-`getattr()` handles None as the first argument gracefully - it returns the default value (None in this case)
-without raising an AttributeError. The subsequent `isinstance()` check then correctly evaluates to False, so the
-code flow is safe.
-
 ## Code Quality Issues
 
 ### Issue 8: Accessing Private matplotlib API ✓ PARTIALLY FIXED
@@ -100,14 +54,6 @@ split into smaller functions.
 **Severity:** Low (maintainability)
 **Recommendation:** Consider extracting some cases into separate handler functions
 
-### Issue 12: Magic Numbers in counter.py
-
-**File:** `src/stonerplots/counter.py:6-32`
-**Description:** Large dictionary `ROMAN_NUMERAL_MAP` has magic numbers without explanation for the overline LaTeX
-syntax.
-**Severity:** Low (documentation)
-**Fix:** Add comment explaining that overlines represent multiplication by 1000 in Roman numerals
-
 ### Issue 13: Deprecated Parameter Warning
 
 **File:** `src/stonerplots/context/multiple_plot.py:124-129`
@@ -156,19 +102,6 @@ multiple files.
 **Recommendation:** Document the expected protocol or use ABC
 
 ## Code Style Issues
-
-### Issue 21: Inconsistent Import Grouping ✓ FIXED
-
-**Files:** `src/stonerplots/context/double_y.py`, `src/stonerplots/context/inset_plot.py`,
-`src/stonerplots/context/__init__.py`
-**Description:** Some files didn't follow the documented import grouping standard (stdlib, well-known third-party,
-other third-party, local). Multiple imports from the same module were not combined into one statement, and imports
-were not sorted alphabetically within groups.
-**Fix Applied:**
-
-- Combined duplicate imports from `.base` module in `double_y.py` and `inset_plot.py`
-- Sorted imports alphabetically in `context/__init__.py`
-**Date Fixed:** 2026-01-19
 
 ### Issue 22: Line Length Exceeds Standards
 
@@ -246,24 +179,6 @@ formatting.
 
 ## Testing Issues
 
-### Issue 31: Limited Test Coverage
-
-**File:** `tests/stonerplots/test_examples.py`
-**Description:** Only one test file exists that runs example scripts. However, these example tests provide
-comprehensive coverage of the codebase.
-**Severity:** Low (test coverage is actually good at ~86%)
-**Status:** Re-evaluated - coverage is adequate
-**Note:** The initial estimate of ~30% coverage was incorrect. Running pytest with coverage shows:
-
-- **Actual coverage: 85.81%** (923 statements, 131 missed)
-- Example tests exercise most code paths effectively
-- Coverage exceeds the recommended 85% threshold
-
-**Recommendation:** Current test coverage is satisfactory. Future improvements could include:
-
-- Unit tests for edge cases and error conditions
-- Tests for the remaining uncovered code paths (primarily error handling)
-
 ### Issue 32: No Tests for Error Conditions
 
 **File:** Test suite
@@ -304,22 +219,19 @@ Consider adding logging (using Python's logging module) instead of or in additio
 
 ## Summary
 
-**Total Issues Found: 28** (2 issues reclassified as "Not an Issue")
+**Total Issues Found: 18** (excluding fixed issues and items reclassified as "Not an Issue")
 
-- High Severity: 0 (2 fixed)
-- Medium Severity: 11
-- Low Severity: 15
+- High Severity: 0
+- Medium Severity: 3
+- Low Severity: 13
 - Info: 2
 
 **Priority Fixes:**
 
-1. ~~Issue #15 & #16: Fix weakref comparison bugs in base.py~~ ✓ FIXED
 1. Issue #18: Add renderer None handling in util.py
 1. Issue #19: Add bounds checking in StackVertical
 1. Issue #8: Review matplotlib private API usage
-1. Issue #31: Improve test coverage
 
 **Code Quality Score: 8.0/10**
 The codebase is generally well-structured with good use of modern Python features (match/case, context managers).
-Main areas for improvement are documentation completeness, type hints, test coverage, and fixing the remaining
-identified bugs.
+Main areas for improvement are documentation completeness, type hints, and fixing the remaining identified bugs.
