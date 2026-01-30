@@ -8,6 +8,9 @@ dev/
 TODO.md
 new-version.md
 
+# Example figures (generated outputs)
+examples/figures/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
