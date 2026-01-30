@@ -73,13 +73,6 @@ Refactored `_process_artist` function by extracting handler functions for each a
 
 **Impact:** Improved code maintainability and readability. No functional changes - all existing behavior preserved.
 
-### Issue 13: Deprecated Parameter Warning
-
-**File:** `src/stonerplots/context/multiple_plot.py:124-129`
-**Description:** The code warns about deprecated `nplots` parameter but doesn't specify a removal version.
-**Severity:** Low (deprecation policy)
-**Recommendation:** Add version number for when this will be removed
-
 ## Potential Bugs
 
 ### Issue 14: Inconsistent Attribute Access in save_figure.py
@@ -90,86 +83,6 @@ behaviour (gets current figure).
 **Severity:** Low (edge case handling)
 **Test:** Verify behaviour when use.number is None
 
-### Issue 17: Unsafe Division in format.py ✓ FIXED
-
-**Status:** Fix implemented on 2026-01-30
-
-**File:** ~~`src/stonerplots/format.py:91-92`~~ ✓ FIXED
-**Description:** Division operation `value / (10**pre)` could potentially overflow or underflow for extreme values.
-**Severity:** Low (edge case)
-**Recommendation:** Add bounds checking or try/except for numerical errors
-
-**Fix Applied:**
-
-Added try/except blocks to handle numerical errors (OverflowError, ZeroDivisionError, FloatingPointError) in both
-`TexFormatter.__call__` and `TexEngFormatter.__call__` methods. When these errors occur, the formatter falls back
-to using Python's default `g` format specifier to display the value.
-
-**Verification:** Code formatted with black to maintain project standards.
-
-### Issue 18: Missing Renderer Parameter Handling ✓ ALREADY FIXED
-
-**Status:** Already fixed in current code
-
-**File:** `src/stonerplots/util.py:351-377`
-**Description:** The `find_best_position` function has `renderer=None` parameter but doesn't handle None case
-before using it.
-**Severity:** Medium (potential NoneType error)
-**Fix:** Add default renderer acquisition if None: `renderer = renderer or ax.figure.canvas.get_renderer()`
-
-**Current Code:**
-
-The `find_best_position` function already contains the fix at lines 376-377:
-
-```python
-if renderer is None:
-    renderer = ax.figure.canvas.get_renderer()
-```
-
-This issue has been resolved in previous updates.
-
-### Issue 19: Potential Index Error in StackVertical ✓ ALREADY FIXED
-
-**Status:** Already fixed in current code
-
-**File:** `src/stonerplots/context/multiple_plot.py:398-400`
-**Description:** Accesses `ax.yaxis.get_ticklabels()[0]` without checking if the list is non-empty.
-**Severity:** Medium (potential IndexError)
-**Fix:** Add check: `if ticklabels := ax.yaxis.get_ticklabels(): fnt_pts = ticklabels[0].get_fontsize()`
-
-**Current Code:**
-
-The `_fix_limits` method already contains the fix at lines 398-400:
-```python
-ticklabels = ax.yaxis.get_ticklabels()
-if not ticklabels:
-    return  # No tick labels to adjust for
-```
-
-This issue has been resolved in previous updates.
-
-### Issue 20: Hardcoded Axis Name String ✓ FIXED
-
-**Status:** Fix implemented on 2026-01-30
-
-**File:** ~~`src/stonerplots/context/inset_plot.py:105-106`~~ ✓ FIXED
-**Description:** Uses `getattr(self._ax,"ax",None)` assuming an "ax" attribute exists. This pattern is repeated in
-multiple files.
-**Severity:** Low (duck typing assumption)
-**Recommendation:** Document the expected protocol or use ABC
-
-**Fix Applied:**
-
-- Updated the docstring for the `ax` parameter in the `InsetPlot` class to document that it supports duck typing
-  for axes wrappers that have an `ax` attribute pointing to the underlying Axes object.
-- Added an inline comment in the `__enter__` method to clarify the duck typing check for axes wrappers.
-
-**Documentation Added:**
-
-The parameter documentation now explicitly states: "This can also be an object that wraps an Axes instance and has
-an `ax` attribute that points to the underlying Axes object (duck typing support for axes wrappers)."
-
-**Verification:** Code formatted with black to maintain project standards.
 
 ## Code Style Issues
 
