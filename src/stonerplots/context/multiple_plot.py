@@ -123,7 +123,7 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
         self.same_aspect = "height_ratios" not in kwargs and "width_ratios" not in kwargs and same_aspect
         if "nplots" in self.kwargs:
             warnings.warn(
-                "nplots argument is deprecated. Pass the same value directly as the number of panels now.",
+                "nplots argument is deprecated. Pass the same value directly as the number of panels now. This p[arameter will be removed in version 2.0",
                 DeprecationWarning,
             )
             self.panels = self.kwargs.pop("nplots")
@@ -411,3 +411,4 @@ class StackVertical(MultiPanel):
             ylim[1] = tr.inverted().transform((0, 1 + dy))[1]
         ax.set_ylim(ylim)
         self.figure.canvas.draw()
+
