@@ -46,13 +46,32 @@ registered.
 
 **Risk:** Low for remaining private APIs
 
-### Issue 10: Complex Nested Logic in util.py
+### Issue 10: Complex Nested Logic in util.py ✓ FIXED
 
-**File:** `src/stonerplots/util.py:162-186`
+**Status:** Fix implemented on 2026-01-30
+
+**File:** ~~`src/stonerplots/util.py:162-186`~~ ✓ FIXED
 **Description:** The `_process_artist` function has deeply nested match/case logic that could be simplified or
 split into smaller functions.
 **Severity:** Low (maintainability)
 **Recommendation:** Consider extracting some cases into separate handler functions
+
+**Fix Applied:**
+
+Refactored `_process_artist` function by extracting handler functions for each artist type:
+
+- Created `_handle_line2d()` for Line2D artists
+- Created `_handle_rectangle()` for Rectangle artists
+- Created `_handle_patch()` for Patch artists
+- Created `_handle_polycollection()` for PolyCollection artists
+- Created `_handle_collection()` for Collection artists
+- Created `_handle_text()` for Text artists
+- Created `_handle_axes_legend()` for Axes and Legend artists
+- Updated `_process_artist()` to use these helper functions with simplified match/case logic
+
+**Verification:** All 45 existing tests pass successfully. Code formatted with black to maintain project standards.
+
+**Impact:** Improved code maintainability and readability. No functional changes - all existing behavior preserved.
 
 ### Issue 13: Deprecated Parameter Warning
 
