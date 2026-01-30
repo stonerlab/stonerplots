@@ -109,16 +109,17 @@ class TexEngFormatter(EngFormatter):
             else:
                 power = power % 3
                 try:
-                    v = _round(value / (10**pre), 4)
-                    if np.abs(v) < 0.1:
-                        v *= 1000
-                        pre -= 3
-                    elif np.abs(v) > 1000.0:
-                        v /= 1000
-                        pre += 3.0
+                    with np.errstate(over="raise", divide="raise", invalid="raise"):
+                        v = _round(value / (10**pre), 4)
+                        if np.abs(v) < 0.1:
+                            v *= 1000
+                            pre -= 3
+                        elif np.abs(v) > 1000.0:
+                            v /= 1000
+                            pre += 3.0
 
                     ret = f"${v}\\mathrm{{{self.prefix[int(pre)]} {self.unit}}}$"
-                except (OverflowError, ZeroDivisionError, FloatingPointError):
+                except (OverflowError, ZeroDivisionError, FloatingPointError, KeyError):
                     ret = f"${value:g}\\,\\mathrm{{{self.unit}}}$"
         else:
             ret = "$0.0$"
