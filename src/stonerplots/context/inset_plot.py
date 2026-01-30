@@ -20,7 +20,9 @@ class InsetPlot(PreserveFigureMixin):
     Args:
         ax (matplotlib.Axes, None):
             The parent axes in which to create the inset plot. If `None` (default), the current
-            axes from `plt.gca()` are used.
+            axes from `plt.gca()` are used. This can also be an object that wraps an Axes instance
+            and has an `ax` attribute that points to the underlying Axes object (duck typing support
+            for axes wrappers).
         loc (str, int, None):
             Location of the inset. Accepts location strings compatible with matplotlib legends
             (e.g., "upper left", "center", etc.) or their numeric equivalents. Includes "best" or
@@ -102,9 +104,10 @@ class InsetPlot(PreserveFigureMixin):
 
     def __enter__(self):
         """Create the inset axes using the axes_grid toolkit."""
-        if isinstance(getattr(self._ax,"ax",None),Axes):
-            self.ax=self._ax.ax
-        self.ax=self._ax if isinstance(self._ax,Axes) else plt.gca()
+        # Support for axes wrappers: check if _ax is a wrapper with an 'ax' attribute
+        if isinstance(getattr(self._ax, "ax", None), Axes):
+            self.ax = self._ax.ax
+        self.ax = self._ax if isinstance(self._ax, Axes) else plt.gca()
         if not isinstance(self._loc, int):
             self.loc = self.locations.get(str(self._loc).lower().replace("-", " "), 1)
         else:
