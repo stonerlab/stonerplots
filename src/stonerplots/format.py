@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Additional matplotlib formatting classes."""
+
 import numpy as np
 from matplotlib.ticker import EngFormatter, Formatter, Locator, NullFormatter
 
@@ -48,8 +49,11 @@ class TexFormatter(Formatter):
             if np.abs(power) < 4:
                 ret = f"${round(value)}$"
             else:
-                v = _round(value / (10**power))
-                ret = f"${v}\\times 10^{{{power:.0f}}}$"
+                try:
+                    v = _round(value / (10**power))
+                    ret = f"${v}\\times 10^{{{power:.0f}}}$"
+                except (OverflowError, ZeroDivisionError, FloatingPointError):
+                    ret = f"${value:g}$"
         else:
             ret = "$0.0$"
         return ret
@@ -104,15 +108,18 @@ class TexEngFormatter(EngFormatter):
                 ret = f"${round(value, 4)}\\,\\mathrm{{{self.unit}}}$"
             else:
                 power = power % 3
-                v = _round(value / (10**pre), 4)
-                if np.abs(v) < 0.1:
-                    v *= 1000
-                    pre -= 3
-                elif np.abs(v) > 1000.0:
-                    v /= 1000
-                    pre += 3.0
+                try:
+                    v = _round(value / (10**pre), 4)
+                    if np.abs(v) < 0.1:
+                        v *= 1000
+                        pre -= 3
+                    elif np.abs(v) > 1000.0:
+                        v /= 1000
+                        pre += 3.0
 
-                ret = f"${v}\\mathrm{{{self.prefix[int(pre)]} {self.unit}}}$"
+                    ret = f"${v}\\mathrm{{{self.prefix[int(pre)]} {self.unit}}}$"
+                except (OverflowError, ZeroDivisionError, FloatingPointError):
+                    ret = f"${value:g}\\,\\mathrm{{{self.unit}}}$"
         else:
             ret = "$0.0$"
         return ret

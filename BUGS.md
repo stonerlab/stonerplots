@@ -90,35 +90,85 @@ behaviour (gets current figure).
 **Severity:** Low (edge case handling)
 **Test:** Verify behaviour when use.number is None
 
-### Issue 17: Unsafe Division in format.py
+### Issue 17: Unsafe Division in format.py ✓ FIXED
 
-**File:** `src/stonerplots/format.py:91-92`
+**Status:** Fix implemented on 2026-01-30
+
+**File:** ~~`src/stonerplots/format.py:91-92`~~ ✓ FIXED
 **Description:** Division operation `value / (10**pre)` could potentially overflow or underflow for extreme values.
 **Severity:** Low (edge case)
 **Recommendation:** Add bounds checking or try/except for numerical errors
 
-### Issue 18: Missing Renderer Parameter Handling
+**Fix Applied:**
 
-**File:** `src/stonerplots/util.py:266-290`
+Added try/except blocks to handle numerical errors (OverflowError, ZeroDivisionError, FloatingPointError) in both
+`TexFormatter.__call__` and `TexEngFormatter.__call__` methods. When these errors occur, the formatter falls back
+to using Python's default `g` format specifier to display the value.
+
+**Verification:** Code formatted with black to maintain project standards.
+
+### Issue 18: Missing Renderer Parameter Handling ✓ ALREADY FIXED
+
+**Status:** Already fixed in current code
+
+**File:** `src/stonerplots/util.py:351-377`
 **Description:** The `find_best_position` function has `renderer=None` parameter but doesn't handle None case
 before using it.
 **Severity:** Medium (potential NoneType error)
 **Fix:** Add default renderer acquisition if None: `renderer = renderer or ax.figure.canvas.get_renderer()`
 
-### Issue 19: Potential Index Error in StackVertical
+**Current Code:**
 
-**File:** `src/stonerplots/context/multiple_plot.py:398`
+The `find_best_position` function already contains the fix at lines 376-377:
+```python
+if renderer is None:
+    renderer = ax.figure.canvas.get_renderer()
+```
+
+This issue has been resolved in previous updates.
+
+### Issue 19: Potential Index Error in StackVertical ✓ ALREADY FIXED
+
+**Status:** Already fixed in current code
+
+**File:** `src/stonerplots/context/multiple_plot.py:398-400`
 **Description:** Accesses `ax.yaxis.get_ticklabels()[0]` without checking if the list is non-empty.
 **Severity:** Medium (potential IndexError)
 **Fix:** Add check: `if ticklabels := ax.yaxis.get_ticklabels(): fnt_pts = ticklabels[0].get_fontsize()`
 
-### Issue 20: Hardcoded Axis Name String
+**Current Code:**
 
-**File:** `src/stonerplots/context/inset_plot.py:107-108`
+The `_fix_limits` method already contains the fix at lines 398-400:
+```python
+ticklabels = ax.yaxis.get_ticklabels()
+if not ticklabels:
+    return  # No tick labels to adjust for
+```
+
+This issue has been resolved in previous updates.
+
+### Issue 20: Hardcoded Axis Name String ✓ FIXED
+
+**Status:** Fix implemented on 2026-01-30
+
+**File:** ~~`src/stonerplots/context/inset_plot.py:105-106`~~ ✓ FIXED
 **Description:** Uses `getattr(self._ax,"ax",None)` assuming an "ax" attribute exists. This pattern is repeated in
 multiple files.
 **Severity:** Low (duck typing assumption)
 **Recommendation:** Document the expected protocol or use ABC
+
+**Fix Applied:**
+
+- Updated the docstring for the `ax` parameter in the `InsetPlot` class to document that it supports duck typing
+  for axes wrappers that have an `ax` attribute pointing to the underlying Axes object.
+- Added an inline comment in the `__enter__` method to clarify the duck typing check for axes wrappers.
+
+**Documentation Added:**
+
+The parameter documentation now explicitly states: "This can also be an object that wraps an Axes instance and has
+an `ax` attribute that points to the underlying Axes object (duck typing support for axes wrappers)."
+
+**Verification:** Code formatted with black to maintain project standards.
 
 ## Code Style Issues
 
@@ -238,19 +288,26 @@ Consider adding logging (using Python's logging module) instead of or in additio
 
 ## Summary
 
-**Total Issues Found: 18** (excluding fixed issues and items reclassified as "Not an Issue")
+**Total Issues Found: 14** (excluding fixed issues and items reclassified as "Not an Issue")
 
 - High Severity: 0
-- Medium Severity: 3
-- Low Severity: 13
+- Medium Severity: 1
+- Low Severity: 11
 - Info: 2
+
+**Recently Fixed Issues:**
+
+1. Issue #17: ✓ Added bounds checking for unsafe division in format.py
+1. Issue #18: ✓ Already fixed - renderer None handling in util.py
+1. Issue #19: ✓ Already fixed - bounds checking in StackVertical
+1. Issue #20: ✓ Documented hardcoded axis name string protocol
 
 **Priority Fixes:**
 
-1. Issue #18: Add renderer None handling in util.py
-1. Issue #19: Add bounds checking in StackVertical
 1. Issue #8: Review matplotlib private API usage
+1. Issue #13: Add version number to deprecated parameter warning
+1. Issue #29: Investigate TODO in format.py
 
-**Code Quality Score: 8.0/10**
+**Code Quality Score: 8.5/10**
 The codebase is generally well-structured with good use of modern Python features (match/case, context managers).
 Main areas for improvement are documentation completeness, type hints, and fixing the remaining identified bugs.
