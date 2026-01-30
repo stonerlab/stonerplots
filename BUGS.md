@@ -120,6 +120,7 @@ before using it.
 **Current Code:**
 
 The `find_best_position` function already contains the fix at lines 376-377:
+
 ```python
 if renderer is None:
     renderer = ax.figure.canvas.get_renderer()
