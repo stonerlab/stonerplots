@@ -3,6 +3,7 @@
 
 Based on code used in matplotlib to automatically position a legend.
 """
+
 from collections.abc import Iterable
 from copy import copy
 from pathlib import Path
@@ -159,28 +160,112 @@ def _auto_linset_data(ax, axins, renderer, insets=True):
     return bboxes, lines, offsets
 
 
+def _handle_line2d(artist, lines):
+    """Handle Line2D artist by extracting its transformed path.
+
+    Args:
+        artist (Line2D): The Line2D artist to process.
+        lines (list): List to append the transformed path to.
+    """
+    lines.append(artist.get_transform().transform_path(artist.get_path()))
+
+
+def _handle_rectangle(artist, bboxes):
+    """Handle Rectangle artist by extracting its bounding box.
+
+    Args:
+        artist (Rectangle): The Rectangle artist to process.
+        bboxes (list): List to append the bounding box to.
+    """
+    bboxes.append(artist.get_bbox().transformed(artist.get_data_transform()))
+
+
+def _handle_patch(artist, lines):
+    """Handle Patch artist by extracting its transformed path.
+
+    Args:
+        artist (Patch): The Patch artist to process.
+        lines (list): List to append the transformed path to.
+    """
+    lines.append(artist.get_transform().transform_path(artist.get_path()))
+
+
+def _handle_polycollection(artist, lines):
+    """Handle PolyCollection artist by extracting all its transformed paths.
+
+    Args:
+        artist (PolyCollection): The PolyCollection artist to process.
+        lines (list): List to extend with the transformed paths.
+    """
+    lines.extend(artist.get_transform().transform_path(path) for path in artist.get_paths())
+
+
+def _handle_collection(artist, offsets):
+    """Handle Collection artist by extracting point offsets.
+
+    Args:
+        artist (Collection): The Collection artist to process.
+        offsets (list): List to extend with transformed offsets.
+    """
+    _, transOffset, hoffsets, _ = artist._prepare_points()
+    if hoffsets.size > 0:
+        offsets.extend(transOffset.transform(hoffsets))
+
+
+def _handle_text(artist, renderer, bboxes):
+    """Handle Text artist by extracting its window extent.
+
+    Args:
+        artist (Text): The Text artist to process.
+        renderer (Renderer): The figure renderer being used.
+        bboxes (list): List to append the window extent to.
+    """
+    bboxes.append(artist.get_window_extent(renderer))
+
+
+def _handle_axes_legend(artist, axins, renderer, bboxes, lines, offsets):
+    """Handle Axes or Legend artist by recursively extracting data.
+
+    Args:
+        artist (Axes | Legend): The Axes or Legend artist to process.
+        axins (Axes): Inset axes to exclude from processing.
+        renderer (Renderer): The figure renderer being used.
+        bboxes (list): List to extend with bounding boxes.
+        lines (list): List to extend with paths.
+        offsets (list): List to extend with offsets.
+    """
+    sub_bboxes, sub_lines, sub_offsets = _auto_linset_data(artist, axins, renderer, insets=False)
+    bboxes.extend(sub_bboxes)
+    lines.extend(sub_lines)
+    offsets.extend(sub_offsets)
+
+
 def _process_artist(artist, renderer, axins, bboxes, lines, offsets):
-    """Process an artist to extract relevant display coordinates."""
+    """Process an artist to extract relevant display coordinates.
+
+    Args:
+        artist (Artist): The matplotlib artist to process.
+        renderer (Renderer): The figure renderer being used.
+        axins (Axes): Inset axes to exclude from processing.
+        bboxes (list): List to append/extend bounding boxes to.
+        lines (list): List to append/extend paths to.
+        offsets (list): List to append/extend offsets to.
+    """
     match artist:
         case Line2D():
-            lines.append(artist.get_transform().transform_path(artist.get_path()))
+            _handle_line2d(artist, lines)
         case Rectangle():
-            bboxes.append(artist.get_bbox().transformed(artist.get_data_transform()))
+            _handle_rectangle(artist, bboxes)
         case Patch():
-            lines.append(artist.get_transform().transform_path(artist.get_path()))
+            _handle_patch(artist, lines)
         case PolyCollection():
-            lines.extend(artist.get_transform().transform_path(path) for path in artist.get_paths())
+            _handle_polycollection(artist, lines)
         case Collection():
-            _, transOffset, hoffsets, _ = artist._prepare_points()
-            if hoffsets.size > 0:
-                offsets.extend(transOffset.transform(hoffsets))
+            _handle_collection(artist, offsets)
         case Text():
-            bboxes.append(artist.get_window_extent(renderer))
+            _handle_text(artist, renderer, bboxes)
         case Axes() | Legend() if artist is not axins:
-            sub_bboxes, sub_lines, sub_offsets = _auto_linset_data(artist, axins, renderer, insets=False)
-            bboxes.extend(sub_bboxes)
-            lines.extend(sub_lines)
-            offsets.extend(sub_offsets)
+            _handle_axes_legend(artist, axins, renderer, bboxes, lines, offsets)
         case _:
             pass
 
