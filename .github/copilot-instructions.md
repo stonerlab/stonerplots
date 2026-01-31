@@ -34,7 +34,7 @@ All docstrings for python functions, classes, methods and modules should confirm
 
 ## Code formatting
 
-#### Class, function, method and variable naming conventions
+### Class, function, method and variable naming conventions
 
 The following apply to entities created by copilot. Unless specifically instructed, do not rename
 existing entities that do not conform to the following.
