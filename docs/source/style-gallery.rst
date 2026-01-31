@@ -215,7 +215,7 @@ or *hi-res* styles.
 med-res Style
 ^^^^^^^^^^^^^
 
-.. image:: ../../examples/figures/fig05g.png
+.. image:: ../../examples/figures/fig05g.svg
    :alt: 600dpi image mode.
    :align: center
 
@@ -240,14 +240,14 @@ This was produced with the style ["stoner", "grid"].
 The *extra* argument to :py:class:`SavedFigure` can be used to do further tweaks. For example here with
 *extra* = {"lines.linestyle":"--"}
 
-.. image:: ../../examples/figures/fig01d.png
+.. image:: ../../examples/figures/fig01d.svg
    :alt: Plot with Linestyle = --
    :align: center
 
 The :py:class:`CentredAxes` can be used to remove the external frame of a plot and place the axes
 crossing at the origin.
 
-.. image:: ../../examples/figures/fig01g.png
+.. image:: ../../examples/figures/fig01g.svg
    :alt: Plot with centred axes
    :align: center
 
