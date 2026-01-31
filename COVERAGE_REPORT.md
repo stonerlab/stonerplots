@@ -20,21 +20,21 @@ pytest tests/ --cov=src/stonerplots --cov-report=term
 
 ## Coverage by Module
 
-| Module                     | Statements | Missed | Coverage  | Change      |
-|----------------------------|------------|--------|-----------|-------------|
-| `__init__.py`              | 26         | 0      | 100.00%   | ➡️          |
-| `colours.py`               | 6          | 0      | 100.00%   | ➡️          |
-| `context/__init__.py`      | 6          | 0      | 100.00%   | ➡️          |
-| `counter.py`               | 16         | 0      | 100.00%   | ⬆️ +6.25%   |
-| `context/noframe.py`       | 43         | 0      | 100.00%   | ⬆️ +18.60%  |
-| `context/inset_plot.py`    | 41         | 2      | 95.12%    | ➡️          |
-| `context/multiple_plot.py` | 184        | 8      | 95.65%    | ⬆️ +3.26%   |
-| `context/double_y.py`      | 86         | 4      | 95.35%    | ⬆️ +11.63%  |
-| `context/save_figure.py`   | 153        | 8      | 94.77%    | ⬆️ +6.23%   |
-| `util.py`                  | 166        | 10     | 93.98%    | ⬆️ +3.19%   |
-| `format.py`                | 93         | 10     | 89.25%    | ⬆️ +18.27%  |
-| `context/base.py`          | 120        | 21     | 82.50%    | ⬆️ +10.83%  |
-| **TOTAL**                  | **940**    | **63** | **93.30%**| **⬆️ +7.49%**|
+| Module                     | Statements | Missed | Coverage  | Change        |
+|----------------------------|------------|--------|-----------|---------------|
+| `__init__.py`              | 26         | 0      | 100.00%   | ➡️            |
+| `colours.py`               | 6          | 0      | 100.00%   | ➡️            |
+| `context/__init__.py`      | 6          | 0      | 100.00%   | ➡️            |
+| `counter.py`               | 16         | 0      | 100.00%   | ⬆️ +6.25%     |
+| `context/noframe.py`       | 43         | 0      | 100.00%   | ⬆️ +18.60%    |
+| `context/inset_plot.py`    | 41         | 2      | 95.12%    | ➡️            |
+| `context/multiple_plot.py` | 184        | 8      | 95.65%    | ⬆️ +3.26%     |
+| `context/double_y.py`      | 86         | 4      | 95.35%    | ⬆️ +11.63%    |
+| `context/save_figure.py`   | 153        | 8      | 94.77%    | ⬆️ +6.23%     |
+| `util.py`                  | 166        | 10     | 93.98%    | ⬆️ +3.19%     |
+| `format.py`                | 93         | 10     | 89.25%    | ⬆️ +18.27%    |
+| `context/base.py`          | 120        | 21     | 82.50%    | ⬆️ +10.83%    |
+| **TOTAL**                  | **940**    | **63** | **93.30%**| **⬆️ +7.49%** |
 
 ## Why the Initial Estimate Was Wrong
 
@@ -84,7 +84,7 @@ This resulted in an additional **2.66% increase in coverage** (90.64% → 93.30%
 
 The modules with coverage below 95%:
 
-1. **`format.py` (89.25%)**: 
+1. **`format.py` (89.25%)**:
    - Missing: Exception handling paths (lines 55-56, 118-119) - exception handler bodies for extreme numerical values
    - Missing: Minor formatter/locator setting (lines 199, 203-207) - edge cases in locator setting
    - ✅ **Improved**: Helper methods `format_data()` and `format_data_short()` now tested
@@ -108,6 +108,7 @@ and optional parameters.
 The uncovered code falls into these categories:
 
 #### 1. Exception Handler Bodies (Low Priority)
+
 Lines inside `except` blocks that handle edge cases like `OverflowError`, `ZeroDivisionError`, and `FloatingPointError`.
 These are defensive programming patterns that are hard to trigger in normal usage.
 
@@ -115,7 +116,8 @@ These are defensive programming patterns that are hard to trigger in normal usag
 
 **Testing approach:** Would require crafting extreme numerical values or conditions to trigger these specific errors.
 
-#### 2. Helper Methods (Medium Priority)  
+#### 2. Helper Methods (Medium Priority)
+
 Methods like `format_data()` and `format_data_short()` that wrap the main formatter logic.
 These are typically called by matplotlib internals rather than user code.
 
@@ -126,6 +128,7 @@ These are typically called by matplotlib internals rather than user code.
 ✅ **Addressed**: Helper methods `format_data()` and `format_data_short()` now have comprehensive tests.
 
 #### 3. Advanced Collection Protocol Methods (Low Priority)
+
 Special methods like `__contains__`, complex tuple indexing, and reversed iteration that support
 advanced Python collection protocols but aren't commonly used.
 
@@ -137,6 +140,7 @@ advanced Python collection protocols but aren't commonly used.
 `__reversed__`, and `__iter__`.
 
 #### 4. Optional Parameter Edge Cases (Medium Priority)
+
 Code paths for optional parameters and edge conditions in context managers.
 
 **Affected modules:** `context/noframe.py`, `context/base.py`
@@ -147,6 +151,7 @@ Code paths for optional parameters and edge conditions in context managers.
 combinations and edge cases.
 
 #### 5. WeakRef Edge Cases (Low Priority)
+
 Code handling dereferenced weak references and edge cases in figure/axes tracking.
 
 **Affected modules:** `context/base.py`
@@ -208,6 +213,7 @@ ensure proper error handling, input validation, and edge case handling for helpe
 **Status**: ✅ Coverage goal exceeded (93.30% >> 85%)
 
 **Test composition:**
+
 - 52 example execution tests (integration testing)
 - 7 format edge case tests (formatter robustness)
 - 28 error condition tests (input validation)

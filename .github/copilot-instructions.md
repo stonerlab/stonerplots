@@ -2,7 +2,7 @@
 
 ## Docstring Formatting
 
-All docstrings for python functions, classes, methods should confirm to the following:
+All docstrings for python functions, classes, methods and modules should confirm to the following:
 
 - Generally the format is based on Google stadnard
 - Written in British English
@@ -27,10 +27,24 @@ All docstrings for python functions, classes, methods should confirm to the foll
     module) then it should be documented as a publuc method or function
   - Otherwise, only the summary needs to be probided and other sections are optional.
 
+- Modules should conform to the following:
+
+  - The docstring should include a brief overview of the contents of the module, higlighting common aspects
+    of te contents.
+
 ## Code formatting
 
-For user examples, the line length is 79 characters, for all other code use 119 characters.
-Otherwise folow black coding standards.
+#### Class, function, method and variable naming conventions
+
+The following apply to entities created by copilot. Unless specifically instructed, do not rename
+existing entities that do not conform to the following.
+
+- Classes should follow PascalCase conventions
+- functions, methods and variables not in module level scope follow snake_case conventions
+- Variables in the module level scope follow CAPITAL case convention
+
+### imports
+
 Group ipmorts as follows:
 
 - standard library imports
@@ -39,6 +53,14 @@ Group ipmorts as follows:
 - imports from within this package, including relative imports
 
 Within each group, sort imports alphabetically. Where possible combine imports from the same module into one statement.
+
+### Line length
+
+- For user examples, the line length is 79 characters, for all other files use 119 characters.
+- Otherwise folow black coding standards.
+- Avoid line splits that are not compatible with the versions of python
+  specified in the package building scripts.
+- Avoid trailing whitespace at the end of lines
 
 ## Issues and Bugs discovered during copilot operations
 
@@ -50,16 +72,14 @@ If an issue or bug in BUGS.md is fixed, remove the issue report from the BUGS.md
 
 ## Markdown Formatting
 
-- User markdownlint to identify errors in markdown formatting and fix.
+When changing markdown files, follow these guidelines:
+
+- Use markdownlint to identify errors in markdown formatting and fix any it flags.
 - Use a maximum line length of 119 characters.
 - Use British English spellings in text except where code requires differently.
-- Pay particular attention to spacing around lists and headers.
+- Pay particular attention to spacing around lists, headers and code blocks.
+- Verify that files referenced in mardown files, such as images, actually exist.
 
-## Line length
-
-- Keep the lines to 119 characters in code.
-- Avoid line splits that are not compativle with the versions of python
-  specified in the package building scripts.
 
 ## Examples and Figures Directory
 

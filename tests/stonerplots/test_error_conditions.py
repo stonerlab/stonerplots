@@ -4,11 +4,10 @@
 This test module verifies that error conditions are properly caught and handled with appropriate
 exceptions. It addresses the code coverage gaps identified in COVERAGE_REPORT.md.
 """
+from tempfile import NamedTemporaryFile
 
-import numpy as np
 import pytest
 from matplotlib import pyplot as plt
-from matplotlib.ticker import LogLocator
 
 from stonerplots.context.double_y import DoubleYAxis
 from stonerplots.context.multiple_plot import MultiPanel
@@ -109,33 +108,38 @@ class TestSaveFigureErrors:
 
     def test_saved_figure_invalid_filename_in_call(self):
         """Test that SavedFigure raises ValueError for invalid filename in __call__."""
-        cm = SavedFigure(filename="/tmp/test.png")
-        with pytest.raises(ValueError, match="Only a single positional argument"):
-            cm(123)
+        with NamedTemporaryFile(suffix=".png") as tmp:
+            cm = SavedFigure(filename=tmp.name)
+            with pytest.raises(ValueError, match="Only a single positional argument"):
+                cm(123)
 
     def test_saved_figure_invalid_formats_type(self):
         """Test that SavedFigure.formats setter raises TypeError for invalid type."""
-        cm = SavedFigure(filename="/tmp/test.png")
-        with pytest.raises(TypeError, match="Invalid formats specified"):
-            cm.formats = 789
+        with NamedTemporaryFile(suffix=".png") as tmp:
+            cm = SavedFigure(filename=tmp.name)
+            with pytest.raises(TypeError, match="Invalid formats specified"):
+                cm.formats = 789
 
     def test_saved_figure_invalid_style_type(self):
         """Test that SavedFigure.style setter raises TypeError for invalid type."""
-        cm = SavedFigure(filename="/tmp/test.png")
-        with pytest.raises(TypeError, match="Invalid style"):
-            cm.style = 456
+        with NamedTemporaryFile(suffix=".png") as tmp:
+            cm = SavedFigure(filename=tmp.name)
+            with pytest.raises(TypeError, match="Invalid style"):
+                cm.style = 456
 
     def test_saved_figure_invalid_extra_type(self):
         """Test that SavedFigure.extra setter raises KeyError for invalid rcParams."""
-        cm = SavedFigure(filename="/tmp/test.png")
-        with pytest.raises(KeyError, match="are not valid Matplotlib rcParameters"):
-            cm.extra = {"invalid_param_name": "value"}
+        with NamedTemporaryFile(suffix=".png") as tmp:
+            cm = SavedFigure(filename=tmp.name)
+            with pytest.raises(KeyError, match="are not valid Matplotlib rcParameters"):
+                cm.extra = {"invalid_param_name": "value"}
 
     def test_saved_figure_multiple_positional_args(self):
         """Test that SavedFigure raises ValueError for multiple positional arguments."""
-        cm = SavedFigure(filename="/tmp/test.png")
-        with pytest.raises(ValueError, match="Only a single positional argument"):
-            cm("file1", "file2")
+        with NamedTemporaryFile(suffix=".png") as tmp:
+            cm = SavedFigure(filename=tmp.name)
+            with pytest.raises(ValueError, match="Only a single positional argument"):
+                cm("file1", "file2")
 
 
 class TestDoubleYAxisErrors:
@@ -208,17 +212,19 @@ class TestErrorConditionIntegration:
     def test_saved_figure_valid_usage_after_error(self):
         """Test that SavedFigure still works correctly after an error."""
         # First trigger an error in __call__
-        cm = SavedFigure(filename="/tmp/test.png")
-        with pytest.raises(ValueError):
-            cm(123)
+        with NamedTemporaryFile(suffix=".png") as tmp:
+            cm = SavedFigure(filename=tmp.name)
+            with pytest.raises(ValueError):
+                cm(123)
 
         # Then verify normal usage still works (without actually saving)
-        cm2 = SavedFigure(filename="/tmp/test2.png", style="default", autoclose=True)
-        with cm2:
-            fig = plt.figure()
-            plt.plot([1, 2], [3, 4])
-            plt.close(fig)
+        with NamedTemporaryFile(suffix=".png") as tmp:
+            cm2 = SavedFigure(filename=tmp.name, style="default", autoclose=True)
+            with cm2:
+                fig = plt.figure()
+                plt.plot([1, 2], [3, 4])
+                plt.close(fig)
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+    pytest.main([__file__, "--pdb"])

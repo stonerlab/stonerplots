@@ -83,7 +83,6 @@ behaviour (gets current figure).
 **Severity:** Low (edge case handling)
 **Test:** Verify behaviour when use.number is None
 
-
 ## Code Style Issues
 
 ### Issue 22: Line Length Exceeds Standards
