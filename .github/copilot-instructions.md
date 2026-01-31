@@ -80,12 +80,11 @@ When changing markdown files, follow these guidelines:
 - Pay particular attention to spacing around lists, headers and code blocks.
 - Verify that files referenced in mardown files, such as images, actually exist.
 
-
 ## Examples and Figures Directory
 
 The `examples/figures/` directory contains example output figures that are used in the documentation and README.md.
 
-- **DO NOT** add `examples/figures/` to `.gitignore` - these files must be committed to the repository.
+- __DO NOT__ add `examples/figures/` to `.gitignore` - these files must be committed to the repository.
 - The figures in this directory are essential for documentation and are referenced by:
   - README.md (e.g., fig05a.png in the repository header)
   - Documentation files in docs/source/ (multiple RST files reference these figures)
