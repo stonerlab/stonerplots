@@ -33,6 +33,8 @@ jobs:
             pytest-emoji
             pytest-cov
             matplotlib
+      - name: Install package
+        run: pip install -e .
       - name: Run pytest
         uses: pavelzw/pytest-action@510c5e90c360a185039bea56ce8b3e7e51a16507
         with:
