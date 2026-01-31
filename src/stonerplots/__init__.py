@@ -42,7 +42,7 @@ __all__ = [
     "TexEngFormatter",
     "default",
 ]
-__version__ = "1.8.2"
+__version__ = "1.9.0"
 
 # Default style handling.
 default = _default()
@@ -69,3 +69,4 @@ get_named_colors_mapping().update(tube_colours_90)
 get_named_colors_mapping().update(tube_colours_70)
 get_named_colors_mapping().update(tube_colours_50)
 get_named_colors_mapping().update(tube_colours_10)
+
