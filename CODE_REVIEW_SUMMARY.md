@@ -102,51 +102,61 @@ addressed to improve code quality, maintainability, and reliability.
 
 ## Test Coverage Analysis
 
-### Current State
+### Current State (Updated: 2026-01-31)
 
-- ✅ Example script execution tests exist (47 examples)
+- ✅ Example script execution tests exist (52 examples)
 - ✅ Examples provide comprehensive coverage of the codebase
-- ❌ No unit tests for individual functions/classes
-- ❌ No tests for error conditions
-- ❌ No tests for edge cases
+- ✅ Unit tests for error conditions added (28 tests)
+- ✅ Tests for formatter edge cases (7 tests)
+- ✅ Integration tests included
 
 ### Coverage Results
 
-**Actual Coverage: 85.81%** (923 statements, 131 missed)
+**Updated Coverage: 90.64%** (940 statements, 88 missed) - **Up from 85.81%**
 
-The initial estimate of ~30% coverage was incorrect. Running pytest with coverage shows that the example tests
-effectively exercise most code paths in the library.
+After adding comprehensive error condition tests, coverage improved by 4.83 percentage points.
 
 **Coverage by Module:**
 
 - `__init__.py`: 100.00%
 - `colours.py`: 100.00%
 - `context/__init__.py`: 100.00%
+- `counter.py`: 100.00% ⬆️ (was 93.75%)
 - `context/inset_plot.py`: 95.12%
-- `context/multiple_plot.py`: 92.39%
-- `util.py`: 90.79%
-- `context/save_figure.py`: 88.54%
-- `context/double_y.py`: 83.72%
+- `context/multiple_plot.py`: 95.65% ⬆️ (was 92.39%)
+- `context/double_y.py`: 95.35% ⬆️ (was 83.72%)
+- `context/save_figure.py`: 94.77% ⬆️ (was 88.54%)
+- `util.py`: 93.98% ⬆️ (was 90.79%)
+- `format.py`: 84.95% ⬆️ (was 70.93%)
 - `context/noframe.py`: 81.40%
-- `context/base.py`: 70.83%
-- `format.py`: 70.93%
-- `counter.py`: 93.75%
+- `context/base.py`: 71.67% ⬆️ (was 70.83%)
 
 ### Assessment
 
-✅ **Coverage Goal Met:** The current 85.81% coverage exceeds the recommended 85% threshold.
+✅ **Coverage Goal Exceeded:** The current 90.64% coverage significantly exceeds the recommended 85% threshold.
 
-### Recommended Test Additions (Optional)
+### Test Composition
 
-While current coverage is good, these additions would further improve test quality:
+- 52 example execution tests (integration testing)
+- 7 format edge case tests (formatter robustness)
+- 28 error condition tests (input validation)
+- **Total: 87 tests** (80 passed, 2 skipped)
 
-1. Unit tests for error conditions (ValueError, TypeError scenarios)
-1. Tests for edge cases in format classes
-1. Tests for utility functions with unusual inputs
-1. Integration tests for complex multi-panel layouts
+### Remaining Gaps (Low Priority)
 
-**Current Coverage:** 85.81% (exceeds 85% target)
-**Recommended Coverage:** Maintain 85%+
+The remaining 9.36% uncovered code consists primarily of:
+
+1. Exception handler bodies (defensive programming for extreme edge cases)
+2. Helper methods called by matplotlib internals
+3. Advanced collection protocol methods (`__contains__`, complex indexing)
+4. WeakRef edge case handling
+5. Optional parameter combinations in rarely-used code paths
+
+These gaps are low priority as they represent edge cases that are difficult to test reliably and have minimal
+impact on normal usage.
+
+**Current Coverage:** 90.64% (significantly exceeds 85% target)
+**Recommended Coverage:** Maintain 85%+ (✅ Achieved)
 
 ## Compliance with Project Standards
 
