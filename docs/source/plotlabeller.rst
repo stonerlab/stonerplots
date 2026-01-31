@@ -31,6 +31,6 @@ To use :py:class:`PlotLabeller`, you would typically just stack it with SavedFig
 
 This will give a plot somewhat like:
 
-.. image:: ../../examples/figures/fig01c.png
+.. image:: ../../examples/figures/fig01c.svg
    :alt: A plot with the x and y tick labels formatted in engineering style with SI prefixes.
    :align: center

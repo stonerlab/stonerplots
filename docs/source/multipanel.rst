@@ -81,7 +81,7 @@ first argument in conjunction with an optional `same_aspect`::
 By default, :py:class:`MultiPanel` will adjust the aspect to match the narrowest figure unless you specify
 *same_aspect* to be False, or give *width_ratios* or *height_ratios* to manually change the aspect ratios of the plots.
 
-.. image:: ../../examples/figures/triplot.png
+.. image:: ../../examples/figures/trriplot.png
    :alt: An example of a triple-panel sub-plot arranged in two rows.
    :align: center
 
@@ -95,7 +95,7 @@ containing a different number of rows::
                 ax.plot(x_data[ix], y_data[ix], marker="")
                 ...
 
-.. image:: ../../examples/figures/triplot2.png
+.. image:: ../../examples/figures/trriplot2.svg
    :alt: A triple panel sub-plot in 2 columns.
    :align: center
 
