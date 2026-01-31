@@ -41,6 +41,11 @@ jobs:
           verbose: true
           emoji: true
           job-summary: true
-          custom-arguments: '-q --cov=src/stonerplots --cov-report=term --cov-report=html'
+          custom-arguments: '-q --cov=src/stonerplots --cov-report=term --cov-report=html --cov-report=xml'
           click-to-expand: true
           report-title: 'Test Report'
+      - name: Upload coverage to Codacy
+        uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 # v1.3.0
+        with:
+          project-token: ${{ secrets.CODACY_TOKEN }}
+          coverage-reports: coverage.xml
