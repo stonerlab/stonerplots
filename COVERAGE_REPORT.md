@@ -7,9 +7,10 @@
 
 The initial code review estimated test coverage at ~30%. However, this estimate was **incorrect**.
 
-### Actual Coverage: 90.64%
+### Actual Coverage: 93.30%
 
-After adding comprehensive error condition tests, coverage has improved from 85.81% to **90.64%**.
+After adding comprehensive error condition tests and tests for helper methods and optional parameters, coverage has
+improved from 85.81% to **93.30%**.
 
 This was verified by running pytest with coverage reporting:
 
@@ -19,21 +20,21 @@ pytest tests/ --cov=src/stonerplots --cov-report=term
 
 ## Coverage by Module
 
-| Module                     | Statements | Missed | Coverage  | Change    |
-|----------------------------|------------|--------|-----------|-----------|
-| `__init__.py`              | 26         | 0      | 100.00%   | ➡️        |
-| `colours.py`               | 6          | 0      | 100.00%   | ➡️        |
-| `context/__init__.py`      | 6          | 0      | 100.00%   | ➡️        |
-| `counter.py`               | 16         | 0      | 100.00%   | ⬆️ +6.25% |
-| `context/inset_plot.py`    | 41         | 2      | 95.12%    | ➡️        |
-| `context/multiple_plot.py` | 184        | 8      | 95.65%    | ⬆️ +3.26% |
-| `context/double_y.py`      | 86         | 4      | 95.35%    | ⬆️ +11.63%|
-| `context/save_figure.py`   | 153        | 8      | 94.77%    | ⬆️ +6.23% |
-| `util.py`                  | 166        | 10     | 93.98%    | ⬆️ +3.19% |
-| `format.py`                | 93         | 14     | 84.95%    | ⬆️ +14.02%|
-| `context/noframe.py`       | 43         | 8      | 81.40%    | ➡️        |
-| `context/base.py`          | 120        | 34     | 71.67%    | ⬆️ +0.84% |
-| **TOTAL**                  | **940**    | **88** | **90.64%**| **⬆️ +4.83%**|
+| Module                     | Statements | Missed | Coverage  | Change      |
+|----------------------------|------------|--------|-----------|-------------|
+| `__init__.py`              | 26         | 0      | 100.00%   | ➡️          |
+| `colours.py`               | 6          | 0      | 100.00%   | ➡️          |
+| `context/__init__.py`      | 6          | 0      | 100.00%   | ➡️          |
+| `counter.py`               | 16         | 0      | 100.00%   | ⬆️ +6.25%   |
+| `context/noframe.py`       | 43         | 0      | 100.00%   | ⬆️ +18.60%  |
+| `context/inset_plot.py`    | 41         | 2      | 95.12%    | ➡️          |
+| `context/multiple_plot.py` | 184        | 8      | 95.65%    | ⬆️ +3.26%   |
+| `context/double_y.py`      | 86         | 4      | 95.35%    | ⬆️ +11.63%  |
+| `context/save_figure.py`   | 153        | 8      | 94.77%    | ⬆️ +6.23%   |
+| `util.py`                  | 166        | 10     | 93.98%    | ⬆️ +3.19%   |
+| `format.py`                | 93         | 10     | 89.25%    | ⬆️ +18.27%  |
+| `context/base.py`          | 120        | 21     | 82.50%    | ⬆️ +10.83%  |
+| **TOTAL**                  | **940**    | **63** | **93.30%**| **⬆️ +7.49%**|
 
 ## Why the Initial Estimate Was Wrong
 
@@ -47,6 +48,8 @@ would be low. However:
 
 ## Recent Improvements (2026-01-31)
 
+### Phase 1: Error Condition Tests
+
 Added comprehensive error condition tests (`test_error_conditions.py`) covering:
 
 1. **counter.py**: ValueError validation for invalid roman numeral inputs
@@ -58,36 +61,47 @@ Added comprehensive error condition tests (`test_error_conditions.py`) covering:
 
 This resulted in a **4.83% increase in coverage** (85.81% → 90.64%).
 
+### Phase 2: Helper Methods and Optional Parameters
+
+Added comprehensive tests (`test_coverage_improvements.py`) addressing the optional recommendations from the original
+coverage report:
+
+1. **format.py helper methods**: Tests for `format_data()` and `format_data_short()` methods in both TexFormatter and
+   TexEngFormatter classes, bringing coverage from 84.95% to 89.25% (+4.30%)
+2. **context/noframe.py optional parameters**: Tests for `__call__()` method with various parameter combinations
+   including `x`, `y`, `include_open`, and `use` parameters, plus tests for axis limit adjustment edge cases, bringing
+   coverage from 81.40% to 100.00% (+18.60%)
+3. **context/base.py collection protocol**: Tests for tuple indexing in RavelList, `__contains__`, `__reversed__`,
+   and `__iter__` methods in PlotContextSequence, bringing coverage from 71.67% to 82.50% (+10.83%)
+
+This resulted in an additional **2.66% increase in coverage** (90.64% → 93.30%).
+
 ## Test Coverage Goals
 
-✅ **Goal Exceeded:** The 90.64% coverage significantly exceeds the recommended 85% threshold.
+✅ **Goal Exceeded:** The 93.30% coverage significantly exceeds the recommended 85% threshold.
 
 ## Areas with Lower Coverage
 
-The modules with coverage below 85%:
+The modules with coverage below 95%:
 
-1. **`format.py` (84.95%)**: 
-   - Missing: Exception handling paths (lines 55-56, 118-119, 122-123)
-   - Missing: Helper methods `format_data()` and `format_data_short()` (lines 63, 70, 130, 137)
-   - Missing: Minor formatter/locator setting (lines 199, 203-207)
+1. **`format.py` (89.25%)**: 
+   - Missing: Exception handling paths (lines 55-56, 118-119) - exception handler bodies for extreme numerical values
+   - Missing: Minor formatter/locator setting (lines 199, 203-207) - edge cases in locator setting
+   - ✅ **Improved**: Helper methods `format_data()` and `format_data_short()` now tested
 
-2. **`context/noframe.py` (81.40%)**:
-   - Missing: Optional parameter handling in `__call__()` (lines 35-39)
-   - Missing: Figure selection via `use` parameter (line 45)
-   - Missing: Axis limit adjustment edge cases (lines 55, 57)
-
-3. **`context/base.py` (71.67%)**:
-   - Missing: Complex indexing operations with tuples (lines 83-88)
-   - Missing: Container protocol methods (`__contains__`, lines 187, 191-193)
-   - Missing: Axis selection helpers (lines 207-208, 212-218, 222-225)
-   - Missing: WeakRef handling edge cases (lines 288-290, 320-327, 333)
+2. **`context/base.py` (82.50%)**:
+   - Missing: Axis selection helpers (lines 212-218, 222-225) - edge cases in save/restore operations without figures
+   - Missing: WeakRef handling edge cases (lines 288-290, 320-327, 333) - dereferenced weak references
+   - Missing: Edge case in `__len__` method (line 183)
+   - ✅ **Improved**: Tuple indexing, `__contains__`, `__reversed__`, and `__iter__` now tested
 
 ## Recommendations
 
 ### Current Status: Excellent
 
-The current test coverage is **excellent at 90.64%** and exceeds industry standards. The codebase is well-tested
-with a combination of integration tests (examples) and unit tests (error conditions).
+The current test coverage is **excellent at 93.30%** and exceeds industry standards. The codebase is well-tested
+with a combination of integration tests (examples), unit tests (error conditions), and targeted tests for helper methods
+and optional parameters.
 
 ### Remaining Gaps Analysis
 
@@ -109,6 +123,8 @@ These are typically called by matplotlib internals rather than user code.
 
 **Testing approach:** Would require integration with matplotlib's ticker system directly.
 
+✅ **Addressed**: Helper methods `format_data()` and `format_data_short()` now have comprehensive tests.
+
 #### 3. Advanced Collection Protocol Methods (Low Priority)
 Special methods like `__contains__`, complex tuple indexing, and reversed iteration that support
 advanced Python collection protocols but aren't commonly used.
@@ -117,12 +133,18 @@ advanced Python collection protocols but aren't commonly used.
 
 **Testing approach:** Would require tests explicitly exercising these protocols.
 
+✅ **Addressed**: Collection protocol methods now have comprehensive tests covering tuple indexing, `__contains__`,
+`__reversed__`, and `__iter__`.
+
 #### 4. Optional Parameter Edge Cases (Medium Priority)
 Code paths for optional parameters and edge conditions in context managers.
 
 **Affected modules:** `context/noframe.py`, `context/base.py`
 
 **Testing approach:** Would require tests with specific combinations of optional parameters.
+
+✅ **Addressed**: Optional parameters in `context/noframe.py` now have comprehensive tests covering all parameter
+combinations and edge cases.
 
 #### 5. WeakRef Edge Cases (Low Priority)
 Code handling dereferenced weak references and edge cases in figure/axes tracking.
@@ -133,15 +155,16 @@ Code handling dereferenced weak references and edge cases in figure/axes trackin
 
 ### Recommended Actions
 
-1. **No immediate action required** - Coverage at 90.64% is excellent
-2. **Optional enhancements** if time permits:
-   - Add tests for helper methods in `format.py` (would bring it to 95%+)
-   - Add tests for optional parameter combinations in `context/noframe.py`
-   - Add tests for collection protocol methods in `context/base.py`
+1. **No immediate action required** - Coverage at 93.30% is excellent
+2. ✅ **Completed enhancements:**
+   - ✅ Added tests for helper methods in `format.py` (improved from 84.95% to 89.25%)
+   - ✅ Added tests for optional parameter combinations in `context/noframe.py` (improved from 81.40% to 100.00%)
+   - ✅ Added tests for collection protocol methods in `context/base.py` (improved from 71.67% to 82.50%)
 
 3. **Not recommended:**
    - Testing exception handler bodies for extreme numerical conditions (diminishing returns)
    - Testing weak reference edge cases (too fragile and environment-dependent)
+   - Testing save/restore edge cases without figures (rare edge cases)
 
 ## Configuration Updates
 
@@ -175,16 +198,18 @@ Updated to include coverage reporting:
 
 ## Conclusion
 
-The test coverage for StonerPlots is **excellent at 90.64%**, a significant improvement from the initial 85.81%. The
-addition of error condition tests has substantially improved coverage of error handling paths across all modules.
+The test coverage for StonerPlots is **excellent at 93.30%**, a significant improvement from the initial 85.81%. The
+addition of error condition tests and targeted tests for helper methods and optional parameters has substantially
+improved coverage across all modules.
 
-The example-based testing approach provides comprehensive coverage of real-world usage patterns, while the new
-unit tests ensure proper error handling and input validation.
+The example-based testing approach provides comprehensive coverage of real-world usage patterns, while the unit tests
+ensure proper error handling, input validation, and edge case handling for helper methods and optional parameters.
 
-**Status**: ✅ Coverage goal exceeded (90.64% >> 85%)
+**Status**: ✅ Coverage goal exceeded (93.30% >> 85%)
 
 **Test composition:**
 - 52 example execution tests (integration testing)
 - 7 format edge case tests (formatter robustness)
 - 28 error condition tests (input validation)
-- **Total: 87 tests** (80 passed, 2 skipped)
+- 20 coverage improvement tests (helper methods and optional parameters)
+- **Total: 107 tests** (100 passed, 2 skipped, 5 xfailed)
