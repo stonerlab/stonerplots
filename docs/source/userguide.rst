@@ -223,7 +223,7 @@ usually don't put a frame around the figure. The :py:class:`CentredAxes` context
         fig.ax = plt.subplots()
         ... # all your plotting commands
 
-.. image:: ../../examples/figures/fig01g.png
+.. image:: ../../examples/figures/fig01g.svg
   :alt: Centred Axes Plot
   :align: center
 

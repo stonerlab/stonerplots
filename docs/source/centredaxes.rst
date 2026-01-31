@@ -16,7 +16,7 @@ have been created within it and then relocate the axes and remove the frame.::
         ax.set(**pparam)
 
 
-.. image:: ../../examples/figures/fig01g.png
+.. image:: ../../examples/figures/fig01g.svg
    :alt: Axes centered on the origin.
    :align: center
 
