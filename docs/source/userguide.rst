@@ -88,7 +88,7 @@ After specifying the *style* to use, we specify the *formats* to save the figure
 both `png` and `eps` formats. Finally, we ask SavedFigure to close any figures opened after it has saved them with
 the *autoclose* parameter.
 
-.. image:: ../../examples/figures/fig02h_0.png
+.. image:: ../../examples/figures/fig02h_1.png
   :alt: Thesis style figure
   :align: center
 
@@ -121,7 +121,7 @@ formatter - :py:class:`stonerplots.format.TexEngFormatter`. To make this even ea
 :py:class:`SavedFigure` can save the figure) to set the tick label formatting as needed. The formatter can handle
 numbers between `1E-24` to `1E+24` - technically further prefixes have been approved but they are little known!
 
-.. image:: ../../examples/figures/fig01c.png
+.. image:: ../../examples/figures/fig01c.svg
   :alt: IEEE format figure
   :align: center
 
@@ -267,7 +267,7 @@ original plot. On exit from the context manager, it can optionally colour the le
 also merge legends for the two sets of data and try to locate them in the best location, taking account of both sets
 of data. See :doc:`Double Y-axis plots<doubleyaxis>` for further details.
 
-.. image:: ../../examples/figures/fig7d.png
+.. image:: ../../examples/figures/fig7d.svg
   :alt: Double Y axis plot
   :align: center
 

@@ -88,7 +88,7 @@ There are specific stylesheets for producing plots at the correct size and style
 |                                                                                                         |
 +-----------------------------------------------------+---------------------------------------------------+
 |                                                                                                         |
-| .. image:: ../../examples/figures/fig02h_0.png                                                          |
+| .. image:: ../../examples/figures/fig02h_1.png                                                          |
 |    :alt: Example plot in thesis template format                                                         |
 |    :align: center                                                                                       |
 |                                                                                                         |
@@ -96,7 +96,7 @@ There are specific stylesheets for producing plots at the correct size and style
 |                                                                                                         |
 +-----------------------------------------------------+---------------------------------------------------+
 |                                                                                                         |
-| .. image:: ../../examples/figures/fig02h_1.png                                                          |
+| .. image:: ../../examples/figures/fig02h_2.png                                                          |
 |    :alt: Example twin plot in thesis template format                                                    |
 |    :align: center                                                                                       |
 |                                                                                                         |
@@ -261,7 +261,7 @@ The :py:class:`stonerplots.DoubleYAxis` context manager can be used to add a new
 right hand side of the existing axes' frame. The left and right y-axes can be coloured differently and the legend of
 both sets of axes combined.
 
-.. image:: ../../examples/figures/fig7d.png
+.. image:: ../../examples/figures/fig7d.svg
    :alt: Plot with two separate y-axes.
    :align: center
 
@@ -302,6 +302,6 @@ Consistent Axes Formatting
 
 The :py:class:`stonerplots.PlotLabeller` context manager can adjust the axes label formatting for multiple figures.
 
-.. image:: ../../examples/figures/fig01c.png
+.. image:: ../../examples/figures/fig01c.svg
    :alt: 2x2 multi-panel plot.
    :align: center

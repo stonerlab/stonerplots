@@ -73,6 +73,6 @@ manager::
         plt.ylabel("2$^\\mathrm{nd}$ Harmonic")
 
 
-.. image:: ../../examples/figures/fig7d.png
+.. image:: ../../examples/figures/fig7d.svg
    :alt: 2x2 multi-panel plot.
    :align: center
