@@ -35,7 +35,7 @@ ROMAN_NUMERAL_MAP = {
 }
 
 
-def roman(number):
+def roman(number: int) -> str:
     """Convert a positive integer to Roman numeral representation.
 
     Args:
@@ -59,7 +59,7 @@ def roman(number):
     return result
 
 
-def counter(value, pattern="({alpha})", **kwargs):
+def counter(value: int, pattern: str = "({alpha})", **kwargs: str) -> str:
     r"""Format an integer as a string using a pattern and various representations.
 
     Args:
