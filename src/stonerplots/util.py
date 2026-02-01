@@ -11,7 +11,7 @@ from typing import Any, List, Optional, Callable, Tuple, Union
 
 from matplotlib.artist import Artist
 from matplotlib.axes import Axes
-from matplotlib.axes._base import _TransformedBoundsLocator
+from matplotlib.axes._base import _TransformedBoundsLocator  # type: ignore[attr-defined]
 from matplotlib.collections import Collection, PolyCollection
 from matplotlib.figure import Figure
 from matplotlib.legend import Legend
@@ -214,7 +214,7 @@ def _handle_collection(artist: Collection, offsets: List[Tuple[float, float]]) -
         artist (Collection): The Collection artist to process.
         offsets (list): List to extend with transformed offsets.
     """
-    _, transOffset, hoffsets, _ = artist._prepare_points()
+    _, transOffset, hoffsets, _ = artist._prepare_points()  # type: ignore[attr-defined]
     if hoffsets.size > 0:
         offsets.extend(transOffset.transform(hoffsets))
 
@@ -243,7 +243,7 @@ def _handle_axes_legend(
         lines (list): List to extend with paths.
         offsets (list): List to extend with offsets.
     """
-    sub_bboxes, sub_lines, sub_offsets = _auto_linset_data(artist, axins, renderer, insets=False)
+    sub_bboxes, sub_lines, sub_offsets = _auto_linset_data(artist, axins, renderer, insets=False)  # type: ignore[arg-type]
     bboxes.extend(sub_bboxes)
     lines.extend(sub_lines)
     offsets.extend(sub_offsets)
@@ -337,7 +337,10 @@ def new_bbox_for_loc(axins: Axes, ax: Axes, loc: int = 1, padding: Tuple[float, 
             The new bounding box for the axes.
     """
     parent_bbox = ax.get_position()
-    inset_bbox = axins.get_tightbbox().transformed(ax.figure.transFigure.inverted())
+    inset_bbox_raw = axins.get_tightbbox()
+    if inset_bbox_raw is None:
+        raise ValueError("Could not get tight bounding box for inset axes")
+    inset_bbox = inset_bbox_raw.transformed(ax.figure.transFigure.inverted())
 
     inset_bbox.update_from_data_xy(  # Adjust the position to allow for the padding
         [
@@ -385,7 +388,7 @@ def find_best_position(ax: Axes, axins: Axes, renderer: Optional[Any] = None) ->
     """
     ax.figure.canvas.draw()  # render the figure
     if renderer is None:
-        renderer = ax.figure.canvas.get_renderer()
+        renderer = ax.figure.canvas.get_renderer()  # type: ignore[attr-defined]
     bboxes, lines, offsets = _auto_linset_data(ax, axins, renderer)
 
     candidates = []

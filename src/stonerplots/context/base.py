@@ -85,7 +85,7 @@ class RavelList(list):
     @overload
     def __getitem__(self, index: slice) -> List[Any]: ...
     
-    def __getitem__(self, index: Union[SupportsIndex, tuple, slice]) -> Any:
+    def __getitem__(self, index: Union[SupportsIndex, tuple, slice]) -> Any:  # type: ignore[override]
         """2D-style indexing using tuples.
 
         Args:
@@ -208,15 +208,21 @@ class PlotContextSequence(Sequence):
         """Return the number of axes."""
         return len(self.raveled_axes)
 
-    def __contains__(self, value) -> bool:
+    def __contains__(self, value: Any) -> bool:
         """Check if a value is contained within the axes."""
         return value in self.raveled_axes
 
-    def __getitem__(self, index) -> Axes:
+    @overload
+    def __getitem__(self, index: SupportsIndex) -> Axes: ...
+    
+    @overload
+    def __getitem__(self, index: slice) -> List[Axes]: ...
+    
+    def __getitem__(self, index: Union[SupportsIndex, slice]) -> Union[Axes, List[Axes]]:
         """Get axis item at index and optionally set it as current."""
         ret = self.axes[index]
         self._check_single_axis_selection(ret)
-        return ret
+        return ret  # type: ignore[return-value]
 
     def __iter__(self) -> Iterator[Axes]:
         """Iterate over the axes and set each as current when iterating."""
@@ -280,8 +286,8 @@ class TrackNewFiguresAndAxes:
             include_open (bool): If `True`, includes already open figures and axes. Defaults to `False`.
         """
         super().__init__()
-        self._existing_open_figs: List[weakref.ref[Figure]] = []
-        self._existing_open_axes: dict[int, List[weakref.ref[Axes]]] = {}
+        self._existing_open_figs: List[Union[weakref.ref[Figure], Figure]] = []
+        self._existing_open_axes: dict[int, List[Union[weakref.ref[Axes], Axes]]] = {}
         self.include_open = kwargs.pop("include_open", False)
 
     def __enter__(self) -> "TrackNewFiguresAndAxes":
@@ -307,12 +313,17 @@ class TrackNewFiguresAndAxes:
             [<Figure size ...>]
         """
         # Dereference weakrefs to get actual figure objects for comparison
-        existing_figs = []
+        # Handle both cases: list of weakrefs or list of already-dereferenced figures
+        existing_figs: List[Figure] = []
         for item in self._existing_open_figs:
-            # Item is a weakref, dereference it
-            fig = item()
-            if fig is not None:
-                existing_figs.append(fig)
+            if isinstance(item, weakref.ref):
+                # Item is a weakref, dereference it
+                fig = item()
+                if fig is not None:
+                    existing_figs.append(fig)
+            else:
+                # Item is already a dereferenced figure
+                existing_figs.append(item)  # type: ignore[arg-type]
 
         for num in plt.get_fignums():
             fig = plt.figure(num)
@@ -335,13 +346,18 @@ class TrackNewFiguresAndAxes:
             [<AxesSubplot:...>]
         """
         # Dereference all weakrefs from all figures to get actual axes objects for comparison
-        existing_axes = []
+        # Handle both cases: weakrefs or already-dereferenced axes objects
+        existing_axes: List[Axes] = []
         for _, axes_refs in self._existing_open_axes.items():
             for item in axes_refs:
-                # Item is a weakref, dereference it
-                ax = item()
-                if ax is not None:
-                    existing_axes.append(ax)
+                if isinstance(item, weakref.ref):
+                    # Item is a weakref, dereference it
+                    ax = item()
+                    if ax is not None:
+                        existing_axes.append(ax)
+                else:
+                    # Item is already a dereferenced axes
+                    existing_axes.append(item)
 
         for num in plt.get_fignums():
             fig = plt.figure(num)
