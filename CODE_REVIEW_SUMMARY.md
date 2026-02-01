@@ -7,7 +7,10 @@
 
 ## Executive Summary
 
-This comprehensive code review analysed the entire StonerPlots repository, examining Python source files, documentation, test coverage, and adherence to project coding standards. The codebase is generally well-structured and makes good use of modern Python features. However, several critical bugs were identified that require immediate attention, particularly bugs that will cause runtime failures.
+This comprehensive code review analysed the entire StonerPlots repository, examining Python source files,
+documentation, test coverage, and adherence to project coding standards. The codebase is generally well-structured
+and makes good use of modern Python features. However, several critical bugs were identified that require immediate
+attention, particularly bugs that will cause runtime failures.
 
 ## Overall Assessment
 
@@ -47,11 +50,14 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 **File:** `src/stonerplots/counter.py:73`  
 **Severity:** High  
 
-**Description:** The `counter()` function will raise an exception when `value >= 26` because `chr(ord("a") + value)` will exceed the valid ASCII range for lowercase letters.
+**Description:** The `counter()` function will raise an exception when `value >= 26` because `chr(ord("a") +
+value)` will exceed the valid ASCII range for lowercase letters.
 
-**Impact:** Function crashes with IndexError/ValueError for values >= 26. This is a fundamental limitation that breaks the function for common use cases (e.g., labelling subfigures beyond 26).
+**Impact:** Function crashes with IndexError/ValueError for values >= 26. This is a fundamental limitation that
+breaks the function for common use cases (e.g., labelling subfigures beyond 26).
 
 **Proof:**
+
 ```python
 >>> from stonerplots.counter import counter
 >>> counter(25)  # Works: 'z'
@@ -61,6 +67,7 @@ This comprehensive code review analysed the entire StonerPlots repository, exami
 ```
 
 **Recommended Fix:**
+
 ```python
 # Option 1: Use modulo for wraparound
 alpha = chr(ord("a") + (value % 26))
@@ -81,16 +88,20 @@ def _int_to_alpha(value):
     return result
 ```
 
-### 2. Assignment Bug in InsetPlot.__enter__() (High Severity)
+### 2. Assignment Bug in InsetPlot.**enter**() (High Severity)
 
 **File:** `src/stonerplots/context/inset_plot.py:114-115`  
 **Severity:** High  
 
-**Description:** Line 114 assigns `self.ax = self._ax.ax` when an axes wrapper is detected, but line 115 unconditionally overwrites this with `self.ax = self._ax if isinstance(self._ax, Axes) else plt.gca()`. This makes the wrapper detection code on line 114 completely ineffective.
+**Description:** Line 114 assigns `self.ax = self._ax.ax` when an axes wrapper is detected, but line 115
+unconditionally overwrites this with `self.ax = self._ax if isinstance(self._ax, Axes) else plt.gca()`. This makes
+the wrapper detection code on line 114 completely ineffective.
 
-**Impact:** Axes wrappers are not properly handled, causing potential AttributeError or incorrect behavior when using wrapped axes objects.
+**Impact:** Axes wrappers are not properly handled, causing potential AttributeError or incorrect behavior when
+using wrapped axes objects.
 
 **Current Code:**
+
 ```python
 def __enter__(self) -> Axes:
     """Create the inset axes using the axes_grid toolkit."""
@@ -103,6 +114,7 @@ def __enter__(self) -> Axes:
 ```
 
 **Recommended Fix:**
+
 ```python
 def __enter__(self) -> Axes:
     """Create the inset axes using the axes_grid toolkit."""
@@ -122,11 +134,14 @@ def __enter__(self) -> Axes:
 **File:** `src/stonerplots/context/multiple_plot.py:425-428`  
 **Severity:** High  
 
-**Description:** Accessing `yticks[1]` and `yticks[-2]` without checking if the list has enough elements. If there are fewer than 3 yticks, this will raise an IndexError.
+**Description:** Accessing `yticks[1]` and `yticks[-2]` without checking if the list has enough elements. If there
+are fewer than 3 yticks, this will raise an IndexError.
 
-**Impact:** Function crashes with IndexError when plots have minimal tick marks (e.g., custom tick configurations, small data ranges).
+**Impact:** Function crashes with IndexError when plots have minimal tick marks (e.g., custom tick configurations,
+small data ranges).
 
 **Current Code:**
+
 ```python
 yticks = [tr.transform((0, x))[1] for x in ax.get_yticks()]  # Tick positions in axes units.
 
@@ -137,6 +152,7 @@ if yticks[-2] < 1.0 - dy and ix != 0:  # ← No bounds check!
 ```
 
 **Recommended Fix:**
+
 ```python
 yticks = [tr.transform((0, x))[1] for x in ax.get_yticks()]
 
@@ -154,11 +170,13 @@ if len(yticks) > 1 and yticks[-2] > 1.0 - dy and ix != 0:
 **File:** `setup.py:22`  
 **Severity:** Medium  
 
-**Description:** Line 22 specifies `packages=["stonerplots"]` but the actual package is in `src/stonerplots`. This configuration may fail during package installation depending on how setuptools resolves it.
+**Description:** Line 22 specifies `packages=["stonerplots"]` but the actual package is in `src/stonerplots`. This
+configuration may fail during package installation depending on how setuptools resolves it.
 
 **Impact:** Potential installation failures or incorrect package structure in installed environments.
 
 **Current Code:**
+
 ```python
 setup(
     name="StonerPlots",
@@ -174,11 +192,13 @@ setup(
 
 **Recommended Fix:**
 
-Since `pyproject.toml` already properly configures the package discovery with `[tool.setuptools.packages.find]` and `where = ["src"]`, the best fix is to remove redundant configuration from `setup.py`:
+Since `pyproject.toml` already properly configures the package discovery with `[tool.setuptools.packages.find]` and
+`where = ["src"]`, the best fix is to remove redundant configuration from `setup.py`:
 
 **Option 1 (Recommended):** Remove `setup.py` entirely since all configuration is in `pyproject.toml`.
 
 **Option 2:** If `setup.py` must remain, add proper package_dir:
+
 ```python
 setup(
     # ...
@@ -193,11 +213,15 @@ setup(
 **File:** `src/stonerplots/format.py:109-124`  
 **Severity:** Medium  
 
-**Description:** Variable `pre` is computed as a numpy float (`np.ceil(power / 3.0) * 3`) and then modified with `pre += 3.0`. When used as a dictionary key with `int(pre)` on line 124, floating-point precision errors could theoretically cause issues.
+**Description:** Variable `pre` is computed as a numpy float (`np.ceil(power / 3.0) * 3`) and then modified with
+`pre += 3.0`. When used as a dictionary key with `int(pre)` on line 124, floating-point precision errors could
+theoretically cause issues.
 
-**Impact:** Low probability, but potential KeyError if floating-point arithmetic produces unexpected values. The try/except block catches this, so impact is limited to fallback formatting.
+**Impact:** Low probability, but potential KeyError if floating-point arithmetic produces unexpected values. The
+try/except block catches this, so impact is limited to fallback formatting.
 
 **Current Code:**
+
 ```python
 power = np.floor(np.log10(np.abs(value)))
 pre = np.ceil(power / 3.0) * 3  # Returns numpy float
@@ -208,6 +232,7 @@ ret = f"${v}\\mathrm{{{self.prefix[int(pre)]} {self.unit}}}$"  # Convert to int 
 ```
 
 **Recommended Fix:**
+
 ```python
 pre = int(np.ceil(power / 3.0) * 3)  # Convert to int immediately
 ```
@@ -215,20 +240,25 @@ pre = int(np.ceil(power / 3.0) * 3)  # Convert to int immediately
 ### 6. Accessing Private matplotlib API (Medium Severity)
 
 **Files:**
+
 - ~~`src/stonerplots/__init__.py:15, 67-71`~~ ✅ **FIXED** - Now uses `get_named_colors_mapping()`
 - `src/stonerplots/util.py:14, 110` - Uses `_TransformedBoundsLocator`
 - `src/stonerplots/context/double_y.py:153` - References `_subplots.AxesSubplot` in docstring
 
 **Severity:** Low-Medium (potential breaking change in future matplotlib versions)
 
-**Description:** The codebase uses private matplotlib APIs (indicated by leading underscores) which could break in future matplotlib versions.
+**Description:** The codebase uses private matplotlib APIs (indicated by leading underscores) which could break in
+future matplotlib versions.
 
 **Status:**
-1. ✅ `_colors_full_map` has been fixed by using public API `get_named_colors_mapping()`
+
+1. ✅ `_colors_full_map` has been fixed by using public API
+   `get_named_colors_mapping()`
 2. ⚠️ `_TransformedBoundsLocator` - No public alternative exists; document usage and monitor matplotlib releases
 3. ⚠️ `_subplots.AxesSubplot` - Documentation only; use `matplotlib.axes.Axes` type instead
 
 **Recommended Actions:**
+
 - Update docstring type annotation to use `matplotlib.axes.Axes`
 - Add comment documenting `_TransformedBoundsLocator` usage rationale
 - Monitor matplotlib release notes for API changes
@@ -244,16 +274,19 @@ pre = int(np.ceil(power / 3.0) * 3)  # Convert to int immediately
 
 **Impact:** Feature gap - marker handling may not be complete in auto-positioning logic.
 
-**Recommendation:** Investigate if this TODO is still relevant or can be removed. If relevant, consider implementing or documenting as a known limitation.
+**Recommendation:** Investigate if this TODO is still relevant or can be removed. If relevant, consider
+implementing or documenting as a known limitation.
 
 ### 8. Missing Type Hints Throughout Codebase
 
 **File:** Multiple files  
 **Severity:** Low (maintainability)  
 
-**Description:** Most functions lack comprehensive type hints, which would improve IDE support, enable static type checking, and catch type-related bugs early.
+**Description:** Most functions lack comprehensive type hints, which would improve IDE support, enable static type
+checking, and catch type-related bugs early.
 
 **Recommendation:**
+
 - Add type hints progressively, starting with public APIs
 - Consider adding `py.typed` marker for better IDE support
 - Use mypy for type checking in CI
@@ -265,7 +298,8 @@ pre = int(np.ceil(power / 3.0) * 3)  # Convert to int immediately
 
 **Description:** Mix of `if x is None:`, `if not x:`, and `match x: case None:` patterns for None checking.
 
-**Recommendation:** Establish and document preferred pattern for None checking. Generally `is None` is preferred for explicit None checks.
+**Recommendation:** Establish and document preferred pattern for None checking. Generally `is None` is preferred
+for explicit None checks.
 
 ### 10. Line Length Violations
 
@@ -290,7 +324,8 @@ pre = int(np.ceil(power / 3.0) * 3)  # Convert to int immediately
 **File:** `src/stonerplots/context/base.py:178`  
 **Severity:** Low (micro-optimization)  
 
-**Description:** `self.axes.flatten()` is called repeatedly in `__len__`, `__contains__`, and `__iter__` methods. Could cache the result if performance matters for large numbers of axes.
+**Description:** `self.axes.flatten()` is called repeatedly in `__len__`, `__contains__`, and `__iter__` methods.
+Could cache the result if performance matters for large numbers of axes.
 
 **Impact:** Only matters for very large figure arrays; unlikely to be significant.
 
@@ -310,7 +345,8 @@ pre = int(np.ceil(power / 3.0) * 3)  # Convert to int immediately
 
 **Description:** The filename setter accepts any string/Path without validation for directory traversal or invalid characters.
 
-**Recommendation:** Add path validation if accepting untrusted user input. For trusted input, current implementation is acceptable.
+**Recommendation:** Add path validation if accepting untrusted user input. For trusted input, current implementation
+is acceptable.
 
 ## Informational Issues
 
@@ -321,14 +357,17 @@ pre = int(np.ceil(power / 3.0) * 3)  # Convert to int immediately
 
 **Description:** Uses `runpy.run_path(script)` to execute arbitrary Python files from the examples directory.
 
-**Note:** This is appropriate for testing examples but ensure test files are from trusted sources only. Not a security issue in current context.
+**Note:** This is appropriate for testing examples but ensure test files are from trusted sources only. Not a
+security issue in current context.
 
 ### 16. DoubleYAxis.good_colour() Logic Issue
 
 **File:** `src/stonerplots/context/double_y.py:154-160`  
 **Severity:** Info  
 
-**Description:** The `good_colour()` method has a `case str()` branch that checks `if -len(self.colours) < axis < len(self.colours)`, but when `self.colours` is a string, `len(self.colours)` is the string length, not the number of colours.
+**Description:** The `good_colour()` method has a `case str()` branch that checks
+`if -len(self.colours) < axis < len(self.colours)`, but when `self.colours` is a string, `len(self.colours)` is the
+string length, not the number of colours.
 
 **Impact:** Logic may not work as intended when colours is a single string vs a list.
 
@@ -367,6 +406,7 @@ pre = int(np.ceil(power / 3.0) * 3)  # Convert to int immediately
 ### Remaining Gaps
 
 The uncovered 9.36% consists primarily of:
+
 1. Exception handler bodies (defensive programming)
 2. Helper methods called by matplotlib internals
 3. Advanced collection protocol methods
@@ -408,7 +448,8 @@ The uncovered 9.36% consists primarily of:
 - ✅ Uses public matplotlib APIs (after fixes)
 - ℹ️ Uses `runpy` for test execution (acceptable for tests)
 
-**Overall:** The repository does not handle untrusted input in security-critical ways. Main risks are future compatibility with matplotlib updates.
+**Overall:** The repository does not handle untrusted input in security-critical ways. Main risks are future
+compatibility with matplotlib updates.
 
 ## Recommendations
 
@@ -449,13 +490,16 @@ The uncovered 9.36% consists primarily of:
 
 ## Conclusion
 
-The StonerPlots repository is a well-designed matplotlib extension with useful functionality for scientific plotting. However, **three critical bugs** were identified that will cause runtime failures and must be fixed immediately:
+The StonerPlots repository is a well-designed matplotlib extension with useful functionality for scientific
+plotting. However, **three critical bugs** were identified that will cause runtime failures and must be fixed
+immediately:
 
 1. **Counter function crashes for values >= 26**
 2. **InsetPlot axes wrapper handling is broken**
 3. **StackVertical crashes with minimal tick marks**
 
-These bugs are straightforward to fix and should be addressed before the next release. The remaining issues are mostly documentation and code style improvements that can be addressed over time.
+These bugs are straightforward to fix and should be addressed before the next release. The remaining issues are
+mostly documentation and code style improvements that can be addressed over time.
 
 **Current Score:** 7.8/10  
 **Potential Score:** 9.0/10 (after fixing critical bugs and addressing medium-priority issues)

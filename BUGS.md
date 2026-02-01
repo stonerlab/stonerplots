@@ -4,7 +4,8 @@
 **Last Updated:** 2026-02-01  
 **Repository:** stonerlab/stonerplots  
 
-This document contains detailed information about all issues and bugs discovered during a comprehensive code review of the stonerplots repository.
+This document contains detailed information about all issues and bugs discovered during a comprehensive code review of
+the stonerplots repository.
 
 ---
 
@@ -18,9 +19,11 @@ This document contains detailed information about all issues and bugs discovered
 
 **Description:**
 
-The `counter()` function computes lowercase alphabet labels using `chr(ord("a") + value)`. This works for values 0-25 (producing 'a'-'z'), but crashes for values >= 26 because the resulting ASCII code exceeds the lowercase letter range.
+The `counter()` function computes lowercase alphabet labels using `chr(ord("a") + value)`. This works for values 0-25
+(producing 'a'-'z'), but crashes for values >= 26 because the resulting ASCII code exceeds the lowercase letter range.
 
 **Current Code:**
+
 ```python
 def counter(value: int, pattern: str = "({alpha})", **kwargs: str) -> str:
     r"""Format an integer as a string using a pattern and various representations.
@@ -39,6 +42,7 @@ def counter(value: int, pattern: str = "({alpha})", **kwargs: str) -> str:
 ```
 
 **Reproduction:**
+
 ```python
 >>> from stonerplots.counter import counter
 >>> counter(0)
@@ -64,7 +68,8 @@ The function assumes `value` is in range [0, 25] but doesn't validate or handle 
 
 **Recommended Fix:**
 
-**Option 1: Multi-letter labels (Excel-style)**
+#### Option 1: Multi-letter labels (Excel-style)
+
 ```python
 def _int_to_alpha(value: int) -> str:
     """Convert integer to Excel-style column label (a, b, ..., z, aa, ab, ...)."""
@@ -85,7 +90,8 @@ def counter(value: int, pattern: str = "({alpha})", **kwargs: str) -> str:
     # ...
 ```
 
-**Option 2: Wraparound (modulo)**
+#### Option 2: Wraparound (modulo)
+
 ```python
 def counter(value: int, pattern: str = "({alpha})", **kwargs: str) -> str:
     # ...
@@ -93,7 +99,8 @@ def counter(value: int, pattern: str = "({alpha})", **kwargs: str) -> str:
     # ...
 ```
 
-**Option 3: Raise error**
+#### Option 3: Raise error
+
 ```python
 def counter(value: int, pattern: str = "({alpha})", **kwargs: str) -> str:
     # ...
@@ -103,11 +110,12 @@ def counter(value: int, pattern: str = "({alpha})", **kwargs: str) -> str:
     # ...
 ```
 
-**Recommendation:** Option 1 (multi-letter labels) is most flexible and matches user expectations. Option 3 is simplest but limits functionality.
+**Recommendation:** Option 1 (multi-letter labels) is most flexible and matches user expectations. Option 3 is simplest
+but limits functionality.
 
 ---
 
-### Issue #2: Assignment Bug in InsetPlot.__enter__()
+### Issue #2: Assignment Bug in InsetPlot.**enter**()
 
 **File:** `src/stonerplots/context/inset_plot.py:114-115`  
 **Severity:** HIGH  
@@ -115,9 +123,12 @@ def counter(value: int, pattern: str = "({alpha})", **kwargs: str) -> str:
 
 **Description:**
 
-The `__enter__()` method attempts to handle axes wrappers by detecting objects with an `.ax` attribute. However, line 114 assigns `self.ax = self._ax.ax`, and then line 115 **unconditionally overwrites** this assignment, making the wrapper detection completely ineffective.
+The `__enter__()` method attempts to handle axes wrappers by detecting objects with an `.ax` attribute. However,
+line 114 assigns `self.ax = self._ax.ax`, and then line 115 **unconditionally overwrites** this assignment, making
+the wrapper detection completely ineffective.
 
 **Current Code:**
+
 ```python
 def __enter__(self) -> Axes:
     """Create the inset axes using the axes_grid toolkit."""
@@ -143,7 +154,8 @@ def __enter__(self) -> Axes:
 
 **Root Cause:**
 
-Missing `elif` or `else` on line 115. The assignment is unconditional, so it always executes regardless of the wrapper check.
+Missing `elif` or `else` on line 115. The assignment is unconditional, so it always executes regardless of the
+wrapper check.
 
 **Recommended Fix:**
 
@@ -193,9 +205,11 @@ with InsetPlot(wrapper) as inset:
 
 **Description:**
 
-The `_fix_limits()` method accesses `yticks[1]` and `yticks[-2]` without checking if the yticks list has enough elements. If there are fewer than 3 ticks, this raises an IndexError.
+The `_fix_limits()` method accesses `yticks[1]` and `yticks[-2]` without checking if the yticks list has enough
+elements. If there are fewer than 3 ticks, this raises an IndexError.
 
 **Current Code:**
+
 ```python
 def _fix_limits(self, ix: int, ax: Axes, fnt_pts: float, ax_height: float) -> None:
     """Adjust axes ylim to ensure labels don't overlap between stacked plots."""
@@ -234,7 +248,8 @@ with StackVertical(fig, 2) as axes:
 
 **Root Cause:**
 
-Code assumes `yticks` always has at least 3 elements, but matplotlib can produce fewer ticks depending on the data range and tick settings.
+Code assumes `yticks` always has at least 3 elements, but matplotlib can produce fewer ticks depending on the data
+range and tick settings.
 
 **Recommended Fix:**
 
@@ -294,9 +309,11 @@ def _fix_limits(self, ix: int, ax: Axes, fnt_pts: float, ax_height: float) -> No
 
 **Description:**
 
-The `setup.py` file specifies `packages=["stonerplots"]` but doesn't specify `package_dir`, and the actual package is located in `src/stonerplots`. This may cause installation issues.
+The `setup.py` file specifies `packages=["stonerplots"]` but doesn't specify `package_dir`, and the actual package
+is located in `src/stonerplots`. This may cause installation issues.
 
 **Current Code:**
+
 ```python
 # setup.py
 setup(
@@ -322,6 +339,7 @@ setup(
 **Option 1 (Recommended):** Remove `setup.py` entirely
 
 Since `pyproject.toml` already has complete configuration:
+
 ```toml
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -355,9 +373,12 @@ setup(
 
 **Description:**
 
-The variable `pre` is computed using numpy floating-point operations and then used as a dictionary key after conversion to int. While the try/except block catches KeyError, the float→int conversion could theoretically produce unexpected results due to floating-point precision.
+The variable `pre` is computed using numpy floating-point operations and then used as a dictionary key after
+conversion to int. While the try/except block catches KeyError, the float→int conversion could theoretically
+produce unexpected results due to floating-point precision.
 
 **Current Code:**
+
 ```python
 def __call__(self, value: Optional[float], pos: Optional[int] = None) -> str:
     """Format value with SI prefix."""
@@ -437,6 +458,7 @@ def __call__(self, value: Optional[float], pos: Optional[int] = None) -> str:
 ### Issue #6: Usage of Private matplotlib APIs
 
 **Files:**
+
 - ~~`src/stonerplots/__init__.py:15, 61-65`~~ ✅ **FIXED** (now uses `get_named_colors_mapping()`)
 - `src/stonerplots/util.py:14` - Import of `_TransformedBoundsLocator`
 - `src/stonerplots/context/double_y.py:153` - Docstring references `_subplots.AxesSubplot`
@@ -446,7 +468,8 @@ def __call__(self, value: Optional[float], pos: Optional[int] = None) -> str:
 
 **Description:**
 
-The codebase uses private matplotlib APIs (indicated by leading underscores) which could break in future matplotlib versions. However, one issue has been fixed and the remaining issues have low impact.
+The codebase uses private matplotlib APIs (indicated by leading underscores) which could break in future matplotlib
+versions. However, one issue has been fixed and the remaining issues have low impact.
 
 **Current Status:**
 
@@ -467,6 +490,7 @@ The codebase uses private matplotlib APIs (indicated by leading underscores) whi
 **Recommended Fixes:**
 
 **For util.py (add comment):**
+
 ```python
 from matplotlib.axes._base import _TransformedBoundsLocator  # type: ignore[attr-defined]
 
@@ -476,6 +500,7 @@ from matplotlib.axes._base import _TransformedBoundsLocator  # type: ignore[attr
 ```
 
 **For double_y.py (update docstring):**
+
 ```python
 def __enter__(self):
     """Handle context entry for managing temporary switchable axes in a Matplotlib figure.
@@ -504,7 +529,8 @@ Comment reads: `# XXX TODO: If markers are present, it would be good to take the
 
 **Impact:**
 
-Indicates feature gap in auto-positioning logic - marker bounding boxes may not be considered when automatically positioning inset plots.
+Indicates feature gap in auto-positioning logic - marker bounding boxes may not be considered when automatically
+positioning inset plots.
 
 **Recommended Action:**
 
@@ -523,7 +549,8 @@ Indicates feature gap in auto-positioning logic - marker bounding boxes may not 
 
 **Description:**
 
-Most functions in the codebase lack comprehensive type hints. While some functions have partial hints in docstrings, Python type annotations are missing.
+Most functions in the codebase lack comprehensive type hints. While some functions have partial hints in docstrings,
+Python type annotations are missing.
 
 **Impact:**
 
@@ -564,6 +591,7 @@ def move_inset(parent: Axes, inset_axes: Axes, new_bbox: Bbox) -> None:
 **Description:**
 
 The codebase uses different patterns for None checking:
+
 - `if x is None:`
 - `if not x:`
 - `match x: case None:`
@@ -596,6 +624,7 @@ match value:
 **Recommendation:**
 
 Establish and document preferred pattern:
+
 - Use `is None` / `is not None` for explicit None checks
 - Use `if not x:` only when you explicitly want falsy checking (0, empty containers, etc.)
 - Document the standard in CONTRIBUTING.md
@@ -666,6 +695,7 @@ Minor - affects code consistency and readability.
 **Recommendation:**
 
 Use f-strings consistently throughout the codebase (Python 3.10+ supports this). F-strings are:
+
 - More readable
 - Faster
 - Less error-prone (syntax checked at compile time)
@@ -681,7 +711,8 @@ Use f-strings consistently throughout the codebase (Python 3.10+ supports this).
 
 **Description:**
 
-`self.axes.flatten()` is called repeatedly in `__len__`, `__contains__`, and `__iter__` methods, creating a new flattened list each time.
+`self.axes.flatten()` is called repeatedly in `__len__`, `__contains__`, and `__iter__` methods, creating a new
+flattened list each time.
 
 **Impact:**
 
@@ -770,6 +801,7 @@ However, verify this doesn't break intended behavior - some operations may requi
 **Description:**
 
 The `filename` setter accepts any string/Path without validating for:
+
 - Directory traversal (`../../../etc/passwd`)
 - Invalid characters for the filesystem
 - Existence of parent directories
@@ -846,7 +878,8 @@ def test_example(script: Path) -> None:
 - None in current context - tests execute trusted code from the repository
 - Would be a security issue if running untrusted scripts
 
-**Note:** This is intentional design for testing example scripts. Not a bug or vulnerability. Just noting for security awareness that test files should be from trusted sources only.
+**Note:** This is intentional design for testing example scripts. Not a bug or vulnerability. Just noting for
+security awareness that test files should be from trusted sources only.
 
 ---
 
@@ -879,7 +912,9 @@ def good_colour(self, axis: int) -> bool:
 
 **Issue:**
 
-When `self.colours` is a string (e.g., `"red"`), `len(self.colours)` returns the string length (3), not the number of colours (1). The condition `-len(self.colours) < axis < len(self.colours)` checks `-3 < axis < 3`, which may not be the intended behavior.
+When `self.colours` is a string (e.g., `"red"`), `len(self.colours)` returns the string length (3), not the number
+of colours (1). The condition `-len(self.colours) < axis < len(self.colours)` checks `-3 < axis < 3`, which may not
+be the intended behavior.
 
 **Impact:**
 
@@ -889,6 +924,7 @@ When `self.colours` is a string (e.g., `"red"`), `len(self.colours)` returns the
 **Recommended Review:**
 
 Clarify the intended behavior:
+
 1. Should `colours` as a single string apply to both axes?
 2. Should string length matter, or should it be treated as a single colour?
 3. Is the string case meant to handle comma-separated colours?
@@ -943,15 +979,15 @@ def good_colour(self, axis: int) -> bool:
 
 **Short Term (Next sprint):**
 
-4. Address Issue #4: Package configuration
-5. Fix Issue #5: Type inconsistency in TexEngFormatter
-6. Document Issue #6: matplotlib private API usage
+1. Address Issue #4: Package configuration
+2. Fix Issue #5: Type inconsistency in TexEngFormatter
+3. Document Issue #6: matplotlib private API usage
 
 **Long Term (When time permits):**
 
-7. Address remaining low-priority code quality issues
-8. Add comprehensive type hints (Issue #8)
-9. Establish coding standards documentation
+1. Address remaining low-priority code quality issues
+2. Add comprehensive type hints (Issue #8)
+3. Establish coding standards documentation
 
 ---
 

@@ -16,6 +16,7 @@ This directory contains the results of a comprehensive code review conducted on 
 **Start here** - Executive summary of the code review findings.
 
 Contains:
+
 - Overall assessment and code quality score (7.8/10)
 - Issue breakdown by severity
 - Critical issues requiring immediate attention (3 HIGH severity bugs)
@@ -25,6 +26,7 @@ Contains:
 - Security analysis
 
 **Quick Stats:**
+
 - **16 issues identified**
   - 3 HIGH severity (critical bugs requiring immediate fixes)
   - 3 MEDIUM severity (important improvements)
@@ -32,6 +34,7 @@ Contains:
   - 2 INFO (awareness only)
 
 **Critical Bugs Found:**
+
 1. ❌ Counter function crashes for values >= 26
 2. ❌ InsetPlot axes wrapper handling is broken  
 3. ❌ StackVertical crashes with minimal tick marks
@@ -41,6 +44,7 @@ Contains:
 **Detailed reference** - Complete documentation of all identified issues.
 
 Contains for each issue:
+
 - Issue number and detailed description
 - File location with exact line numbers
 - Code examples showing the problem
@@ -51,21 +55,22 @@ Contains for each issue:
 - Test cases to verify the fix
 
 **Categories:**
+
 1. **Critical Issues** (HIGH severity) - Issues #1-3
    - Buffer overflow in counter()
    - Assignment bug in InsetPlot
    - Index out of bounds in StackVertical
-   
+
 2. **Medium Priority Issues** - Issues #4-6
    - Package configuration mismatch
    - Type inconsistency in formatter
    - Private matplotlib API usage
-   
+
 3. **Low Priority Issues** - Issues #7-14
    - Code quality improvements
    - Documentation gaps
    - Performance optimizations
-   
+
 4. **Informational Issues** - Issues #15-16
    - Security awareness notes
    - Logic review recommendations
@@ -148,6 +153,7 @@ Contains for each issue:
 ### Overall Score: 7.8/10
 
 **Strengths:**
+
 - ✅ Excellent test coverage (90.64%)
 - ✅ Modern Python features (match/case, context managers)
 - ✅ Well-organized package structure
@@ -155,6 +161,7 @@ Contains for each issue:
 - ✅ Good use of matplotlib's style system
 
 **Improvement Areas:**
+
 - ⚠️ 3 critical bugs that cause crashes
 - ⚠️ Missing type hints in most functions
 - ⚠️ Some use of private matplotlib APIs
@@ -168,6 +175,7 @@ Contains for each issue:
 **Recommended Target:** 85%+ (✅ Exceeded)
 
 **Coverage by Module:**
+
 - `__init__.py`: 100.00%
 - `colours.py`: 100.00%
 - `counter.py`: 100.00%
@@ -193,6 +201,7 @@ This review was conducted by systematically analyzing:
 7. ✅ Test coverage analysis
 
 **Tools Used:**
+
 - GitHub Copilot code-review agent (deep analysis)
 - Manual code inspection
 - Test execution and coverage analysis
@@ -206,11 +215,12 @@ This review was conducted by systematically analyzing:
 
 ## 🔐 Security Assessment
 
-**Overall Security Risk: LOW**
+### Overall Security Risk: LOW
 
 ✅ **No Critical Security Issues Found**
 
 **Findings:**
+
 - ✅ No SQL injection risks (no database access)
 - ✅ No command injection risks (limited subprocess use)
 - ✅ No hardcoded credentials or secrets
@@ -218,6 +228,7 @@ This review was conducted by systematically analyzing:
 - ℹ️ Test suite uses `runpy` for example execution (acceptable for trusted code)
 
 **Recommendations:**
+
 - Add path validation in SavedFigure if accepting user input (Issue #14)
 - Keep test examples from trusted sources only
 
@@ -284,7 +295,8 @@ When you fix an issue:
 5. ✅ Update this README if major categories change
 
 Example commit message:
-```
+
+```text
 Fix counter() buffer overflow (Issue #1)
 
 - Add multi-letter label support (a, b, ..., z, aa, ab, ...)
@@ -298,8 +310,8 @@ Fix counter() buffer overflow (Issue #1)
 
 ### Project Documentation
 
-- **Repository:** https://github.com/stonerlab/stonerplots
-- **Issues:** https://github.com/stonerlab/stonerplots/issues
+- **Repository:** <https://github.com/stonerlab/stonerplots>
+- **Issues:** <https://github.com/stonerlab/stonerplots/issues>
 - **README:** [../README.md](../README.md)
 - **Contributing:** (Consider creating CONTRIBUTING.md with coding standards)
 
@@ -335,7 +347,8 @@ If you have questions about any findings or disagree with an assessment:
 4. Open a GitHub issue for discussion if needed
 5. Reference the issue number in your discussion
 
-**Remember:** This review is meant to improve code quality, not criticize. All codebases have areas for improvement, and this codebase is generally well-written!
+**Remember:** This review is meant to improve code quality, not criticize. All codebases have areas for improvement,
+and this codebase is generally well-written!
 
 ---
 
@@ -354,15 +367,19 @@ Update these numbers as issues are fixed.
 
 ## 🎉 Conclusion
 
-The StonerPlots repository is a well-designed matplotlib extension with clean architecture and good test coverage. The three critical bugs identified are straightforward to fix and should be addressed before the next release. With these fixes and medium-priority improvements, the codebase quality could easily reach 9.0/10.
+The StonerPlots repository is a well-designed matplotlib extension with clean architecture and good test coverage. The
+three critical bugs identified are straightforward to fix and should be addressed before the next release. With these
+fixes and medium-priority improvements, the codebase quality could easily reach 9.0/10.
 
 The review identified:
+
 - ✅ Strong foundation with good practices
 - ⚠️ 3 critical bugs requiring immediate fixes
 - 📝 Several opportunities for code quality improvements
 - 🎯 Clear actionable recommendations for each issue
 
 **Next Steps:**
+
 1. Fix the 3 critical bugs (Issues #1-3)
 2. Address medium-priority configuration and documentation issues
 3. Consider long-term improvements (type hints, pre-commit hooks)
