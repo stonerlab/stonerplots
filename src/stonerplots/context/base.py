@@ -80,10 +80,12 @@ class RavelList(list):
         return items
 
     @overload
-    def __getitem__(self, index: SupportsIndex) -> Any: ...
+    def __getitem__(self, index: SupportsIndex) -> Any: 
+        ...
     
     @overload
-    def __getitem__(self, index: slice) -> List[Any]: ...
+    def __getitem__(self, index: slice) -> List[Any]: 
+        ...
     
     def __getitem__(self, index: Union[SupportsIndex, tuple, slice]) -> Any:  # type: ignore[override]
         """2D-style indexing using tuples.
@@ -213,10 +215,12 @@ class PlotContextSequence(Sequence):
         return value in self.raveled_axes
 
     @overload
-    def __getitem__(self, index: SupportsIndex) -> Axes: ...
+    def __getitem__(self, index: SupportsIndex) -> Axes: 
+        ...
     
     @overload
-    def __getitem__(self, index: slice) -> List[Axes]: ...
+    def __getitem__(self, index: slice) -> List[Axes]: 
+        ...
     
     def __getitem__(self, index: Union[SupportsIndex, slice]) -> Union[Axes, List[Axes]]:
         """Get axis item at index and optionally set it as current."""
@@ -375,3 +379,4 @@ class TrackNewFiguresAndAxes:
         """Clean up the saved figures and axes."""
         self._existing_open_figs = []
         self._existing_open_axes = {}
+
