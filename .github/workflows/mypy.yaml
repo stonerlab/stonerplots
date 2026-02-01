@@ -39,3 +39,12 @@ jobs:
 
       - name: Run mypy on base.py
         run: python -m mypy src/stonerplots/context/base.py
+
+      - name: Run mypy on format.py
+        run: python -m mypy src/stonerplots/format.py
+
+      - name: Run mypy on counter.py
+        run: python -m mypy src/stonerplots/counter.py
+
+      - name: Run mypy on colours.py
+        run: python -m mypy src/stonerplots/colours.py

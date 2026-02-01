@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 """Additional matplotlib formatting classes."""
 
+from typing import Any, Optional, Union
 import numpy as np
+from numpy.ma import MaskedArray
 from matplotlib.ticker import EngFormatter, Formatter, Locator, NullFormatter
 
 from .context.base import TrackNewFiguresAndAxes
 
 
-def _round(value, offset=2):
+def _round(value: float, offset: int = 2) -> float:
     """Round numbers for the TexFormatters to avoid crazy numbers of decimal places.
 
     Args:
@@ -40,7 +42,7 @@ class TexFormatter(Formatter):
         >>> plt.show()
     """
 
-    def __call__(self, value, pos=None):
+    def __call__(self, value: float, pos: Optional[int] = None) -> str:
         """Return the value in a suitable texable format."""
         if value is None or np.isnan(value):
             ret = ""
@@ -58,11 +60,11 @@ class TexFormatter(Formatter):
             ret = "$0.0$"
         return ret
 
-    def format_data(self, value):
+    def format_data(self, value: float) -> str:
         """Return the full string representation of the value with the position unspecified."""
         return self.__call__(value)
 
-    def format_data_short(self, value):  # pylint: disable=r0201
+    def format_data_short(self, value: Union[float, MaskedArray]) -> str:  # pylint: disable=r0201
         """Return a short string version of the tick value.
 
         Defaults to the position-independent long value.
@@ -77,7 +79,7 @@ class TexEngFormatter(EngFormatter):
     rather than using E notation.
     """
 
-    prefix = {
+    prefix: dict[int, str] = {
         0: "",
         3: "k",
         6: "M",
@@ -97,7 +99,7 @@ class TexEngFormatter(EngFormatter):
         -24: "y",
     }
 
-    def __call__(self, value, pos=None):
+    def __call__(self, value: float, pos: Optional[int] = None) -> str:
         """Return the value in a suitable texable format."""
         if value is None or np.isnan(value):
             ret = ""
@@ -125,11 +127,11 @@ class TexEngFormatter(EngFormatter):
             ret = "$0.0$"
         return ret
 
-    def format_data(self, value):
+    def format_data(self, value: float) -> str:
         """Return the full string representation of the value with the position unspecified."""
         return self.__call__(value)
 
-    def format_data_short(self, value):  # pylint: disable=r0201
+    def format_data_short(self, value: Union[float, MaskedArray]) -> str:  # pylint: disable=r0201
         """Return a short string version of the tick value.
 
         Defaults to the position-independent long value.
@@ -164,18 +166,27 @@ class PlotLabeller(TrackNewFiguresAndAxes):
         >>> plt.show()
     """
 
-    def __init__(self, *args, x=TexEngFormatter, y=TexEngFormatter, z=TexEngFormatter, **kargs):
+    def __init__(
+        self,
+        *args: Any,
+        x: Union[type[Formatter], type[Locator], Formatter, Locator, list, tuple] = TexEngFormatter,
+        y: Union[type[Formatter], type[Locator], Formatter, Locator, list, tuple] = TexEngFormatter,
+        z: Union[type[Formatter], type[Locator], Formatter, Locator, list, tuple] = TexEngFormatter,
+        **kargs: Any,
+    ) -> None:
         """Store tick formatting classes."""
         self._initialize_axes("x", x)
         self._initialize_axes("y", y)
         self._initialize_axes("z", z)
         super().__init__(*args, **kargs)
 
-    def _initialize_axes(self, label, axis):
+    def _initialize_axes(
+        self, label: str, axis: Union[type[Formatter], type[Locator], Formatter, Locator, list, tuple]
+    ) -> None:
         """Initialize axis with given formatters or locators."""
         if not isinstance(axis, (list, tuple)):
             axis = [axis]
-        formatted_axes = []
+        formatted_axes: list[Union[Formatter, Locator]] = []
         for elem in axis:
             if isinstance(elem, type):
                 elem = elem()
@@ -187,7 +198,9 @@ class PlotLabeller(TrackNewFiguresAndAxes):
             formatted_axes.append(elem)
         setattr(self, f"{label}axis", formatted_axes)
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(
+        self, exc_type: Optional[type[BaseException]], exc_value: Optional[BaseException], traceback: Any
+    ) -> None:
         """Apply the ticker formatter to all the opened axes."""
         for ax in self.new_axes:
             for name in ("xaxis", "yaxis", "zaxis"):

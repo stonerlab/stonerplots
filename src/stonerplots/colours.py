@@ -3,7 +3,7 @@
 __all__ = ["tube_colours", "tube_colours_90", "tube_colours_70", "tube_colours_50", "tube_colours_10"]
 
 # Taken from the tfl blog: https://blog.tfl.gov.uk/2022/12/22/digital-colour-standard/
-tube_colours = {
+tube_colours: dict[str, str] = {
     "bakerloo": "#B26300",
     "central": "#DC241F",
     "circle": "#FFC80A",
@@ -38,7 +38,7 @@ tube_colours = {
     "night_service": "#1A1A36",
 }
 
-tube_colours_90 = {
+tube_colours_90: dict[str, str] = {
     "bakerloo90": "#753500",
     "central90": "#940000",
     "district90": "#004d1f",
@@ -57,7 +57,7 @@ tube_colours_90 = {
     "night90": "#05040D",
 }
 
-tube_colours_70 = {
+tube_colours_70: dict[str, str] = {
     "bakerloo70": "#9E5200",
     "central70": "#BD0404",
     "hammersmith&city70": "#E06C87",
@@ -76,7 +76,7 @@ tube_colours_70 = {
     "night70": "#0E0D21",
 }
 
-tube_colours_50 = {
+tube_colours_50: dict[str, str] = {
     "bakerloo50": "#ff991a",
     "central50": "#e96663",
     "hammersmith&city50": "#f2c0cb",
@@ -96,7 +96,7 @@ tube_colours_50 = {
 }
 
 
-tube_colours_10 = {
+tube_colours_10: dict[str, str] = {
     "bakerloo10": "#F1E3D1",
     "central10": "#F9DCDB",
     "district10": "#b3ffd1",
