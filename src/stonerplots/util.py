@@ -7,7 +7,7 @@ Based on code used in matplotlib to automatically position a legend.
 from collections.abc import Iterable
 from copy import copy
 from pathlib import Path
-from typing import List, Optional, Callable, Tuple
+from typing import Any, List, Optional, Callable, Tuple, Union
 
 from matplotlib.artist import Artist
 from matplotlib.axes import Axes
@@ -55,14 +55,14 @@ class _default(object):
         return copy(self._formats)
 
     @formats.setter
-    def formats(self, value: str | Iterable[str]) -> None:
+    def formats(self, value: Union[str, Iterable[str], None]) -> None:
         """Store the default formats."""
-        if isinstance(value, str):
+        if value is None:
+            self._formats = ["png"]
+        elif isinstance(value, str):
             self._formats = [x.strip() for x in value.split(",") if x.strip()]
         elif isinstance(value, Iterable):
             self._formats = list(value)
-        elif value is None:
-            self._formats = ["png"]
         else:
             raise TypeError("Invalid type for formats. Expected str, iterable, or None.")
 
@@ -83,7 +83,7 @@ class _default(object):
         self._filename = value
 
 
-def move_inset(parent: Optional[Figure, Axes], inset_axes: Axes, new_bbox: Bbox) -> None:
+def move_inset(parent: Optional[Union[Figure, Axes]], inset_axes: Axes, new_bbox: Bbox) -> None:
     """Relocate an inset_axes to a new location.
 
     Args:
@@ -140,8 +140,8 @@ def _get_inset_axes(ax: Axes) -> List[Axes]:
 
 def _auto_linset_data(ax: Axes,
                       axins: Axes,
-                      renderer: Callable[[], Figure],
-                      insets: bool = True) -> Tuple[List[Bbox], List[Artist], List[Tuple[float, float]]]:
+                      renderer: Any,
+                      insets: bool = True) -> Tuple[List[Bbox], List[Any], List[Tuple[float, float]]]:
     """Return display coordinates for hit testing for "best" positioning.
 
     Args:
@@ -156,7 +156,9 @@ def _auto_linset_data(ax: Axes,
             - lines (list): List of `.Path` corresponding to each line.
             - offsets (list): List of (x, y) offsets of all collections.
     """
-    bboxes, lines, offsets = [], [], []
+    bboxes: List[Bbox] = []
+    lines: List[Any] = []
+    offsets: List[Tuple[float, float]] = []
     inset_axes = _get_inset_axes(ax) if insets else []
 
     for artist in ax.get_children() + inset_axes:
@@ -165,7 +167,7 @@ def _auto_linset_data(ax: Axes,
     return bboxes, lines, offsets
 
 
-def _handle_line2d(artist:Line2D, lines:List[Line2D]):
+def _handle_line2d(artist: Line2D, lines: List[Any]) -> None:
     """Handle Line2D artist by extracting its transformed path.
 
     Args:
@@ -175,7 +177,7 @@ def _handle_line2d(artist:Line2D, lines:List[Line2D]):
     lines.append(artist.get_transform().transform_path(artist.get_path()))
 
 
-def _handle_rectangle(artist:Rectangle, bboxes:List[Bbox]):
+def _handle_rectangle(artist: Rectangle, bboxes: List[Bbox]) -> None:
     """Handle Rectangle artist by extracting its bounding box.
 
     Args:
@@ -185,7 +187,7 @@ def _handle_rectangle(artist:Rectangle, bboxes:List[Bbox]):
     bboxes.append(artist.get_bbox().transformed(artist.get_data_transform()))
 
 
-def _handle_patch(artist:Patch, lines:List[Patch]):
+def _handle_patch(artist: Patch, lines: List[Any]) -> None:
     """Handle Patch artist by extracting its transformed path.
 
     Args:
@@ -195,7 +197,7 @@ def _handle_patch(artist:Patch, lines:List[Patch]):
     lines.append(artist.get_transform().transform_path(artist.get_path()))
 
 
-def _handle_polycollection(artist, lines):
+def _handle_polycollection(artist: PolyCollection, lines: List[Any]) -> None:
     """Handle PolyCollection artist by extracting all its transformed paths.
 
     Args:
@@ -205,7 +207,7 @@ def _handle_polycollection(artist, lines):
     lines.extend(artist.get_transform().transform_path(path) for path in artist.get_paths())
 
 
-def _handle_collection(artist, offsets):
+def _handle_collection(artist: Collection, offsets: List[Tuple[float, float]]) -> None:
     """Handle Collection artist by extracting point offsets.
 
     Args:
@@ -217,7 +219,7 @@ def _handle_collection(artist, offsets):
         offsets.extend(transOffset.transform(hoffsets))
 
 
-def _handle_text(artist, renderer, bboxes):
+def _handle_text(artist: Text, renderer: Any, bboxes: List[Bbox]) -> None:
     """Handle Text artist by extracting its window extent.
 
     Args:
@@ -228,7 +230,9 @@ def _handle_text(artist, renderer, bboxes):
     bboxes.append(artist.get_window_extent(renderer))
 
 
-def _handle_axes_legend(artist, axins, renderer, bboxes, lines, offsets):
+def _handle_axes_legend(
+    artist: Union[Axes, Legend], axins: Axes, renderer: Any, bboxes: List[Bbox], lines: List[Any], offsets: List[Tuple[float, float]]
+) -> None:
     """Handle Axes or Legend artist by recursively extracting data.
 
     Args:
@@ -245,7 +249,9 @@ def _handle_axes_legend(artist, axins, renderer, bboxes, lines, offsets):
     offsets.extend(sub_offsets)
 
 
-def _process_artist(artist, renderer, axins, bboxes, lines, offsets):
+def _process_artist(
+    artist: Artist, renderer: Any, axins: Axes, bboxes: List[Bbox], lines: List[Any], offsets: List[Tuple[float, float]]
+) -> None:
     """Process an artist to extract relevant display coordinates.
 
     Args:
@@ -275,7 +281,7 @@ def _process_artist(artist, renderer, axins, bboxes, lines, offsets):
             pass
 
 
-def calculate_position(inset_bbox, parent__bbox, loc=1):
+def calculate_position(inset_bbox: Bbox, parent__bbox: Bbox, loc: int = 1) -> Tuple[float, float]:
     """Calculate the shift in position based on the location of an inset within a parent.
 
     Args:
@@ -313,7 +319,7 @@ def calculate_position(inset_bbox, parent__bbox, loc=1):
     return dx, dy
 
 
-def new_bbox_for_loc(axins, ax, loc=1, padding=(0.02, 0.02)):
+def new_bbox_for_loc(axins: Axes, ax: Axes, loc: int = 1, padding: Tuple[float, float] = (0.02, 0.02)) -> Bbox:
     """Calculate a new axes bounding box for a given location.
 
     Args:
@@ -353,7 +359,7 @@ def new_bbox_for_loc(axins, ax, loc=1, padding=(0.02, 0.02)):
     return inset_location
 
 
-def find_best_position(ax, axins, renderer=None):
+def find_best_position(ax: Axes, axins: Axes, renderer: Optional[Any] = None) -> Tuple[int, Bbox]:
     """Calculate a new axes bounding box for a given location.
 
     Args:
@@ -403,7 +409,7 @@ def find_best_position(ax, axins, renderer=None):
     return idx, insetBox
 
 
-def copy_properties(obj, properties):
+def copy_properties(obj: Any, properties: dict[str, Any]) -> None:
     """Copy matplotlib properties to an object."""
     for k, v in properties.items():
         if attr := getattr(obj, f"set_{k}", None):
