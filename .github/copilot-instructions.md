@@ -61,6 +61,7 @@ Within each group, sort imports alphabetically. Where possible combine imports f
 - Avoid line splits that are not compatible with the versions of python
   specified in the package building scripts.
 - remove trailing whitespace at the end of lines
+- Ensure blank lines only contain an end of line character and not any other whitespace.
 
 ## Issues and Bugs discovered during copilot operations
 
