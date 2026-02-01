@@ -324,8 +324,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             self._context_stack = None
 
         # Clean up weak references
-        # type: ignore[misc, operator]
-        self._existing_open_figs = [ref for ref in self._existing_open_figs if ref() is not None]
+        self._existing_open_figs = [ref for ref in self._existing_open_figs if ref() is not None]  # type: ignore[misc, operator]
         new_file_counter = 0
 
         new_figures = list(self.new_figures)
