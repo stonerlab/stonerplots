@@ -116,8 +116,6 @@ class PreserveFigureMixin:
 
     class _UnsetType:
         """Sentinel type for unset values."""
-        
-        pass
 
     _UNSET = _UnsetType()  # Constant representing the unset state
 
@@ -379,4 +377,5 @@ class TrackNewFiguresAndAxes:
         """Clean up the saved figures and axes."""
         self._existing_open_figs = []
         self._existing_open_axes = {}
+
 
