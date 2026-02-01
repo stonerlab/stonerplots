@@ -3,7 +3,7 @@
 from copy import copy
 import weakref
 from collections.abc import Sequence
-from typing import Any, List, Union, Optional, Type
+from typing import Any, List, Union, Optional, Type, Iterator, overload, SupportsIndex
 from types import TracebackType
 
 import matplotlib as mpl
@@ -79,7 +79,13 @@ class RavelList(list):
             ix += 1
         return items
 
-    def __getitem__(self, index: Union[int, tuple]) -> Any:
+    @overload
+    def __getitem__(self, index: SupportsIndex) -> Any: ...
+    
+    @overload
+    def __getitem__(self, index: slice) -> List[Any]: ...
+    
+    def __getitem__(self, index: Union[SupportsIndex, tuple, slice]) -> Any:  # type: ignore[override]
         """2D-style indexing using tuples.
 
         Args:
@@ -93,6 +99,8 @@ class RavelList(list):
             >>> lst[0, 1]
             2
         """
+        if isinstance(index, slice):
+            return super().__getitem__(index)
         if not isinstance(index, tuple):
             return super().__getitem__(index)
         result = self
@@ -104,12 +112,17 @@ class RavelList(list):
 class PreserveFigureMixin:
     """Mixin for preserving the current figure and axes."""
 
-    _UNSET = None  # Constant representing the unset state
+    class _UnsetType:
+        """Sentinel type for unset values."""
+        
+        pass
+
+    _UNSET = _UnsetType()  # Constant representing the unset state
 
     def __init__(self) -> None:
         """Initialize figure and axes preservation attributes."""
-        self._saved_figure = self._UNSET
-        self._saved_axes = self._UNSET
+        self._saved_figure: Union[Figure, PreserveFigureMixin._UnsetType] = self._UNSET
+        self._saved_axes: Union[Axes, PreserveFigureMixin._UnsetType] = self._UNSET
         super().__init__()
 
     def _store_current_figure_and_axes(self) -> None:
@@ -131,9 +144,9 @@ class PreserveFigureMixin:
 
         Safely reverses the effect of `_store_current_figure_and_axes`.
         """
-        if self._saved_axes is not self._UNSET:
+        if not isinstance(self._saved_axes, PreserveFigureMixin._UnsetType):
             plt.sca(self._saved_axes)  # Restore current axes
-        elif self._saved_figure is not self._UNSET:
+        elif not isinstance(self._saved_figure, PreserveFigureMixin._UnsetType):
             plt.figure(self._saved_figure)  # Restore current figure
 
 
@@ -183,8 +196,8 @@ class PlotContextSequence(Sequence):
     def __init__(self) -> None:
         """Initialize class and ensure private attributes exist."""
         self.axes = RavelList()
-        self._save_fig = None
-        self._save_axes = None
+        self._save_fig: Optional[Figure] = None
+        self._save_axes: Optional[Axes] = None
 
     @property
     def raveled_axes(self) -> List[Axes]:
@@ -195,27 +208,33 @@ class PlotContextSequence(Sequence):
         """Return the number of axes."""
         return len(self.raveled_axes)
 
-    def __contains__(self, value) -> bool:
+    def __contains__(self, value: Any) -> bool:
         """Check if a value is contained within the axes."""
         return value in self.raveled_axes
 
-    def __getitem__(self, index) -> Axes:
+    @overload
+    def __getitem__(self, index: SupportsIndex) -> Axes: ...
+    
+    @overload
+    def __getitem__(self, index: slice) -> List[Axes]: ...
+    
+    def __getitem__(self, index: Union[SupportsIndex, slice]) -> Union[Axes, List[Axes]]:
         """Get axis item at index and optionally set it as current."""
         ret = self.axes[index]
         self._check_single_axis_selection(ret)
-        return ret
+        return ret  # type: ignore[return-value]
 
-    def __iter__(self) -> Axes:
+    def __iter__(self) -> Iterator[Axes]:
         """Iterate over the axes and set each as current when iterating."""
         for ax in self.raveled_axes:
             plt.sca(ax)
             yield ax
 
-    def __reversed__(self) -> List[Axes]:
+    def __reversed__(self) -> Iterator[Axes]:
         """Iterate in reverse over the axes and set each as current."""
         yield from reversed(self.raveled_axes)
 
-    def _check_single_axis_selection(self, ret) -> None:
+    def _check_single_axis_selection(self, ret: Any) -> None:
         """If the result is a single axis, set it as the current axis."""
         if isinstance(ret, mpl.axes.Axes):
             plt.sca(ret)
@@ -256,7 +275,7 @@ class TrackNewFiguresAndAxes:
         new_axes: Returns an iterator over axes created since the context was entered.
     """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Set storage of figures and axes.
 
         Args:
@@ -267,19 +286,20 @@ class TrackNewFiguresAndAxes:
             include_open (bool): If `True`, includes already open figures and axes. Defaults to `False`.
         """
         super().__init__()
-        self._existing_open_figs = []
-        self._existing_open_axes = {}
+        self._existing_open_figs: List[Union[weakref.ref[Figure], Figure]] = []
+        self._existing_open_axes: dict[int, List[Union[weakref.ref[Axes], Axes]]] = {}
         self.include_open = kwargs.pop("include_open", False)
 
-    def __enter__(self) -> None:
+    def __enter__(self) -> "TrackNewFiguresAndAxes":
         """Record any already open figures and axes."""
         for num in plt.get_fignums():
             if not self.include_open:
                 self._existing_open_figs.append(weakref.ref(plt.figure(num)))
                 self._existing_open_axes[num] = [weakref.ref(ax) for ax in plt.figure(num).axes]
+        return self
 
     @property
-    def new_figures(self) -> Figure:
+    def new_figures(self) -> Iterator[Figure]:
         """Return an iterator over figures created since the context manager was entered.
 
         Yields:
@@ -294,7 +314,7 @@ class TrackNewFiguresAndAxes:
         """
         # Dereference weakrefs to get actual figure objects for comparison
         # Handle both cases: list of weakrefs or list of already-dereferenced figures
-        existing_figs = []
+        existing_figs: List[Figure] = []
         for item in self._existing_open_figs:
             if isinstance(item, weakref.ref):
                 # Item is a weakref, dereference it
@@ -303,7 +323,7 @@ class TrackNewFiguresAndAxes:
                     existing_figs.append(fig)
             else:
                 # Item is already a dereferenced figure
-                existing_figs.append(item)
+                existing_figs.append(item)  # type: ignore[arg-type]
 
         for num in plt.get_fignums():
             fig = plt.figure(num)
@@ -312,7 +332,7 @@ class TrackNewFiguresAndAxes:
             yield fig
 
     @property
-    def new_axes(self) -> Axes:
+    def new_axes(self) -> Iterator[Axes]:
         """Return an iterator over all new axes created since the context manager was entered.
 
         Yields:
@@ -327,7 +347,7 @@ class TrackNewFiguresAndAxes:
         """
         # Dereference all weakrefs from all figures to get actual axes objects for comparison
         # Handle both cases: weakrefs or already-dereferenced axes objects
-        existing_axes = []
+        existing_axes: List[Axes] = []
         for _, axes_refs in self._existing_open_axes.items():
             for item in axes_refs:
                 if isinstance(item, weakref.ref):
