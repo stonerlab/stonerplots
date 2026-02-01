@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 """Context manager for central (i.e. non-framed) figures."""
 
+from types import TracebackType
+from typing import Optional, Type
+
 from matplotlib import pyplot as plt
+from matplotlib.figure import Figure
 
 from .base import PreserveFigureMixin, TrackNewFiguresAndAxes
 
@@ -24,14 +28,16 @@ class CentredAxes(TrackNewFiguresAndAxes, PreserveFigureMixin):
             the figure.
     """
 
-    def __init__(self, x=0.0, y=0.0, include_open=False, use=None):
+    def __init__(self, x: float = 0.0, y: float = 0.0, include_open: bool = False, use: Optional[Figure] = None) -> None:
         """Initialise context manager with default settings."""
         super().__init__(include_open=include_open)
         self.use = use
         self.x = x
         self.y = y
 
-    def __call__(self, x=None, y=None, include_open=None, use=None):
+    def __call__(
+        self, x: Optional[float] = None, y: Optional[float] = None, include_open: Optional[bool] = None, use: Optional[Figure] = None
+    ) -> "CentredAxes":
         """Update settings dynamically and return self."""
         self.x = self.x if x is None else x
         self.y = self.y if y is None else y
@@ -39,13 +45,16 @@ class CentredAxes(TrackNewFiguresAndAxes, PreserveFigureMixin):
         self.use = self.use if use is None else use
         return self
 
-    def __enter__(self):
+    def __enter__(self) -> "CentredAxes":
         """Record existing open figures and enter style context (if any)."""
         super().__enter__()
         if self.use:  # Set the current figure to be that given by use.
             plt.figure(getattr(self.use, "number", None))
+        return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(
+        self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException], traceback: Optional[TracebackType]
+    ) -> None:
         """Adjust all the figure axes."""
         super().__exit__(exc_type, exc_value, traceback)
         for ax in self.new_axes:

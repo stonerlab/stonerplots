@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """Context Manager for Double Y axis plots."""
 
+from types import TracebackType
+from typing import Optional, Type, Union
+
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 
@@ -69,7 +72,14 @@ class DoubleYAxis(PreserveFigureMixin):
 
     locations = _locations
 
-    def __init__(self, ax=None, legend=True, loc="best", colours=None, switch_to_y2=True):
+    def __init__(
+        self,
+        ax: Optional[Axes] = None,
+        legend: bool = True,
+        loc: Union[str, int] = "best",
+        colours: Optional[Union[list, tuple, str]] = None,
+        switch_to_y2: bool = True,
+    ) -> None:
         """Initialize the DoubleYAxis context manager.
 
         Ensures proper validation and formatting of input parameters.
@@ -103,7 +113,8 @@ class DoubleYAxis(PreserveFigureMixin):
         super().__init__()
 
         self._ax = ax
-        self.ax = None
+        self.ax: Optional[Axes] = None
+        self.ax2: Optional[Axes] = None
 
         # Configure legend location
         match loc:
@@ -120,23 +131,26 @@ class DoubleYAxis(PreserveFigureMixin):
         self.legend = legend
 
         # Configure axis colours
+        colours_list: Optional[list] = None
         if isinstance(colours, str):
-            colours = [x.strip() for x in colours.split(",")]
-        if isinstance(colours, (list, tuple)):
+            colours_list = [x.strip() for x in colours.split(",")]
+        elif isinstance(colours, (list, tuple)):
             if len(colours) < 2:
-                colours = [None] * (2 - len(colours)) + list(colours)
+                colours_list = [None] * (2 - len(colours)) + list(colours)
             elif len(colours) > 2:
-                colours = list(colours[:2])
+                colours_list = list(colours[:2])
             else:
-                colours = list(colours)
+                colours_list = list(colours)
         elif colours is not None:
             raise TypeError(f"Colours must be a list, tuple, or string, not {type(colours)}.")
-        self.colours = colours
+        self.colours = colours_list
         self._switch = switch_to_y2
 
-    def good_colour(self, axis):
+    def good_colour(self, axis: int) -> bool:
         """Return True if we have a colours defined for this axis."""
         axis = int(axis)
+        if self.colours is None:
+            return False
         match self.colours:
             case list() if -len(self.colours) < axis < len(self.colours):
                 return self.colours[axis] is not None
@@ -145,23 +159,26 @@ class DoubleYAxis(PreserveFigureMixin):
             case _:
                 return False
 
-    def __enter__(self):
+    def __enter__(self) -> Axes:
         """Handle context entry for managing temporary switchable axes in a Matplotlib figure.
 
         Returns:
-            matplotlib.axes._subplots.AxesSubplot:
+            (matplotlib.axes._subplots.AxesSubplot):
                 The secondary Y-axis created through `twinx()`.
         """
         self._store_current_figure_and_axes()
-        if isinstance(getattr(self._ax, "ax", None), Axes):
-            self._ax = self._ax.ax
+        ax_attr = getattr(self._ax, "ax", None)
+        if isinstance(ax_attr, Axes):
+            self._ax = self._ax.ax  # type: ignore[union-attr]
         self.ax = self._ax if isinstance(self._ax, Axes) else plt.gca()
         self.ax2 = self.ax.twinx()
         if self._switch:
             plt.sca(self.ax2)  # Set the secondary axis as the current axis
         return self.ax2
 
-    def __exit__(self, exc_type, value, traceback):
+    def __exit__(
+        self, exc_type: Optional[Type[BaseException]], value: Optional[BaseException], traceback: Optional[TracebackType]
+    ) -> None:
         """Handle the exit portion of the context manager.
 
         Customise axis properties, legends, and restoring the original figure and axes.
@@ -184,6 +201,9 @@ class DoubleYAxis(PreserveFigureMixin):
                 Returns `False` to propagate exceptions, if any occur, during the `with` block.
         """
         # Configure axis visibility and position
+        assert self.ax is not None
+        assert self.ax2 is not None
+        
         self.ax2.spines["left"].set_visible(False)
         self.ax2.yaxis.tick_right()
         self.ax.spines["right"].set_visible(False)
@@ -191,6 +211,7 @@ class DoubleYAxis(PreserveFigureMixin):
 
         # Apply colours to the primary axis
         if self.good_colour(0):
+            assert self.colours is not None
             self.ax.tick_params(axis="y", labelcolor=self.colours[0])
             self.ax.yaxis.label.set_color(self.colours[0])
             self.ax.spines["left"].set_color(self.colours[0])
@@ -198,6 +219,7 @@ class DoubleYAxis(PreserveFigureMixin):
 
         # Apply colours to the secondary axis
         if self.good_colour(1):
+            assert self.colours is not None
             self.ax2.tick_params(axis="y", labelcolor=self.colours[1])
             self.ax2.yaxis.label.set_color(self.colours[1])
             self.ax2.spines["right"].set_color(self.colours[1])
@@ -217,7 +239,7 @@ class DoubleYAxis(PreserveFigureMixin):
             lg2.remove()
             legend = self.ax.legend(handles1 + handles2, labels1 + labels2, loc=self.loc)
             if self.loc == 0:  # Auto-detect the best location if applicable
-                self.loc, _ = find_best_position(self.ax, legend)
+                self.loc, _ = find_best_position(self.ax, legend)  # type: ignore[arg-type]
                 legend.remove()
                 legend = self.ax.legend(handles1 + handles2, labels1 + labels2, loc=self.loc)
             copy_properties(legend, prop2 | prop1)

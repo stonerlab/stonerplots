@@ -4,9 +4,12 @@
 from collections.abc import Iterable, Mapping
 from contextlib import ExitStack
 from pathlib import Path
+from types import TracebackType
+from typing import Any, List, Optional, Type, Union
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 
 from ..util import _default
 from .base import PreserveFigureMixin, TrackNewFiguresAndAxes
@@ -14,7 +17,7 @@ from .base import PreserveFigureMixin, TrackNewFiguresAndAxes
 default = _default()
 
 
-def _make_path(output_file):
+def _make_path(output_file: Union[str, Path]) -> None:
     """Ensure that output_file is going into a path that exists."""
     match output_file:
         case str():
@@ -110,16 +113,23 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
     _keys = ["filename", "style", "autoclose", "formats", "include_open", "use", "extra"]
 
     def __init__(
-        self, filename=None, style=None, autoclose=False, formats=None, extra=None, include_open=False, use=None
-    ):
+        self,
+        filename: Optional[Union[str, Path]] = None,
+        style: Optional[Union[str, Iterable[str]]] = None,
+        autoclose: bool = False,
+        formats: Optional[Union[str, Iterable[str]]] = None,
+        extra: Optional[Mapping[str, Any]] = None,
+        include_open: bool = False,
+        use: Optional[Figure] = None,
+    ) -> None:
         """Initialize with default settings."""
         # Internal state initialization
         super().__init__(include_open=include_open)
-        self._filename = None
-        self._formats = []
-        self._style = []
-        self._extra = {}
-        self._context_stack = None
+        self._filename: Optional[Path] = None
+        self._formats: List[str] = []
+        self._style: List[str] = []
+        self._extra: dict[str, Any] = {}
+        self._context_stack: Optional[ExitStack] = None
 
         # Parameter assignment
         self.filename = filename
@@ -130,11 +140,11 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         self.use = use
 
     @property
-    def filename(self):
+    def filename(self) -> Path:
         """Return filename as a Path object without extension.
 
         Returns:
-            Path: The filename or directory path.
+            (Path): The filename or directory path.
 
         Examples:
             >>> sf = SavedFigure(filename="plot.png")
@@ -146,11 +156,11 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         return self._filename
 
     @filename.setter
-    def filename(self, value):
+    def filename(self, value: Optional[Union[str, Path]]) -> None:
         """Set filename and extract its extension if valid.
 
         Args:
-            value (Union[str, Path]): The filename or directory path.
+            value (Union[str, Path, None]): The filename or directory path.
 
         Examples:
             >>> sf = SavedFigure()
@@ -160,25 +170,24 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         """
         match value:
             case None:  # use default filename
-                value = default.filename
+                self._filename = default.filename
             case _ if not value:  # do not save the figure
                 self._filename = None
             case str() | Path():
-                value = Path(value)
-                ext = value.suffix[1:]
+                path_value = Path(value)
+                ext = path_value.suffix[1:]
                 if ext and ext not in self.formats:
                     self.formats.append(ext)
-                value = value.parent / value.stem
+                self._filename = path_value.parent / path_value.stem
             case _:
                 raise TypeError(f"Cannot interpet {value} as a filename.")
-        self._filename = value
 
     @property
-    def formats(self):
+    def formats(self) -> List[str]:
         """Return the output formats as a list of strings.
 
         Returns:
-            list[str]: The list of output formats.
+            (list[str]): The list of output formats.
 
         Examples:
             >>> sf = SavedFigure(formats="png,pdf")
@@ -190,7 +199,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         return self._formats
 
     @formats.setter
-    def formats(self, value):
+    def formats(self, value: Optional[Union[str, Iterable[str]]]) -> None:
         """Ensure formats are stored as a list of strings.
 
         Args:
@@ -216,11 +225,11 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
                 raise TypeError(f"Invalid formats specified {value}. Expected str, iterable, or None.")
 
     @property
-    def style(self):
+    def style(self) -> List[str]:
         """Return the stylesheets as a list of strings.
 
         Returns:
-            list[str]: The list of stylesheets.
+            (list[str]): The list of stylesheets.
 
         Examples:
             >>> sf = SavedFigure(style="default")
@@ -230,7 +239,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         return self._style
 
     @style.setter
-    def style(self, value):
+    def style(self, value: Optional[Union[str, Iterable[str]]]) -> None:
         """Ensure style is stored as a list of strings.
 
         Args:
@@ -256,12 +265,12 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
                 raise TypeError(f"Invalid style: {value}. Expected str, iterable, or None.")
 
     @property
-    def extra(self):
+    def extra(self) -> dict[str, Any]:
         """Return the extra rcParams dictionary."""
         return self._extra
 
     @extra.setter
-    def extra(self, value):
+    def extra(self, value: Optional[Mapping[str, Any]]) -> None:
         """Ensure we set extra with valid rc_parameters."""
         match value:
             case None:
@@ -274,7 +283,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
                 for param, val in value.items():
                     self._extra[param] = val
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args: Union[str, Path], **kwargs: Any) -> "SavedFigure":
         """Update settings dynamically and return self."""
         settings = {key: kwargs[key] for key in self._keys if key in kwargs}
         match args:
@@ -288,7 +297,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             setattr(self, key, val)
         return self
 
-    def __enter__(self):
+    def __enter__(self) -> "SavedFigure":
         """Record existing open figures and enter style context (if any)."""
         super().__enter__()
         if self.use:  # Set the current figure to be that given by use.
@@ -305,14 +314,17 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
 
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(
+        self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException], traceback: Optional[TracebackType]
+    ) -> None:
         """Exit style context, save new figures, and optionally close them."""
         # Exit all contexts managed by ExitStack
         if self._context_stack is not None:
             self._context_stack.__exit__(exc_type, exc_value, traceback)
             self._context_stack = None
 
-        self._existing_open_figs = [ref() for ref in self._existing_open_figs if ref() is not None]
+        # Clean up weak references
+        self._existing_open_figs = [ref for ref in self._existing_open_figs if ref() is not None]  # type: ignore[misc, operator]
         new_file_counter = 0
 
         new_figures = list(self.new_figures)
@@ -322,7 +334,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         for fig in new_figures:
 
             new_file_counter += 1
-            label = fig.get_label()
+            label = str(fig.get_label())
             filename = self.generate_filename(label, new_file_counter)
 
             if filename:
@@ -337,7 +349,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         # Reset state
         super().__exit__(exc_type, exc_value, traceback)
 
-    def generate_filename(self, label, counter):
+    def generate_filename(self, label: str, counter: int) -> Optional[str]:
         """Help generate filenames based on `filename` and placeholders.
 
         Supports placeholders like {label}, {number}, and appends
@@ -348,7 +360,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             counter (int): The figure counter.
 
         Returns:
-            str: The generated filename.
+            (str): The generated filename.
 
         Examples:
             >>> sf = SavedFigure(filename="plot_{label}.png")
@@ -357,14 +369,16 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         """
         if not self.filename:
             return None
+        
+        path_template: Path
         if self.filename.is_dir():
-            filename: Path = self.filename / "{label}"
+            path_template = self.filename / "{label}"
         else:
-            filename: Path = self.filename if self.filename is not None else Path("{label}")
+            path_template = self.filename if self.filename is not None else Path("{label}")
 
-        filename = str(filename).format(label=label, number=counter)
+        filename_str = str(path_template).format(label=label, number=counter)
         # Append counter if filename lacks placeholders and multiple files
         if "{label}" not in str(self.filename) and "{number}" not in str(self.filename) and counter > 1:
-            parts = filename.rsplit(".", 1)
-            filename = f"{parts[0]}-{counter}.{parts[1]}" if len(parts) > 1 else f"{filename}-{counter}"
-        return filename
+            parts = filename_str.rsplit(".", 1)
+            filename_str = f"{parts[0]}-{counter}.{parts[1]}" if len(parts) > 1 else f"{filename_str}-{counter}"
+        return filename_str
