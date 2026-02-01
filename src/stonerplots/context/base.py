@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Base class for context managers."""
+from copy import copy
 import weakref
 from collections.abc import Sequence
 from typing import Any, List, Union
@@ -64,7 +65,15 @@ class RavelList(list):
             >>> _RavelList._flatten_recursive([[1, 2], [3, [4, 5]]])
             [1, 2, 3, 4, 5]
         """
-        return [element for sublist in items for element in (sublist if isinstance(sublist, list) else [sublist])]
+        ix=0
+        items=copy(items)
+        while True:
+            if ix>=len(items):
+                break
+            if isinstance(items[ix],list):
+                items=items[:ix]+copy(items[ix])+items[ix+1:]
+            ix+=1
+        return items
 
     def __getitem__(self, index: Union[int, tuple]) -> Any:
         """2D-style indexing using tuples.
