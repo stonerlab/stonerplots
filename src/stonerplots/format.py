@@ -3,6 +3,7 @@
 
 from typing import Any, Optional, Union
 import numpy as np
+from numpy.ma import MaskedArray
 from matplotlib.ticker import EngFormatter, Formatter, Locator, NullFormatter
 
 from .context.base import TrackNewFiguresAndAxes
@@ -63,7 +64,7 @@ class TexFormatter(Formatter):
         """Return the full string representation of the value with the position unspecified."""
         return self.__call__(value)
 
-    def format_data_short(self, value: float) -> str:  # pylint: disable=r0201
+    def format_data_short(self, value: Union[float, MaskedArray]) -> str:  # pylint: disable=r0201
         """Return a short string version of the tick value.
 
         Defaults to the position-independent long value.
@@ -130,7 +131,7 @@ class TexEngFormatter(EngFormatter):
         """Return the full string representation of the value with the position unspecified."""
         return self.__call__(value)
 
-    def format_data_short(self, value: float) -> str:  # pylint: disable=r0201
+    def format_data_short(self, value: Union[float, MaskedArray]) -> str:  # pylint: disable=r0201
         """Return a short string version of the tick value.
 
         Defaults to the position-independent long value.
