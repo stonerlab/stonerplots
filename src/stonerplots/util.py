@@ -7,7 +7,9 @@ Based on code used in matplotlib to automatically position a legend.
 from collections.abc import Iterable
 from copy import copy
 from pathlib import Path
+from typing import List, Optional, Callable, Tuple
 
+from matplotlib.artist import Artist
 from matplotlib.axes import Axes
 from matplotlib.axes._base import _TransformedBoundsLocator
 from matplotlib.collections import Collection, PolyCollection
@@ -16,29 +18,29 @@ from matplotlib.legend import Legend
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch, Rectangle
 from matplotlib.text import Text
-from matplotlib.transforms import IdentityTransform
+from matplotlib.transforms import IdentityTransform, Bbox
 
 
 class _default(object):
     """store default style information."""
 
-    _style = ["stoner"]
-    _formats = ["png"]
-    _instance = None
+    _style: List[str] = ["stoner"]
+    _formats: List[str] = ["png"]
+    _instance: Optional["_default"] = None
 
-    def __new__(cls):
+    def __new__(cls) -> "_default":
         """Return the existing class attribute if it is not None."""
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
 
     @property
-    def style(self):
+    def style(self) -> List[str]:
         """Return the stylesheets as a list of strings."""
         return copy(self._style)  # return a copy to avoid inadvertently changing the default style.
 
     @style.setter
-    def style(self, value):
+    def style(self, value: str | Iterable[str]) -> None:
         """Ensure style is stored as a list of strings."""
         if isinstance(value, str):
             self._style = [x.strip() for x in value.split(",") if x.strip()]
@@ -48,12 +50,12 @@ class _default(object):
             raise TypeError("Invalid type for default style. Expected str, iterable.")
 
     @property
-    def formats(self):
+    def formats(self) -> List[str]:
         """Return the formats as a list of strings."""
         return copy(self._formats)
 
     @formats.setter
-    def formats(self, value):
+    def formats(self, value: str | Iterable[str]) -> None:
         """Store the default formats."""
         if isinstance(value, str):
             self._formats = [x.strip() for x in value.split(",") if x.strip()]
@@ -65,12 +67,12 @@ class _default(object):
             raise TypeError("Invalid type for formats. Expected str, iterable, or None.")
 
     @property
-    def filename(self):
+    def filename(self) -> Path:
         """Return filename as a Path object without extension."""
         return self._filename
 
     @filename.setter
-    def filename(self, value):
+    def filename(self, value: str | Path) -> None:
         """Set filename and extract its extension if valid."""
         if value is not None:
             value = Path(value)
@@ -81,7 +83,7 @@ class _default(object):
         self._filename = value
 
 
-def move_inset(parent, inset_axes, new_bbox):
+def move_inset(parent: Optional[Figure, Axes], inset_axes: Axes, new_bbox: Bbox) -> None:
     """Relocate an inset_axes to a new location.
 
     Args:
@@ -112,7 +114,7 @@ def move_inset(parent, inset_axes, new_bbox):
     inset_axes.set_axes_locator(locator)
 
 
-def _get_inset_axes(ax):
+def _get_inset_axes(ax: Axes) -> List[Axes]:
     """Get a list of axes that overlap the axes given.
 
     Args:
@@ -136,7 +138,10 @@ def _get_inset_axes(ax):
     return inset_axes_list
 
 
-def _auto_linset_data(ax, axins, renderer, insets=True):
+def _auto_linset_data(ax: Axes,
+                      axins: Axes,
+                      renderer: Callable[[], Figure],
+                      insets: bool = True) -> Tuple[List[Bbox], List[Artist], List[Tuple[float, float]]]:
     """Return display coordinates for hit testing for "best" positioning.
 
     Args:
@@ -160,7 +165,7 @@ def _auto_linset_data(ax, axins, renderer, insets=True):
     return bboxes, lines, offsets
 
 
-def _handle_line2d(artist, lines):
+def _handle_line2d(artist:Line2D, lines:List[Line2D]):
     """Handle Line2D artist by extracting its transformed path.
 
     Args:
@@ -170,7 +175,7 @@ def _handle_line2d(artist, lines):
     lines.append(artist.get_transform().transform_path(artist.get_path()))
 
 
-def _handle_rectangle(artist, bboxes):
+def _handle_rectangle(artist:Rectangle, bboxes:List[Bbox]):
     """Handle Rectangle artist by extracting its bounding box.
 
     Args:
@@ -180,7 +185,7 @@ def _handle_rectangle(artist, bboxes):
     bboxes.append(artist.get_bbox().transformed(artist.get_data_transform()))
 
 
-def _handle_patch(artist, lines):
+def _handle_patch(artist:Patch, lines:List[Patch]):
     """Handle Patch artist by extracting its transformed path.
 
     Args:

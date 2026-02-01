@@ -3,10 +3,13 @@
 from copy import copy
 import weakref
 from collections.abc import Sequence
-from typing import Any, List, Union
+from typing import Any, List, Union, Optional, Type
+from types import TracebackType
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 __all__ = ["RavelList", "PreserveFigureMixin", "PlotContextSequence", "TrackNewFiguresAndAxes"]
 
@@ -25,6 +28,7 @@ locations = {
     "upper center": 9,
     "center": 10,
 }
+
 
 class RavelList(list):
     """A list with additional flattening and fake 2D indexing capabilities.
@@ -65,14 +69,14 @@ class RavelList(list):
             >>> _RavelList._flatten_recursive([[1, 2], [3, [4, 5]]])
             [1, 2, 3, 4, 5]
         """
-        ix=0
-        items=copy(items)
+        ix = 0
+        items = copy(items)
         while True:
-            if ix>=len(items):
+            if ix >= len(items):
                 break
-            if isinstance(items[ix],list):
-                items=items[:ix]+copy(items[ix])+items[ix+1:]
-            ix+=1
+            if isinstance(items[ix], list):
+                items = items[:ix]+copy(items[ix])+items[ix+1:]
+            ix += 1
         return items
 
     def __getitem__(self, index: Union[int, tuple]) -> Any:
@@ -102,13 +106,13 @@ class PreserveFigureMixin:
 
     _UNSET = None  # Constant representing the unset state
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize figure and axes preservation attributes."""
         self._saved_figure = self._UNSET
         self._saved_axes = self._UNSET
         super().__init__()
 
-    def _store_current_figure_and_axes(self):
+    def _store_current_figure_and_axes(self) -> None:
         """Safely store the current figure and axes without creating new ones.
 
         Notes:
@@ -122,7 +126,7 @@ class PreserveFigureMixin:
             if self._saved_figure.axes:  # Check if the current figure has axes
                 self._saved_axes = plt.gca()
 
-    def _restore_current_figure_and_axes(self):
+    def _restore_current_figure_and_axes(self) -> None:
         """Restore the saved figure and axes if previously set.
 
         Safely reverses the effect of `_store_current_figure_and_axes`.
@@ -176,47 +180,47 @@ class PlotContextSequence(Sequence):
 
     _NO_FIGURES_MSG = "No current figures exist."
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize class and ensure private attributes exist."""
         self.axes = RavelList()
         self._save_fig = None
         self._save_axes = None
 
     @property
-    def raveled_axes(self):
+    def raveled_axes(self) -> List[Axes]:
         """Unravel and provide the flattened list of axes."""
         return self.axes.flatten()
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return the number of axes."""
         return len(self.raveled_axes)
 
-    def __contains__(self, value):
+    def __contains__(self, value) -> bool:
         """Check if a value is contained within the axes."""
         return value in self.raveled_axes
 
-    def __getitem__(self, index):
+    def __getitem__(self, index) -> Axes:
         """Get axis item at index and optionally set it as current."""
         ret = self.axes[index]
         self._check_single_axis_selection(ret)
         return ret
 
-    def __iter__(self):
+    def __iter__(self) -> Axes:
         """Iterate over the axes and set each as current when iterating."""
         for ax in self.raveled_axes:
             plt.sca(ax)
             yield ax
 
-    def __reversed__(self):
+    def __reversed__(self) -> List[Axes]:
         """Iterate in reverse over the axes and set each as current."""
         yield from reversed(self.raveled_axes)
 
-    def _check_single_axis_selection(self, ret):
+    def _check_single_axis_selection(self, ret) -> None:
         """If the result is a single axis, set it as the current axis."""
         if isinstance(ret, mpl.axes.Axes):
             plt.sca(ret)
 
-    def _save_current_fig_and_axes(self):
+    def _save_current_fig_and_axes(self) -> None:
         """Safely save the current figure and axes without creating new ones."""
         self._save_fig = None
         self._save_axes = None
@@ -226,7 +230,7 @@ class PlotContextSequence(Sequence):
         if self._save_fig.axes:
             self._save_axes = plt.gca()
 
-    def _restore_saved_fig_and_axes(self):
+    def _restore_saved_fig_and_axes(self) -> None:
         """Restore the saved figure and axes, if not None."""
         if self._save_axes:
             plt.sca(self._save_axes)
@@ -252,7 +256,7 @@ class TrackNewFiguresAndAxes:
         new_axes: Returns an iterator over axes created since the context was entered.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Set storage of figures and axes.
 
         Args:
@@ -267,7 +271,7 @@ class TrackNewFiguresAndAxes:
         self._existing_open_axes = {}
         self.include_open = kwargs.pop("include_open", False)
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         """Record any already open figures and axes."""
         for num in plt.get_fignums():
             if not self.include_open:
@@ -275,7 +279,7 @@ class TrackNewFiguresAndAxes:
                 self._existing_open_axes[num] = [weakref.ref(ax) for ax in plt.figure(num).axes]
 
     @property
-    def new_figures(self):
+    def new_figures(self) -> Figure:
         """Return an iterator over figures created since the context manager was entered.
 
         Yields:
@@ -308,7 +312,7 @@ class TrackNewFiguresAndAxes:
             yield fig
 
     @property
-    def new_axes(self):
+    def new_axes(self) -> Axes:
         """Return an iterator over all new axes created since the context manager was entered.
 
         Yields:
@@ -342,7 +346,12 @@ class TrackNewFiguresAndAxes:
                     continue
                 yield ax
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc: Optional[BaseException],
+        tb: Optional[TracebackType],
+    ) -> None:
         """Clean up the saved figures and axes."""
         self._existing_open_figs = []
         self._existing_open_axes = {}
