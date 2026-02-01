@@ -60,7 +60,7 @@ Within each group, sort imports alphabetically. Where possible combine imports f
 - Otherwise folow black coding standards.
 - Avoid line splits that are not compatible with the versions of python
   specified in the package building scripts.
-- Avoid trailing whitespace at the end of lines
+- remove trailing whitespace at the end of lines
 
 ## Issues and Bugs discovered during copilot operations
 
