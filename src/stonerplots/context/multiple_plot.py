@@ -235,15 +235,15 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
     def _mark_used(self, used: np.ndarray, r: int, c: int, extent: int) -> None:  # type: ignore[type-arg]
         """Mark the used subplots in the grid."""
         if self.transpose:
-            used[r : r + extent, c] = True
+            used[r: r + extent, c] = True
         else:
-            used[r, c : c + extent] = True
+            used[r, c: c + extent] = True
 
     def _create_subplot(self, r: int, c: int, extent: int) -> Axes:
         """Create a subplot for the given row, column, and extent."""
         if self.transpose:
-            return self.figure.add_subplot(self.gs[r : r + extent, c])
-        return self.figure.add_subplot(self.gs[r, c : c + extent])
+            return self.figure.add_subplot(self.gs[r: r + extent, c])
+        return self.figure.add_subplot(self.gs[r, c: c + extent])
 
     def _do_figure_adjustment(self) -> None:
         """Adjust the figure size based on the adjust_figsize setting."""
@@ -391,7 +391,8 @@ class StackVertical(MultiPanel):
                 boundary = 0.05 / h
                 rect[1] = boundary if rect[1] == 0 else rect[1]
                 rect[3] = 1 - 2 * boundary if rect[3] == 1 else rect[3]
-                self.figure.get_layout_engine().set(h_pad=0.0, hspace=0.0, rect=rect)  # type: ignore[union-attr, call-arg]
+                # type: ignore[union-attr, call-arg]
+                self.figure.get_layout_engine().set(h_pad=0.0, hspace=0.0, rect=rect)
         self._align_labels()
         self.figure.canvas.draw()
         self._restore_current_figure_and_axes()
@@ -422,9 +423,9 @@ class StackVertical(MultiPanel):
         tr = ax.transData + ax.transAxes.inverted()  # Transform data to axes units
         yticks = [tr.transform((0, x))[1] for x in ax.get_yticks()]  # Tick positions in axes units.
 
-        if yticks[1] < dy and ix != len(self.axes) - 1:  # Adjust range for non-bottom plots
+        if len(yticks) > 1 and yticks[1] < dy and ix != len(self.axes) - 1:  # Adjust range for non-bottom plots
             ylim[0] = tr.inverted().transform((0, -dy))[1]
-        if yticks[-2] < 1.0 - dy and ix != 0:  # Adjust range for non-top plots
+        if len(yticks) > 2 and yticks[-2] < 1.0 - dy and ix != 0:  # Adjust range for non-top plots
             ylim[1] = tr.inverted().transform((0, 1 + dy))[1]
         ax.set_ylim(ylim[0], ylim[1])
         self.figure.canvas.draw()

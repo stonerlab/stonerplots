@@ -324,7 +324,8 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             self._context_stack = None
 
         # Clean up weak references
-        self._existing_open_figs = [ref for ref in self._existing_open_figs if ref() is not None]  # type: ignore[misc, operator]
+        # type: ignore[misc, operator]
+        self._existing_open_figs = [ref for ref in self._existing_open_figs if ref() is not None]
         new_file_counter = 0
 
         new_figures = list(self.new_figures)
@@ -339,7 +340,8 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
 
             if filename:
                 for fmt in self.formats:
-                    output_file = f"{filename}.{fmt.lower()}"
+                    output_file = Path(f"{filename}.{fmt.lower()}")
+
                     _make_path(output_file)
                     fig.savefig(output_file)
 
@@ -382,4 +384,3 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             parts = filename_str.rsplit(".", 1)
             filename_str = f"{parts[0]}-{counter}.{parts[1]}" if len(parts) > 1 else f"{filename_str}-{counter}"
         return filename_str
-

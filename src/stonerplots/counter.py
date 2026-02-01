@@ -69,7 +69,10 @@ def counter(value: int, pattern: str = "({alpha})", **kwargs: str) -> str:
 
     Returns:
         str: The formatted string.
+
+    Notes:
+        alpha and Alpha formats will wraparound if the value is outside the range 0-25.
     """
-    alpha = chr(ord("a") + value)  # Lowercase alphabet representation
+    alpha = chr(ord("a") + value%26)  # Lowercase alphabet representation
     Roman = roman(value + 1)  # Uppercase Roman numeral
     return pattern.format(alpha=alpha, Alpha=alpha.upper(), roman=Roman.lower(), Roman=Roman, int=value, **kwargs)

@@ -109,10 +109,12 @@ class InsetPlot(PreserveFigureMixin):
     def __enter__(self) -> Axes:
         """Create the inset axes using the axes_grid toolkit."""
         # Support for axes wrappers: check if _ax is a wrapper with an 'ax' attribute
-        ax_attr = getattr(self._ax, "ax", None)
-        if isinstance(ax_attr, Axes):
-            self.ax = self._ax.ax  # type: ignore[union-attr]
-        self.ax = self._ax if isinstance(self._ax, Axes) else plt.gca()
+        if isinstance(ax_attr:=getattr(self._ax, "ax", None), Axes):
+            self.ax = ax_attr  # type: ignore[union-attr]
+        elif isinstance(self._ax, Axes):
+            self.ax = self._ax
+        else:
+            self.ax = plt.gca()
         if not isinstance(self._loc, int):
             self.loc = self.locations.get(str(self._loc).lower().replace("-", " "), 1)
         else:

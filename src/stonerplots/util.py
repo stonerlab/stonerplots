@@ -11,7 +11,11 @@ from typing import Any, List, Optional, Tuple, Union
 
 from matplotlib.artist import Artist
 from matplotlib.axes import Axes
+
+# Private API import due to lack of alternative public implementation
 from matplotlib.axes._base import _TransformedBoundsLocator  # type: ignore[attr-defined]
+# _TransformedBoundsLocator needed to create axes locators for positioning inset axes
+
 from matplotlib.collections import Collection, PolyCollection
 from matplotlib.figure import Figure
 from matplotlib.legend import Legend

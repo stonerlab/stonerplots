@@ -163,7 +163,7 @@ class DoubleYAxis(PreserveFigureMixin):
         """Handle context entry for managing temporary switchable axes in a Matplotlib figure.
 
         Returns:
-            (matplotlib.axes._subplots.AxesSubplot):
+            (matplotlib.axes.Axes):
                 The secondary Y-axis created through `twinx()`.
         """
         self._store_current_figure_and_axes()
@@ -247,4 +247,3 @@ class DoubleYAxis(PreserveFigureMixin):
         # Restore the original figure and axes
         if self._switch:
             self._restore_current_figure_and_axes()
-
