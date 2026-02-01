@@ -18,7 +18,7 @@ from matplotlib.legend import Legend
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch, Rectangle
 from matplotlib.text import Text
-from matplotlib.transforms import IdentityTransform, Bbox
+from matplotlib.transforms import Bbox, IdentityTransform
 
 
 class _default(object):
@@ -138,10 +138,9 @@ def _get_inset_axes(ax: Axes) -> List[Axes]:
     return inset_axes_list
 
 
-def _auto_linset_data(ax: Axes,
-                      axins: Axes,
-                      renderer: Any,
-                      insets: bool = True) -> Tuple[List[Bbox], List[Any], List[Tuple[float, float]]]:
+def _auto_linset_data(
+    ax: Axes, axins: Axes, renderer: Any, insets: bool = True
+) -> Tuple[List[Bbox], List[Any], List[Tuple[float, float]]]:
     """Return display coordinates for hit testing for "best" positioning.
 
     Args:
@@ -231,7 +230,12 @@ def _handle_text(artist: Text, renderer: Any, bboxes: List[Bbox]) -> None:
 
 
 def _handle_axes_legend(
-    artist: Union[Axes, Legend], axins: Axes, renderer: Any, bboxes: List[Bbox], lines: List[Any], offsets: List[Tuple[float, float]]
+    artist: Union[Axes, Legend],
+    axins: Axes,
+    renderer: Any,
+    bboxes: List[Bbox],
+    lines: List[Any],
+    offsets: List[Tuple[float, float]],
 ) -> None:
     """Handle Axes or Legend artist by recursively extracting data.
 
@@ -250,7 +254,12 @@ def _handle_axes_legend(
 
 
 def _process_artist(
-    artist: Artist, renderer: Any, axins: Axes, bboxes: List[Bbox], lines: List[Any], offsets: List[Tuple[float, float]]
+    artist: Artist,
+    renderer: Any,
+    axins: Axes,
+    bboxes: List[Bbox],
+    lines: List[Any],
+    offsets: List[Tuple[float, float]],
 ) -> None:
     """Process an artist to extract relevant display coordinates.
 
@@ -423,4 +432,3 @@ def copy_properties(obj: Any, properties: dict[str, Any]) -> None:
                     attr(v.get_text(), v.get_fontproperties())
                 case _:
                     pass
-

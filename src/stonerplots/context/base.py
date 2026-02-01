@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Base class for context managers."""
-from copy import copy
 import weakref
 from collections.abc import Sequence
-from typing import Any, List, Union, Optional, Type, Iterator, overload, SupportsIndex
+from copy import copy
 from types import TracebackType
+from typing import Any, Iterator, List, Optional, SupportsIndex, Type, Union, overload
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -75,18 +75,16 @@ class RavelList(list):
             if ix >= len(items):
                 break
             if isinstance(items[ix], list):
-                items = items[:ix]+copy(items[ix])+items[ix+1:]
+                items = items[:ix] + copy(items[ix]) + items[ix + 1 :]
             ix += 1
         return items
 
     @overload
-    def __getitem__(self, index: SupportsIndex) -> Any: 
-        ...
-    
+    def __getitem__(self, index: SupportsIndex) -> Any: ...
+
     @overload
-    def __getitem__(self, index: slice) -> List[Any]: 
-        ...
-    
+    def __getitem__(self, index: slice) -> List[Any]: ...
+
     def __getitem__(self, index: Union[SupportsIndex, tuple, slice]) -> Any:  # type: ignore[override]
         """2D-style indexing using tuples.
 
@@ -213,13 +211,11 @@ class PlotContextSequence(Sequence):
         return value in self.raveled_axes
 
     @overload
-    def __getitem__(self, index: SupportsIndex) -> Axes: 
-        ...
-    
+    def __getitem__(self, index: SupportsIndex) -> Axes: ...
+
     @overload
-    def __getitem__(self, index: slice) -> List[Axes]: 
-        ...
-    
+    def __getitem__(self, index: slice) -> List[Axes]: ...
+
     def __getitem__(self, index: Union[SupportsIndex, slice]) -> Union[Axes, List[Axes]]:
         """Get axis item at index and optionally set it as current."""
         ret = self.axes[index]
@@ -377,5 +373,3 @@ class TrackNewFiguresAndAxes:
         """Clean up the saved figures and axes."""
         self._existing_open_figs = []
         self._existing_open_axes = {}
-
-

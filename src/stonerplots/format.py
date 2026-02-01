@@ -2,9 +2,10 @@
 """Additional matplotlib formatting classes."""
 
 from typing import Any, Optional, Union
+
 import numpy as np
-from numpy.ma import MaskedArray
 from matplotlib.ticker import EngFormatter, Formatter, Locator, NullFormatter
+from numpy.ma import MaskedArray
 
 from .context.base import TrackNewFiguresAndAxes
 

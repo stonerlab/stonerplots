@@ -11,10 +11,9 @@ import numpy as np
 import pytest
 from matplotlib import pyplot as plt
 
-from stonerplots.context.base import RavelList
+from stonerplots.context.base import PlotContextSequence, RavelList
 from stonerplots.context.noframe import CentredAxes
 from stonerplots.format import TexEngFormatter, TexFormatter
-from stonerplots.context.base import PlotContextSequence
 
 
 class TestFormatHelperMethods:

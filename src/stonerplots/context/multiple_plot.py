@@ -151,11 +151,11 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
         """Set the figure based on the provided figure argument or the current figure."""
         self.figure = self._fig_arg or plt.gcf()
         match self.figure:
-            case int()|str():
+            case int() | str():
                 self.figure = plt.figure(self.figure)
-            case _ if isinstance(getattr(self.figure,"figure",None),Figure):
-                self.figure=self.figure.figure
-            case _ if hasattr(self.figure,"number"):
+            case _ if isinstance(getattr(self.figure, "figure", None), Figure):
+                self.figure = self.figure.figure
+            case _ if hasattr(self.figure, "number"):
                 self.figure = plt.figure(self.figure.number)
             case Figure():
                 return
@@ -228,15 +228,15 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
     def _mark_used(self, used, r, c, extent):
         """Mark the used subplots in the grid."""
         if self.transpose:
-            used[r:r + extent, c] = True
+            used[r : r + extent, c] = True
         else:
-            used[r, c:c + extent] = True
+            used[r, c : c + extent] = True
 
     def _create_subplot(self, r, c, extent):
         """Create a subplot for the given row, column, and extent."""
         if self.transpose:
-            return self.figure.add_subplot(self.gs[r:r + extent, c])
-        return self.figure.add_subplot(self.gs[r, c:c + extent])
+            return self.figure.add_subplot(self.gs[r : r + extent, c])
+        return self.figure.add_subplot(self.gs[r, c : c + extent])
 
     def _do_figure_adjustment(self):
         """Adjust the figure size based on the adjust_figsize setting."""
@@ -411,4 +411,3 @@ class StackVertical(MultiPanel):
             ylim[1] = tr.inverted().transform((0, 1 + dy))[1]
         ax.set_ylim(ylim)
         self.figure.canvas.draw()
-

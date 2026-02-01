@@ -14,14 +14,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.colors import get_named_colors_mapping
 
-from .colours import (
-    tube_colours,
-    tube_colours_10,
-    tube_colours_50,
-    tube_colours_70,
-    tube_colours_90,
-)
-from .context import DoubleYAxis, InsetPlot, MultiPanel, SavedFigure, StackVertical, CentredAxes
+from .colours import tube_colours, tube_colours_10, tube_colours_50, tube_colours_70, tube_colours_90
+from .context import CentredAxes, DoubleYAxis, InsetPlot, MultiPanel, SavedFigure, StackVertical
 from .counter import counter, roman
 from .format import PlotLabeller, TexEngFormatter, TexFormatter
 from .util import _default
@@ -69,4 +63,3 @@ get_named_colors_mapping().update(tube_colours_90)
 get_named_colors_mapping().update(tube_colours_70)
 get_named_colors_mapping().update(tube_colours_50)
 get_named_colors_mapping().update(tube_colours_10)
-

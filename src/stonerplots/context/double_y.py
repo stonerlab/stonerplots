@@ -5,7 +5,8 @@ from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 
 from ..util import copy_properties, find_best_position
-from .base import PreserveFigureMixin, locations as _locations
+from .base import PreserveFigureMixin
+from .base import locations as _locations
 
 
 class DoubleYAxis(PreserveFigureMixin):
@@ -137,14 +138,12 @@ class DoubleYAxis(PreserveFigureMixin):
         """Return True if we have a colours defined for this axis."""
         axis = int(axis)
         match self.colours:
-            case list() if -len(self.colours)<axis<len(self.colours):
+            case list() if -len(self.colours) < axis < len(self.colours):
                 return self.colours[axis] is not None
-            case str() if -len(self.colours)<axis<len(self.colours):
+            case str() if -len(self.colours) < axis < len(self.colours):
                 return True
             case _:
                 return False
-
-
 
     def __enter__(self):
         """Handle context entry for managing temporary switchable axes in a Matplotlib figure.
@@ -154,9 +153,9 @@ class DoubleYAxis(PreserveFigureMixin):
                 The secondary Y-axis created through `twinx()`.
         """
         self._store_current_figure_and_axes()
-        if isinstance(getattr(self._ax,"ax",None),Axes):
-            self._ax=self._ax.ax
-        self.ax = self._ax if isinstance(self._ax,Axes) else plt.gca()
+        if isinstance(getattr(self._ax, "ax", None), Axes):
+            self._ax = self._ax.ax
+        self.ax = self._ax if isinstance(self._ax, Axes) else plt.gca()
         self.ax2 = self.ax.twinx()
         if self._switch:
             plt.sca(self.ax2)  # Set the secondary axis as the current axis

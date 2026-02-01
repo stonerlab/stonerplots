@@ -16,7 +16,7 @@ for p in [30, 50, 100]:
     with SavedFigure(name, style=["stoner"], autoclose=p == 100 and __name__ != "__main__", use=fig):
         ax = fig.gca()
         ax.plot(x, model(x, p), label=p, marker="")
-        if p==100: # last time
+        if p == 100:  # last time
             ax.legend(title="Order")
             ax.set(**pparam)
             ax.autoscale(tight=True)

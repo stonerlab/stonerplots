@@ -2,6 +2,7 @@
 """Context manager for central (i.e. non-framed) figures."""
 
 from matplotlib import pyplot as plt
+
 from .base import PreserveFigureMixin, TrackNewFiguresAndAxes
 
 __all__ = ["CentredAxes"]
@@ -41,8 +42,8 @@ class CentredAxes(TrackNewFiguresAndAxes, PreserveFigureMixin):
     def __enter__(self):
         """Record existing open figures and enter style context (if any)."""
         super().__enter__()
-        if self.use: # Set the current figure to be that given by use.
-            plt.figure(getattr(self.use,"number",None))
+        if self.use:  # Set the current figure to be that given by use.
+            plt.figure(getattr(self.use, "number", None))
 
     def __exit__(self, exc_type, exc_value, traceback):
         """Adjust all the figure axes."""
