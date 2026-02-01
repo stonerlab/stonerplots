@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """InsetPlot context manager."""
 
+from types import TracebackType
+from typing import Optional, Type, Union
+
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
@@ -76,14 +79,14 @@ class InsetPlot(PreserveFigureMixin):
 
     def __init__(
         self,
-        ax=None,
-        loc="best",
-        width=0.33,
-        height=0.33,
-        dimension="fraction",
-        switch_to_inset=True,
-        padding=(0.02, 0.02),
-    ):
+        ax: Optional[Axes] = None,
+        loc: Union[str, int] = "best",
+        width: Union[float, str] = 0.33,
+        height: Union[float, str] = 0.33,
+        dimension: str = "fraction",
+        switch_to_inset: bool = True,
+        padding: tuple[float, float] = (0.02, 0.02),
+    ) -> None:
         """
         Initialize the `InsetPlot` context manager.
 
@@ -103,11 +106,12 @@ class InsetPlot(PreserveFigureMixin):
         self.padding = padding
         self.switch_to_inset = switch_to_inset
 
-    def __enter__(self):
+    def __enter__(self) -> Axes:
         """Create the inset axes using the axes_grid toolkit."""
         # Support for axes wrappers: check if _ax is a wrapper with an 'ax' attribute
-        if isinstance(getattr(self._ax, "ax", None), Axes):
-            self.ax = self._ax.ax
+        ax_attr = getattr(self._ax, "ax", None)
+        if isinstance(ax_attr, Axes):
+            self.ax = self._ax.ax  # type: ignore[union-attr]
         self.ax = self._ax if isinstance(self._ax, Axes) else plt.gca()
         if not isinstance(self._loc, int):
             self.loc = self.locations.get(str(self._loc).lower().replace("-", " "), 1)
@@ -119,7 +123,9 @@ class InsetPlot(PreserveFigureMixin):
             plt.sca(self.axins)
         return self.axins
 
-    def __exit__(self, exc_type, value, traceback):
+    def __exit__(
+        self, exc_type: Optional[Type[BaseException]], value: Optional[BaseException], traceback: Optional[TracebackType]
+    ) -> None:
         """Reposition the inset as the standard positioning can cause labels to overlap."""
         if self.loc == 0:
             self.loc, _ = find_best_position(self.ax, self.axins)

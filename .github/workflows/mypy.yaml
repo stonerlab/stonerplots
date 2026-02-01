@@ -40,6 +40,21 @@ jobs:
       - name: Run mypy on base.py
         run: python -m mypy src/stonerplots/context/base.py
 
+      - name: Run mypy on save_figure.py
+        run: python -m mypy src/stonerplots/context/save_figure.py
+
+      - name: Run mypy on double_y.py
+        run: python -m mypy src/stonerplots/context/double_y.py
+
+      - name: Run mypy on inset_plot.py
+        run: python -m mypy src/stonerplots/context/inset_plot.py
+
+      - name: Run mypy on multiple_plot.py
+        run: python -m mypy src/stonerplots/context/multiple_plot.py
+
+      - name: Run mypy on noframe.py
+        run: python -m mypy src/stonerplots/context/noframe.py
+
       - name: Run mypy on format.py
         run: python -m mypy src/stonerplots/format.py
 

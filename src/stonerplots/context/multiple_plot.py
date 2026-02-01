@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 """Context managers for preparing multiple subplot figures."""
 import warnings
+from types import TracebackType
+from typing import Any, Optional, Type, Union
 
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
 from ..counter import counter
@@ -13,7 +16,7 @@ _gsargs = ["left", "bottom", "right", "top", "width_ratios", "height_ratios", "h
 _fontargs = ["font", "fontfamily", "fontname", "fontsize", "fontstretch", "fontstyle", "fontvariant", "fontweight"]
 
 
-def _filter_keys_in_dict(dic, keys):
+def _filter_keys_in_dict(dic: dict[str, Any], keys: list[str]) -> dict[str, Any]:
     """Filter a dictionary to only include specified keys.
 
     Args:
@@ -21,7 +24,7 @@ def _filter_keys_in_dict(dic, keys):
         keys (iterable): The keys to retain in the dictionary.
 
     Returns:
-        dict: A new dictionary containing only the specified keys.
+        (dict): A new dictionary containing only the specified keys.
     """
     return {key: dic[key] for key in keys if key in dic}
 
@@ -96,23 +99,24 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
 
     def __init__(
         self,
-        panels,
-        figure=None,
-        sharex=False,
-        sharey=False,
-        adjust_figsize=True,
-        label_panels=True,
-        same_aspect=True,
-        transpose=False,
-        **kwargs,
-    ):
+        panels: Union[tuple[int, int], int, list[int]],
+        figure: Optional[Union[Figure, int, str]] = None,
+        sharex: bool = False,
+        sharey: bool = False,
+        adjust_figsize: Union[bool, float, tuple[float, float]] = True,
+        label_panels: Union[str, bool] = True,
+        same_aspect: bool = True,
+        transpose: bool = False,
+        **kwargs: Any,
+    ) -> None:
         """Configure figure and a gridspec for multi-panel plotting."""
         super().__init__()
         if isinstance(panels, int):  # Assume 1 x panels
             panels = (1, panels)
         self.panels = panels
         self._fig_arg = figure
-        self.gs = None
+        self.figure: Figure  # Will be set in __enter__
+        self.gs: Any = None  # GridSpec type
         self.sharex = sharex
         self.sharey = sharey
         self._adjust_figsize_arg = adjust_figsize
@@ -128,7 +132,7 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
             )
             self.panels = self.kwargs.pop("nplots")
 
-    def __enter__(self):
+    def __enter__(self) -> "MultiPanel":
         """Create the grid of axes."""
         self._store_current_figure_and_axes()
         self._set_figure()
@@ -137,7 +141,9 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
         self._label_subplots()
         return self
 
-    def __exit__(self, exc_type, value, traceback):
+    def __exit__(
+        self, exc_type: Optional[Type[BaseException]], value: Optional[BaseException], traceback: Optional[TracebackType]
+    ) -> None:
         """Clean up the axes."""
         self.figure.canvas.draw()
         if self.same_aspect:  # Force the aspect ratios to be the same
@@ -147,7 +153,7 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
 
         self._restore_current_figure_and_axes()
 
-    def _set_figure(self):
+    def _set_figure(self) -> None:
         """Set the figure based on the provided figure argument or the current figure."""
         self.figure = self._fig_arg or plt.gcf()
         match self.figure:
@@ -162,7 +168,7 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
             case _:
                 raise TypeError("Unable to interpret {self.figure} as a figure.")
 
-    def _adjust_figure_size(self):
+    def _adjust_figure_size(self) -> None:
         """Adjust the figure size if necessary."""
         adjust_figsize = self._adjust_figsize_arg
         if isinstance(adjust_figsize, bool):
@@ -172,7 +178,7 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
         self.adjust_figsize = adjust_figsize
         self.figsize = self.figure.get_figwidth(), self.figure.get_figheight()
 
-    def _create_gridspec(self):
+    def _create_gridspec(self) -> None:
         """Create the gridspec for the subplots."""
         match self.panels:
             case int():
@@ -193,12 +199,12 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
         if self.adjust_figsize:
             self._do_figure_adjustment()
 
-    def _label_subplots(self):
+    def _label_subplots(self) -> None:
         """Label the subplots if necessary."""
         if self.label_panels:
             self._label_figure()
 
-    def _create_subplots(self, panels, nplots=None):
+    def _create_subplots(self, panels: tuple[int, int], nplots: Optional[list[int]] = None) -> None:
         """Create the subplots for the given panels."""
         gs_kwargs = _filter_keys_in_dict(self.kwargs, _gsargs)
         self.gs = self.figure.add_gridspec(*panels, **gs_kwargs)
@@ -219,48 +225,49 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
         else:
             self.axes = self.gs.subplots(sharex=self.sharex, sharey=self.sharey)
 
-    def _calculate_extent(self, panels, nplots, r, c):
+    def _calculate_extent(self, panels: tuple[int, int], nplots: list[int], r: int, c: int) -> int:
         """Calculate the extent of the subplot."""
         if self.transpose:
             return panels[0] // nplots[c]
         return panels[1] // nplots[r]
 
-    def _mark_used(self, used, r, c, extent):
+    def _mark_used(self, used: np.ndarray, r: int, c: int, extent: int) -> None:  # type: ignore[type-arg]
         """Mark the used subplots in the grid."""
         if self.transpose:
             used[r : r + extent, c] = True
         else:
             used[r, c : c + extent] = True
 
-    def _create_subplot(self, r, c, extent):
+    def _create_subplot(self, r: int, c: int, extent: int) -> Axes:
         """Create a subplot for the given row, column, and extent."""
         if self.transpose:
             return self.figure.add_subplot(self.gs[r : r + extent, c])
         return self.figure.add_subplot(self.gs[r, c : c + extent])
 
-    def _do_figure_adjustment(self):
+    def _do_figure_adjustment(self) -> None:
         """Adjust the figure size based on the adjust_figsize setting."""
         extra_width = self._calculate_dimension(self.figsize[0], self.adjust_figsize[0], self.panels[1])
         extra_height = self._calculate_dimension(self.figsize[1], self.adjust_figsize[1], self.panels[0])
         self.figure.set_figwidth(extra_width)
         self.figure.set_figheight(extra_height)
 
-    def _calculate_dimension(self, base_size, factor, panels_count):
+    def _calculate_dimension(self, base_size: float, factor: float, panels_count: int) -> float:
         """Calculate the extra dimension (width or height) based on the factor and panels count."""
         if factor < 0:
             return base_size * (1 + factor)
         return base_size * factor * (panels_count - 1) + base_size
 
-    def _label_figure(self):
+    def _label_figure(self) -> None:
         """Do the subplot figure labelling."""
         fig = self.figure
+        label_pattern = self.label_panels if isinstance(self.label_panels, str) else "({alpha})"
         for ix, ax in enumerate(self):
             title_pts = ax.title.get_fontsize()
             ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
             y = (ax_height - title_pts * 1.5) / ax_height
 
             ax.set_title(
-                f" {counter(ix, self.label_panels)}", loc="left", y=y, **_filter_keys_in_dict(self.kwargs, _fontargs)
+                f" {counter(ix, label_pattern)}", loc="left", y=y, **_filter_keys_in_dict(self.kwargs, _fontargs)
             )
 
 
@@ -324,15 +331,15 @@ class StackVertical(MultiPanel):
 
     def __init__(
         self,
-        number,
-        figure=None,
-        joined=True,
-        sharex=True,
-        sharey=False,
-        adjust_figsize=True,
-        label_panels=True,
-        **kwargs,
-    ):
+        number: int,
+        figure: Optional[Union[Figure, int, str]] = None,
+        joined: bool = True,
+        sharex: bool = True,
+        sharey: bool = False,
+        adjust_figsize: Union[bool, float] = True,
+        label_panels: Union[str, bool] = True,
+        **kwargs: Any,
+    ) -> None:
         """Initialize the StackVertical class with configuration for stacked subplots."""
         self.number = number
         self.joined = joined
@@ -341,12 +348,16 @@ class StackVertical(MultiPanel):
         self.sharex = sharex
         self.sharey = sharey
         self.hspace = 0 if self.joined else kwargs.pop("hspace", 0.1)
-        self.adjust_figsize = adjust_figsize if isinstance(adjust_figsize, float) else float(int(adjust_figsize)) * 0.8
+        # Calculate adjust_figsize value to pass to parent class
+        adjust_figsize_val: Union[bool, float, tuple[float, float]] = (
+            adjust_figsize if isinstance(adjust_figsize, float) else float(int(adjust_figsize)) * 0.8
+        )
+        self.adjust_figsize_input = adjust_figsize_val
         self.label_panels = "({alpha})" if isinstance(label_panels, bool) and label_panels else label_panels
         self.align_labels = kwargs.pop("align__labels", True)
         self.kwargs = kwargs
 
-    def __enter__(self):
+    def __enter__(self) -> "StackVertical":
         """Set up and create the stacked subplots."""
         panels = (self.number, 1)
         super().__init__(
@@ -354,14 +365,17 @@ class StackVertical(MultiPanel):
             figure=self._fig_tmp,
             sharex=self.sharex,
             sharey=self.sharey,
-            adjust_figsize=self.adjust_figsize,
+            adjust_figsize=self.adjust_figsize_input,
             label_panels=self.label_panels,
             same_aspect=False,
             **self.kwargs,
         )
-        return super().__enter__()
+        super().__enter__()
+        return self
 
-    def __exit__(self, exc_type, value, traceback):
+    def __exit__(
+        self, exc_type: Optional[Type[BaseException]], value: Optional[BaseException], traceback: Optional[TracebackType]
+    ) -> None:
         """Clean up and adjust the subplot layout upon exiting the context."""
         if self.joined:
             for ax in self.axes:
@@ -380,7 +394,7 @@ class StackVertical(MultiPanel):
         self.figure.canvas.draw()
         self._restore_current_figure_and_axes()
 
-    def _align_labels(self):
+    def _align_labels(self) -> None:
         """Align the y-axis labels across all subplots."""
         if not self.align_labels:
             return
@@ -392,7 +406,7 @@ class StackVertical(MultiPanel):
         for ax in self.axes:
             ax.yaxis.set_label_coords(label_pos, 0.5)
 
-    def _fix_limits(self, ix, ax):
+    def _fix_limits(self, ix: int, ax: Axes) -> None:
         """Adjust the y-axis limits to ensure tick labels are inside the axes frame."""
         fig = self.figure
         ticklabels = ax.yaxis.get_ticklabels()
