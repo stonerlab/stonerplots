@@ -155,18 +155,18 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
 
     def _set_figure(self) -> None:
         """Set the figure based on the provided figure argument or the current figure."""
-        self.figure = self._fig_arg or plt.gcf()
-        match self.figure:
+        fig_or_other: Union[Figure, int, str] = self._fig_arg or plt.gcf()
+        match fig_or_other:
             case int() | str():
-                self.figure = plt.figure(self.figure)
-            case _ if isinstance(getattr(self.figure, "figure", None), Figure):
-                self.figure = self.figure.figure
-            case _ if hasattr(self.figure, "number"):
-                self.figure = plt.figure(self.figure.number)
+                self.figure = plt.figure(fig_or_other)
+            case _ if isinstance(getattr(fig_or_other, "figure", None), Figure):
+                self.figure = fig_or_other.figure  # type: ignore[union-attr]
+            case _ if hasattr(fig_or_other, "number"):
+                self.figure = plt.figure(fig_or_other.number)  # type: ignore[union-attr]
             case Figure():
-                return
+                self.figure = fig_or_other
             case _:
-                raise TypeError("Unable to interpret {self.figure} as a figure.")
+                raise TypeError("Unable to interpret {fig_or_other} as a figure.")
 
     def _adjust_figure_size(self) -> None:
         """Adjust the figure size if necessary."""
@@ -184,11 +184,12 @@ class MultiPanel(PlotContextSequence, PreserveFigureMixin):
             case int():
                 self._create_subplots((1, self.panels) if not self.transpose else (self.panels, 1))
             case list():
+                panel_count = int(np.prod(np.unique(self.panels)))
                 self._create_subplots(
                     (
-                        (len(self.panels), np.prod(np.unique(self.panels)))
+                        (len(self.panels), panel_count)
                         if not self.transpose
-                        else (np.prod(np.unique(self.panels)), len(self.panels))
+                        else (panel_count, len(self.panels))
                     ),
                     self.panels,
                 )
@@ -384,12 +385,13 @@ class StackVertical(MultiPanel):
             for ix, ax in enumerate(self.axes):
                 self._fix_limits(ix, ax)
             eng = self.figure.get_layout_engine()
-            rect = list(eng.get()["rect"])
-            h = self.figure.get_figheight()
-            boundary = 0.05 / h
-            rect[1] = boundary if rect[1] == 0 else rect[1]
-            rect[3] = 1 - 2 * boundary if rect[3] == 1 else rect[3]
-            self.figure.get_layout_engine().set(h_pad=0.0, hspace=0.0, rect=rect)
+            if eng is not None:
+                rect = list(eng.get()["rect"])  # type: ignore[call-arg]
+                h = self.figure.get_figheight()
+                boundary = 0.05 / h
+                rect[1] = boundary if rect[1] == 0 else rect[1]
+                rect[3] = 1 - 2 * boundary if rect[3] == 1 else rect[3]
+                self.figure.get_layout_engine().set(h_pad=0.0, hspace=0.0, rect=rect)  # type: ignore[union-attr, call-arg]
         self._align_labels()
         self.figure.canvas.draw()
         self._restore_current_figure_and_axes()
@@ -412,7 +414,8 @@ class StackVertical(MultiPanel):
         ticklabels = ax.yaxis.get_ticklabels()
         if not ticklabels:
             return  # No tick labels to adjust for
-        fnt_pts = ticklabels[0].get_fontsize()
+        fnt_pts_val = ticklabels[0].get_fontsize()
+        fnt_pts = float(fnt_pts_val) if isinstance(fnt_pts_val, (int, float, str)) else 10.0
         ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
         dy = 1.33 * fnt_pts / ax_height  # Space needed in axes units for labels 4/3 font size.
         ylim = list(ax.get_ylim())
@@ -423,5 +426,5 @@ class StackVertical(MultiPanel):
             ylim[0] = tr.inverted().transform((0, -dy))[1]
         if yticks[-2] < 1.0 - dy and ix != 0:  # Adjust range for non-top plots
             ylim[1] = tr.inverted().transform((0, 1 + dy))[1]
-        ax.set_ylim(ylim)
+        ax.set_ylim(ylim[0], ylim[1])
         self.figure.canvas.draw()

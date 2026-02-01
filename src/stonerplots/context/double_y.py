@@ -203,7 +203,6 @@ class DoubleYAxis(PreserveFigureMixin):
         # Configure axis visibility and position
         assert self.ax is not None
         assert self.ax2 is not None
-        assert self.colours is not None
         
         self.ax2.spines["left"].set_visible(False)
         self.ax2.yaxis.tick_right()
@@ -212,6 +211,7 @@ class DoubleYAxis(PreserveFigureMixin):
 
         # Apply colours to the primary axis
         if self.good_colour(0):
+            assert self.colours is not None
             self.ax.tick_params(axis="y", labelcolor=self.colours[0])
             self.ax.yaxis.label.set_color(self.colours[0])
             self.ax.spines["left"].set_color(self.colours[0])
@@ -219,6 +219,7 @@ class DoubleYAxis(PreserveFigureMixin):
 
         # Apply colours to the secondary axis
         if self.good_colour(1):
+            assert self.colours is not None
             self.ax2.tick_params(axis="y", labelcolor=self.colours[1])
             self.ax2.yaxis.label.set_color(self.colours[1])
             self.ax2.spines["right"].set_color(self.colours[1])
@@ -238,7 +239,7 @@ class DoubleYAxis(PreserveFigureMixin):
             lg2.remove()
             legend = self.ax.legend(handles1 + handles2, labels1 + labels2, loc=self.loc)
             if self.loc == 0:  # Auto-detect the best location if applicable
-                self.loc, _ = find_best_position(self.ax, legend)
+                self.loc, _ = find_best_position(self.ax, legend)  # type: ignore[arg-type]
                 legend.remove()
                 legend = self.ax.legend(handles1 + handles2, labels1 + labels2, loc=self.loc)
             copy_properties(legend, prop2 | prop1)

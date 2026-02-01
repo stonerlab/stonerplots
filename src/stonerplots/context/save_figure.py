@@ -323,7 +323,8 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             self._context_stack.__exit__(exc_type, exc_value, traceback)
             self._context_stack = None
 
-        self._existing_open_figs = [ref() for ref in self._existing_open_figs if ref() is not None]
+        # Clean up weak references
+        self._existing_open_figs = [ref for ref in self._existing_open_figs if ref() is not None]  # type: ignore[misc, operator]
         new_file_counter = 0
 
         new_figures = list(self.new_figures)
@@ -333,7 +334,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         for fig in new_figures:
 
             new_file_counter += 1
-            label = fig.get_label()
+            label = str(fig.get_label())
             filename = self.generate_filename(label, new_file_counter)
 
             if filename:
