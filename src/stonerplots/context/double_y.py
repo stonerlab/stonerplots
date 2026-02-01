@@ -203,7 +203,7 @@ class DoubleYAxis(PreserveFigureMixin):
         # Configure axis visibility and position
         assert self.ax is not None
         assert self.ax2 is not None
-        
+
         self.ax2.spines["left"].set_visible(False)
         self.ax2.yaxis.tick_right()
         self.ax.spines["right"].set_visible(False)
@@ -247,3 +247,4 @@ class DoubleYAxis(PreserveFigureMixin):
         # Restore the original figure and axes
         if self._switch:
             self._restore_current_figure_and_axes()
+
