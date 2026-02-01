@@ -7,7 +7,7 @@ Based on code used in matplotlib to automatically position a legend.
 from collections.abc import Iterable
 from copy import copy
 from pathlib import Path
-from typing import Any, List, Optional, Callable, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 from matplotlib.artist import Artist
 from matplotlib.axes import Axes
@@ -423,3 +423,4 @@ def copy_properties(obj: Any, properties: dict[str, Any]) -> None:
                     attr(v.get_text(), v.get_fontproperties())
                 case _:
                     pass
+
