@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """SavedFigure context manager."""
 
-import sys
 from collections.abc import Iterable, Mapping
 from contextlib import ExitStack
 from pathlib import Path
@@ -12,82 +11,11 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
+from ..path_security import validate_path_security
 from ..util import _default
 from .base import PreserveFigureMixin, TrackNewFiguresAndAxes
 
 default = _default()
-
-
-def _validate_path(output_file: Union[str, Path]) -> None:
-    """Validate that the output path doesn't contain directory traversal attempts.
-    
-    This function checks for directory traversal patterns that could lead to writing
-    files in sensitive system directories. It allows legitimate relative and absolute
-    paths, but blocks paths that would escape to system directories on any platform.
-    
-    On POSIX systems (Linux, MacOS), checks for: /etc, /sys, /proc, /boot, /dev
-    On Windows, checks for: C:\\Windows, C:\\Program Files, system drive root
-    On MacOS additionally checks for: /System, /Library (system-level)
-    
-    Args:
-        output_file (Union[str, Path]): The path to validate.
-        
-    Raises:
-        ValueError: If directory traversal to sensitive system directories is detected.
-    """
-    path = Path(output_file)
-    
-    # Check for directory traversal components
-    if ".." in path.parts:
-        # Resolve the path to see where it actually points
-        try:
-            resolved = path.resolve()
-        except (OSError, RuntimeError) as e:
-            raise ValueError(f"Invalid path: {output_file} (could not resolve path: {e})")
-        
-        # Define sensitive directories based on platform
-        sensitive_dirs: List[str] = []
-        resolved_str = str(resolved)
-        
-        if sys.platform == "win32":
-            # Windows: Check for system directories
-            # Use both forward and backslash for robustness
-            import os
-            windows_dir = os.environ.get("SystemRoot", "C:\\Windows")
-            program_files = os.environ.get("ProgramFiles", "C:\\Program Files")
-            program_files_x86 = os.environ.get("ProgramFiles(x86)", "C:\\Program Files (x86)")
-            
-            # Normalize to use forward slashes for consistent comparison
-            sensitive_dirs = [
-                windows_dir.replace("\\", "/"),
-                program_files.replace("\\", "/"),
-                program_files_x86.replace("\\", "/"),
-            ]
-            # Also check if trying to write to root of system drive
-            if resolved.drive and resolved.parent == Path(resolved.drive + "/"):
-                raise ValueError(
-                    f"Invalid path: {output_file} (attempted write to system drive root: {resolved})"
-                )
-            resolved_str = resolved_str.replace("\\", "/")
-            
-        elif sys.platform == "darwin":
-            # MacOS: POSIX-like but with additional system directories
-            sensitive_dirs = [
-                "/etc", "/sys", "/proc", "/dev",
-                "/System",  # MacOS system files
-                "/Library",  # System-level library (user ~/Library is OK)
-                "/private/etc", "/private/var/root",
-            ]
-        else:
-            # Linux and other POSIX systems
-            sensitive_dirs = ["/etc", "/sys", "/proc", "/boot", "/dev"]
-        
-        # Check if resolved path tries to write to sensitive directories
-        for sensitive_dir in sensitive_dirs:
-            if resolved_str.startswith(sensitive_dir + "/") or resolved_str == sensitive_dir:
-                raise ValueError(
-                    f"Invalid path: {output_file} (attempted write to sensitive system directory: {resolved})"
-                )
 
 
 
@@ -415,7 +343,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
                 for fmt in self.formats:
                     output_file = Path(f"{filename}.{fmt.lower()}")
 
-                    _validate_path(output_file)
+                    validate_path_security(output_file)
                     _make_path(output_file)
                     fig.savefig(output_file)
 
