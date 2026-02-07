@@ -311,7 +311,7 @@ Standardize on f-strings (Python 3.6+ supports this) as they are:
 
 ### Issue: Redundant list creation in flatten() calls
 
-**Labels:** `performance`, `low-priority`
+**Labels:** `performance`, `code-quality`
 
 **Description:**
 
