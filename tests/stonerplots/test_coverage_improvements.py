@@ -10,6 +10,7 @@ This test module addresses the specific recommendations in COVERAGE_REPORT.md:
 import numpy as np
 import pytest
 from matplotlib import pyplot as plt
+from unittest.mock import MagicMock, patch
 
 from stonerplots.context.base import PlotContextSequence, RavelList
 from stonerplots.context.noframe import CentredAxes
@@ -355,7 +356,6 @@ class TestStonerInsetLocator:
 
     def test_locator_fallback_on_missing_api(self):
         """Test that _internal is None when the private API is unavailable."""
-        from unittest.mock import patch
 
         with patch.dict("sys.modules", {"matplotlib.axes._base": None}):
             locator = StonerInsetLocator([0, 0, 1, 1], None)
@@ -363,7 +363,6 @@ class TestStonerInsetLocator:
 
     def test_locator_call_delegation(self):
         """Test that calling the adapter delegates to the internal locator."""
-        from unittest.mock import MagicMock
 
         fig, ax = plt.subplots()
         locator = StonerInsetLocator([0, 0, 1, 1], ax.transAxes)
@@ -381,7 +380,6 @@ class TestStonerInsetLocator:
 
     def test_locator_fails_on_signature_change(self):
         """Test that the adapter captures errors if the internal API signature changes."""
-        from unittest.mock import MagicMock
 
         # Simulate a change where the internal class now requires 3 arguments instead of 2
         def mock_internal_new_version(bounds, transform, something_else):

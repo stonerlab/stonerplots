@@ -46,16 +46,16 @@ stonerplots_path = Path(__file__).parent
 styles_path = stonerplots_path / "styles"
 
 # Reads styles in /styles
-stylesheets = plt.style.core.read_style_directory(str(styles_path))
+stylesheets = plt.style.core.read_style_directory(str(styles_path))  # type: ignore[attr-defined]
 # Reads styles in /styles subfolders
 for inode in styles_path.rglob("*"):
     if inode.is_dir():
         new_data_path = styles_path / inode
-        new_stylesheets = plt.style.core.read_style_directory(str(new_data_path))
+        new_stylesheets = plt.style.core.read_style_directory(str(new_data_path))  # type: ignore[attr-defined]
         stylesheets.update(new_stylesheets)
 
 # Update dictionary of styles
-plt.style.core.update_nested_dict(plt.style.library, stylesheets)
+plt.style.core.update_nested_dict(plt.style.library, stylesheets)  # type: ignore[attr-defined]
 plt.style.core.available[:] = sorted(plt.style.library.keys())
 
 get_named_colors_mapping().update(tube_colours)

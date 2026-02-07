@@ -110,7 +110,7 @@ class StonerInsetLocator:
         try:
             # We isolate the private import here to keep the module namespace clean
             # If matplotlib's internal API changes, this is the only line that should require modification.
-            from matplotlib.axes._base import _TransformedBoundsLocator
+            from matplotlib.axes._base import _TransformedBoundsLocator  # type: ignore[attr-defined]
 
             self._internal = _TransformedBoundsLocator(bounds, transform)
         except Exception as e:
@@ -159,7 +159,7 @@ def move_inset(parent: Optional[Union[Figure, Axes]], inset_axes: Axes, new_bbox
         case _:
             transform = IdentityTransform()
     locator = StonerInsetLocator([new_bbox.x0, new_bbox.y0, new_bbox.width, new_bbox.height], transform)
-    inset_axes.set_axes_locator(locator)
+    inset_axes.set_axes_locator(locator)  # type: ignore[arg-type]
 
 
 def _get_inset_axes(ax: Axes) -> List[Axes]:
