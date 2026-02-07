@@ -11,11 +11,6 @@ from typing import Any, List, Optional, Tuple, Union
 
 from matplotlib.artist import Artist
 from matplotlib.axes import Axes
-
-# Private API import due to lack of alternative public implementation
-from matplotlib.axes._base import _TransformedBoundsLocator  # type: ignore[attr-defined]
-# _TransformedBoundsLocator needed to create axes locators for positioning inset axes
-
 from matplotlib.collections import Collection, PolyCollection
 from matplotlib.figure import Figure
 from matplotlib.legend import Legend
@@ -87,6 +82,55 @@ class _default(object):
         self._filename = value
 
 
+class StonerInsetLocator:
+    """Wrapper for matplotlib's private _TransformedBoundsLocator.
+
+    We use this to position inset axes. Since it uses a private matplotlib class,
+    it's wrapped here so that if matplotlib's internals change, we only have
+    one spot to fix.
+
+    Args:
+        bounds (List[float]):
+            A list of [left, bottom, width, height] in transform coordinates.
+        transform (Any):
+            The matplotlib transform to apply to the bounds.
+
+    Notes:
+        If matplotlib provides a public alternative in the future, we should
+        switch to it.
+
+    Examples:
+        >>> from matplotlib.transforms import IdentityTransform
+        >>> locator = StonerInsetLocator([0.1, 0.1, 0.4, 0.4], IdentityTransform())
+    """
+
+    def __init__(self, bounds: List[float], transform: Any) -> None:
+        """Initialize with bounds and transform."""
+        self._internal = None
+        try:
+            # We isolate the private import here to keep the module namespace clean
+            # If matplotlib's internal API changes, this is the only line that should require modification.
+            from matplotlib.axes._base import _TransformedBoundsLocator
+
+            self._internal = _TransformedBoundsLocator(bounds, transform)
+        except Exception as e:
+            self._init_error = e
+
+    def __call__(self, ax: Axes, renderer: Any) -> Any:
+        """Execute the internal locator logic."""
+        if self._internal is None:
+            raise RuntimeError(
+                f"stonerplots: Inset positioning failed. Matplotlib's internal API "
+                f"is unavailable or has changed: {getattr(self, '_init_error', 'Unknown error')}"
+            )
+        return self._internal(ax, renderer)
+
+    def __repr__(self) -> str:
+        """Return a helpful string representation for debugging."""
+        status = "active" if self._internal else "broken"
+        return f"<StonerInsetLocator ({status}) wrapping matplotlib.axes._base._TransformedBoundsLocator>"
+
+
 def move_inset(parent: Optional[Union[Figure, Axes]], inset_axes: Axes, new_bbox: Bbox) -> None:
     """Relocate an inset_axes to a new location.
 
@@ -114,7 +158,7 @@ def move_inset(parent: Optional[Union[Figure, Axes]], inset_axes: Axes, new_bbox
             transform = parent.transAxes
         case _:
             transform = IdentityTransform()
-    locator = _TransformedBoundsLocator([new_bbox.x0, new_bbox.y0, new_bbox.width, new_bbox.height], transform)
+    locator = StonerInsetLocator([new_bbox.x0, new_bbox.y0, new_bbox.width, new_bbox.height], transform)
     inset_axes.set_axes_locator(locator)
 
 

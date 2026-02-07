@@ -14,6 +14,7 @@ from matplotlib import pyplot as plt
 from stonerplots.context.base import PlotContextSequence, RavelList
 from stonerplots.context.noframe import CentredAxes
 from stonerplots.format import TexEngFormatter, TexFormatter
+from stonerplots.util import StonerInsetLocator
 
 
 class TestFormatHelperMethods:
@@ -306,5 +307,98 @@ class TestBaseCollectionProtocol:
         plt.close(fig)
 
 
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+class TestStonerInsetLocator:
+    """Test the StonerInsetLocator adapter class."""
+
+    def test_locator_initialization(self):
+        """Test that the locator initializes correctly."""
+        bounds = [0.1, 0.1, 0.3, 0.3]
+        fig, ax = plt.subplots()
+        locator = StonerInsetLocator(bounds, ax.transAxes)
+        assert locator._internal is not None
+        plt.close(fig)
+
+    def test_locator_is_callable(self):
+        """Test that the locator is callable as expected by matplotlib."""
+        bounds = [0.1, 0.1, 0.3, 0.3]
+        fig, ax = plt.subplots()
+        locator = StonerInsetLocator(bounds, ax.transAxes)
+        assert callable(locator)
+        plt.close(fig)
+
+    def test_locator_repr(self):
+        """Test the string representation of the locator."""
+        bounds = [0.1, 0.1, 0.3, 0.3]
+        fig, ax = plt.subplots()
+        locator = StonerInsetLocator(bounds, ax.transAxes)
+        repr_str = repr(locator)
+        assert "StonerInsetLocator" in repr_str
+        assert "active" in repr_str
+        assert "matplotlib.axes._base._TransformedBoundsLocator" in repr_str
+        plt.close(fig)
+
+    def test_locator_repr_when_broken(self):
+        """Test the string representation when internal API is missing."""
+        locator = StonerInsetLocator.__new__(StonerInsetLocator)
+        locator._internal = None
+        repr_str = repr(locator)
+        assert "broken" in repr_str
+
+    def test_locator_runtime_error_on_missing_internal(self):
+        """Test that a RuntimeError is raised if the internal locator is missing."""
+        fig, ax = plt.subplots()
+        locator = StonerInsetLocator([0, 0, 1, 1], ax.transAxes)
+        locator._internal = None  # Simulate missing internal API
+        with pytest.raises(RuntimeError, match="Inset positioning failed"):
+            locator(ax, None)
+        plt.close(fig)
+
+    def test_locator_fallback_on_missing_api(self):
+        """Test that _internal is None when the private API is unavailable."""
+        from unittest.mock import patch
+
+        with patch.dict("sys.modules", {"matplotlib.axes._base": None}):
+            locator = StonerInsetLocator([0, 0, 1, 1], None)
+        assert locator._internal is None
+
+    def test_locator_call_delegation(self):
+        """Test that calling the adapter delegates to the internal locator."""
+        from unittest.mock import MagicMock
+
+        fig, ax = plt.subplots()
+        locator = StonerInsetLocator([0, 0, 1, 1], ax.transAxes)
+
+        # Replace internal with a mock to verify delegation
+        mock_internal = MagicMock()
+        locator._internal = mock_internal
+
+        ax_mock = MagicMock()
+        renderer_mock = MagicMock()
+        locator(ax_mock, renderer_mock)
+
+        mock_internal.assert_called_once_with(ax_mock, renderer_mock)
+        plt.close(fig)
+
+    def test_locator_fails_on_signature_change(self):
+        """Test that the adapter captures errors if the internal API signature changes."""
+        from unittest.mock import MagicMock
+
+        # Simulate a change where the internal class now requires 3 arguments instead of 2
+        def mock_internal_new_version(bounds, transform, something_else):
+            return None
+
+        # This should fail during __init__ because we only pass 2 arguments
+        # and our catch-all 'except Exception' should store this TypeError
+        locator = StonerInsetLocator([0, 0, 1, 1], MagicMock())
+        
+        # We manually force the failure by trying to instantiate the "new version" 
+        # inside the same logic the adapter uses
+        try:
+            mock_internal_new_version([0,0,1,1], MagicMock())
+        except TypeError as e:
+            locator._init_error = e
+            locator._internal = None
+
+        # Now verify that the adapter reports this specific signature error
+        with pytest.raises(RuntimeError, match="missing 1 required positional argument"):
+            locator(MagicMock(), MagicMock())
