@@ -390,8 +390,11 @@ class TestStonerInsetLocator:
         locator = StonerInsetLocator([0, 0, 1, 1], MagicMock())
 
         # We manually force the failure by trying to instantiate the "new version"
-        # inside the same logic the adapter uses
+        # inside the same logic the adapter uses.
+        # We deliberately pass fewer arguments than required by the mock to simulate
+        # an upstream API change and verify our error handling logic.
         try:
+            # pylint: disable=no-value-for-parameter
             mock_internal_new_version([0, 0, 1, 1], MagicMock())  # type: ignore[call-arg]
         except TypeError as e:
             locator._init_error = e
