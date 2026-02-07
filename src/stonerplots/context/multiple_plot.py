@@ -391,8 +391,8 @@ class StackVertical(MultiPanel):
                 boundary = 0.05 / h
                 rect[1] = boundary if rect[1] == 0 else rect[1]
                 rect[3] = 1 - 2 * boundary if rect[3] == 1 else rect[3]
-                # type: ignore[union-attr, call-arg]
-                self.figure.get_layout_engine().set(h_pad=0.0, hspace=0.0, rect=rect)
+                # Parameters are accepted by ConstrainedLayoutEngine but not in base LayoutEngine signature.
+                eng.set(h_pad=0.0, hspace=0.0, rect=rect)  # type: ignore[call-arg]
         self._align_labels()
         self.figure.canvas.draw()
         self._restore_current_figure_and_axes()
