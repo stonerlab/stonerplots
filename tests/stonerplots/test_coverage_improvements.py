@@ -388,11 +388,11 @@ class TestStonerInsetLocator:
         # This should fail during __init__ because we only pass 2 arguments
         # and our catch-all 'except Exception' should store this TypeError
         locator = StonerInsetLocator([0, 0, 1, 1], MagicMock())
-        
-        # We manually force the failure by trying to instantiate the "new version" 
+
+        # We manually force the failure by trying to instantiate the "new version"
         # inside the same logic the adapter uses
         try:
-            mock_internal_new_version([0,0,1,1], MagicMock())
+            mock_internal_new_version([0, 0, 1, 1], MagicMock())  # type: ignore[call-arg]
         except TypeError as e:
             locator._init_error = e
             locator._internal = None
