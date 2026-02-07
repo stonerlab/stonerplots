@@ -36,13 +36,15 @@ class TestPathSecurityModule:
         dirs = get_sensitive_directories()
         if sys.platform == "win32":
             # Windows should have Windows-specific paths
-            assert any("Windows" in d or "Program" in d for d in dirs)
+            assert any("Windows" in d or "Program" in d for d in dirs), \
+                "Windows platform should have Windows or Program Files in sensitive dirs"
         elif sys.platform == "darwin":
-            # MacOS should have /System or /Library
-            assert "/System" in dirs or "/Library" in dirs
+            # MacOS should have both /System and /Library
+            assert "/System" in dirs, "macOS platform should have /System in sensitive dirs"
+            assert "/Library" in dirs, "macOS platform should have /Library in sensitive dirs"
         else:
             # Linux should have /etc
-            assert "/etc" in dirs
+            assert "/etc" in dirs, "Linux platform should have /etc in sensitive dirs"
 
     def test_is_high_risk_path_safe_paths(self):
         """Test that normal paths are not flagged as high-risk."""
