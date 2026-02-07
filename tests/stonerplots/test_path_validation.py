@@ -14,25 +14,6 @@ import pytest
 from matplotlib import pyplot as plt
 
 from stonerplots.context.save_figure import SavedFigure
-from stonerplots.path_security import validate_path_security
-
-
-# -*- coding: utf-8 -*-
-"""Test file path validation in save_figure.py.
-
-This test module verifies that the file path validation properly prevents
-directory traversal attacks while allowing legitimate path usage across
-different platforms (Windows, MacOS, Linux).
-"""
-import os
-import sys
-import tempfile
-from pathlib import Path
-
-import pytest
-from matplotlib import pyplot as plt
-
-from stonerplots.context.save_figure import SavedFigure
 from stonerplots.path_security import (
     get_sensitive_directories,
     is_high_risk_path,
@@ -84,13 +65,13 @@ class TestPathSecurityModule:
 class TestPathValidation:
     """Test path validation in save_figure.py."""
 
-    def testvalidate_path_security_normal_relative(self):
+    def test_validate_path_security_normal_relative(self):
         """Test that normal relative paths pass validation."""
         # Should not raise
         validate_path_security("examples/figures/test.png")
         validate_path_security("test/output.pdf")
 
-    def testvalidate_path_security_absolute_safe(self):
+    def test_validate_path_security_absolute_safe(self):
         """Test that absolute paths to safe directories pass validation."""
         with tempfile.TemporaryDirectory() as tmpdir:
             test_path = Path(tmpdir) / "test.png"
@@ -98,33 +79,33 @@ class TestPathValidation:
             validate_path_security(test_path)
             validate_path_security(str(Path(tmpdir) / "subfolder" / "test.png"))
 
-    def testvalidate_path_security_local_relative_with_dotdot(self):
+    def test_validate_path_security_local_relative_with_dotdot(self):
         """Test that local relative paths with .. that stay in safe areas pass validation."""
         # Should not raise - these stay in user space
         validate_path_security("test/../valid.png")
         validate_path_security("../test.png")
 
     @pytest.mark.skipif(sys.platform == "win32", reason="POSIX-specific test")
-    def testvalidate_path_security_traversal_to_etc(self):
+    def test_validate_path_security_traversal_to_etc(self):
         """Test that directory traversal to /etc is blocked on POSIX systems."""
         # Create a deep path to ensure traversal reaches /etc
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
             validate_path_security("../../../../../../../../../etc/passwd")
 
     @pytest.mark.skipif(sys.platform == "win32", reason="POSIX-specific test")
-    def testvalidate_path_security_traversal_to_sys(self):
+    def test_validate_path_security_traversal_to_sys(self):
         """Test that directory traversal to /sys is blocked on POSIX systems."""
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
             validate_path_security("../../../../../../../../../sys/kernel/config")
 
     @pytest.mark.skipif(sys.platform == "win32", reason="POSIX-specific test")
-    def testvalidate_path_security_traversal_to_proc(self):
+    def test_validate_path_security_traversal_to_proc(self):
         """Test that directory traversal to /proc is blocked on POSIX systems."""
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
             validate_path_security("../../../../../../../../../proc/sys/kernel/hostname")
 
     @pytest.mark.skipif(sys.platform != "win32", reason="Windows-specific test")
-    def testvalidate_path_security_traversal_to_windows(self):
+    def test_validate_path_security_traversal_to_windows(self):
         """Test that directory traversal to Windows system directories is blocked."""
         # Try to reach Windows directory
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
@@ -132,19 +113,19 @@ class TestPathValidation:
             validate_path_security("../" * 20 + "Windows/System32/config")
 
     @pytest.mark.skipif(sys.platform != "win32", reason="Windows-specific test")
-    def testvalidate_path_security_traversal_to_program_files(self):
+    def test_validate_path_security_traversal_to_program_files(self):
         """Test that directory traversal to Program Files is blocked on Windows."""
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
             validate_path_security("../" * 20 + "Program Files/test.png")
 
     @pytest.mark.skipif(sys.platform != "darwin", reason="MacOS-specific test")
-    def testvalidate_path_security_traversal_to_system_macos(self):
+    def test_validate_path_security_traversal_to_system_macos(self):
         """Test that directory traversal to /System is blocked on MacOS."""
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
             validate_path_security("../../../../../../../../../System/Library/test")
 
     @pytest.mark.skipif(sys.platform != "darwin", reason="MacOS-specific test")
-    def testvalidate_path_security_traversal_to_library_macos(self):
+    def test_validate_path_security_traversal_to_library_macos(self):
         """Test that directory traversal to /Library is blocked on MacOS."""
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
             validate_path_security("../../../../../../../../../Library/test")
