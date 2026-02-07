@@ -2,9 +2,11 @@
 """Test file path validation in save_figure.py.
 
 This test module verifies that the file path validation properly prevents
-directory traversal attacks while allowing legitimate path usage.
+directory traversal attacks while allowing legitimate path usage across
+different platforms (Windows, MacOS, Linux).
 """
 import os
+import sys
 import tempfile
 from pathlib import Path
 
@@ -29,7 +31,7 @@ class TestPathValidation:
             test_path = Path(tmpdir) / "test.png"
             # Should not raise
             _validate_path(test_path)
-            _validate_path("/tmp/test.png")
+            _validate_path(str(Path(tmpdir) / "subfolder" / "test.png"))
 
     def test_validate_path_local_relative_with_dotdot(self):
         """Test that local relative paths with .. that stay in safe areas pass validation."""
@@ -37,35 +39,62 @@ class TestPathValidation:
         _validate_path("test/../valid.png")
         _validate_path("../test.png")
 
+    @pytest.mark.skipif(sys.platform == "win32", reason="POSIX-specific test")
     def test_validate_path_traversal_to_etc(self):
-        """Test that directory traversal to /etc is blocked."""
+        """Test that directory traversal to /etc is blocked on POSIX systems."""
         # Create a deep path to ensure traversal reaches /etc
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
             _validate_path("../../../../../../../../../etc/passwd")
 
+    @pytest.mark.skipif(sys.platform == "win32", reason="POSIX-specific test")
     def test_validate_path_traversal_to_sys(self):
-        """Test that directory traversal to /sys is blocked."""
+        """Test that directory traversal to /sys is blocked on POSIX systems."""
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
             _validate_path("../../../../../../../../../sys/kernel/config")
 
+    @pytest.mark.skipif(sys.platform == "win32", reason="POSIX-specific test")
     def test_validate_path_traversal_to_proc(self):
-        """Test that directory traversal to /proc is blocked."""
+        """Test that directory traversal to /proc is blocked on POSIX systems."""
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
             _validate_path("../../../../../../../../../proc/sys/kernel/hostname")
 
-    def test_validate_path_traversal_to_boot(self):
-        """Test that directory traversal to /boot is blocked."""
+    @pytest.mark.skipif(sys.platform != "win32", reason="Windows-specific test")
+    def test_validate_path_traversal_to_windows(self):
+        """Test that directory traversal to Windows system directories is blocked."""
+        # Try to reach Windows directory
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
-            _validate_path("../../../../../../../../../boot/grub/grub.cfg")
+            # This should resolve to something like C:\Windows
+            _validate_path("../" * 20 + "Windows/System32/config")
 
-    def test_validate_path_traversal_to_dev(self):
-        """Test that directory traversal to /dev is blocked."""
+    @pytest.mark.skipif(sys.platform != "win32", reason="Windows-specific test")
+    def test_validate_path_traversal_to_program_files(self):
+        """Test that directory traversal to Program Files is blocked on Windows."""
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
-            _validate_path("../../../../../../../../../dev/null")
+            _validate_path("../" * 20 + "Program Files/test.png")
+
+    @pytest.mark.skipif(sys.platform != "darwin", reason="MacOS-specific test")
+    def test_validate_path_traversal_to_system_macos(self):
+        """Test that directory traversal to /System is blocked on MacOS."""
+        with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
+            _validate_path("../../../../../../../../../System/Library/test")
+
+    @pytest.mark.skipif(sys.platform != "darwin", reason="MacOS-specific test")
+    def test_validate_path_traversal_to_library_macos(self):
+        """Test that directory traversal to /Library is blocked on MacOS."""
+        with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
+            _validate_path("../../../../../../../../../Library/test")
 
 
 class TestSavedFigureWithValidation:
     """Test SavedFigure with path validation integrated."""
+
+    def setup_method(self):
+        """Close all figures before each test."""
+        plt.close('all')
+
+    def teardown_method(self):
+        """Close all figures after each test."""
+        plt.close('all')
 
     def test_saved_figure_with_safe_path(self):
         """Test that SavedFigure works with safe paths."""
@@ -75,7 +104,6 @@ class TestSavedFigureWithValidation:
             with SavedFigure(filename=str(output_path), style="default", autoclose=True):
                 fig, ax = plt.subplots()
                 ax.plot([1, 2, 3], [4, 5, 6])
-                plt.show()
             
             # File should be created
             assert output_path.exists()
@@ -89,7 +117,6 @@ class TestSavedFigureWithValidation:
                 fig = plt.figure("test_label")
                 ax = fig.add_subplot(111)
                 ax.plot([1, 2, 3], [4, 5, 6])
-                plt.show()
             
             # File should be created with label substituted
             expected_path = Path(tmpdir) / "figure_test_label.png"
@@ -108,7 +135,6 @@ class TestSavedFigureWithValidation:
                     fig = plt.figure(malicious_label)
                     ax = fig.add_subplot(111)
                     ax.plot([1, 2, 3], [4, 5, 6])
-                    plt.show()
 
     def test_saved_figure_allows_parent_directory_in_safe_area(self):
         """Test that SavedFigure allows using parent directory if it's in a safe area."""
@@ -126,7 +152,6 @@ class TestSavedFigureWithValidation:
                 with SavedFigure(filename=output_path, style="default", autoclose=True):
                     fig, ax = plt.subplots()
                     ax.plot([1, 2, 3], [4, 5, 6])
-                    plt.show()
                 
                 # File should be created in parent directory (tmpdir)
                 expected_path = Path(tmpdir) / "test_output.png"
