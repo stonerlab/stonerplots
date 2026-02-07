@@ -17,6 +17,41 @@ from .base import PreserveFigureMixin, TrackNewFiguresAndAxes
 default = _default()
 
 
+def _validate_path(output_file: Union[str, Path]) -> None:
+    """Validate that the output path doesn't contain directory traversal attempts.
+    
+    This function checks for directory traversal patterns that could lead to writing
+    files in sensitive system directories. It allows legitimate relative and absolute
+    paths, but blocks paths that would escape to system directories like /etc, /sys, etc.
+    
+    Args:
+        output_file (Union[str, Path]): The path to validate.
+        
+    Raises:
+        ValueError: If directory traversal to sensitive system directories is detected.
+    """
+    path = Path(output_file)
+    
+    # Check for directory traversal components
+    if ".." in path.parts:
+        # Resolve the path to see where it actually points
+        try:
+            resolved = path.resolve()
+        except (OSError, RuntimeError) as e:
+            raise ValueError(f"Invalid path: {output_file} (could not resolve path: {e})")
+        
+        # Check if resolved path tries to write to sensitive system directories
+        sensitive_dirs = ["/etc", "/sys", "/proc", "/boot", "/dev"]
+        resolved_str = str(resolved)
+        
+        for sensitive_dir in sensitive_dirs:
+            if resolved_str.startswith(sensitive_dir + "/") or resolved_str == sensitive_dir:
+                raise ValueError(
+                    f"Invalid path: {output_file} (attempted write to sensitive system directory: {resolved})"
+                )
+
+
+
 def _make_path(output_file: Union[str, Path]) -> None:
     """Ensure that output_file is going into a path that exists."""
     match output_file:
@@ -341,6 +376,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
                 for fmt in self.formats:
                     output_file = Path(f"{filename}.{fmt.lower()}")
 
+                    _validate_path(output_file)
                     _make_path(output_file)
                     fig.savefig(output_file)
 
