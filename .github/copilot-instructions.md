@@ -65,11 +65,17 @@ Within each group, sort imports alphabetically. Where possible combine imports f
 
 ## Issues and Bugs discovered during copilot operations
 
-If a new issue or bug is discovered during editing or creating other features, place a descritpion of the issue
-in BUGS.md. Describe the ussye/bug in a way that will make it most easy for a future copilot session to correct
-the problem.
+If a new issue or bug is discovered during editing or creating other features, create a GitHub issue to track it.
+When creating issues, include:
 
-If an issue or bug in BUGS.md is fixed, remove the issue report from the BUGS.md file.
+- A clear, descriptive title
+- The file path and line number where the issue occurs
+- A detailed description of the issue
+- Steps to reproduce (if applicable)
+- Suggested fixes or approaches (if known)
+- Appropriate labels (bug, enhancement, documentation, etc.)
+
+If a GitHub issue is fixed during your work, close the issue with a reference to the commit or PR that fixed it.
 
 ## Markdown Formatting
 
