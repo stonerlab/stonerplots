@@ -11,10 +11,12 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
+from ..path_security import validate_path_security
 from ..util import _default
 from .base import PreserveFigureMixin, TrackNewFiguresAndAxes
 
 default = _default()
+
 
 
 def _make_path(output_file: Union[str, Path]) -> None:
@@ -341,6 +343,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
                 for fmt in self.formats:
                     output_file = Path(f"{filename}.{fmt.lower()}")
 
+                    validate_path_security(output_file)
                     _make_path(output_file)
                     fig.savefig(output_file)
 
