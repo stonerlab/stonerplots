@@ -18,7 +18,6 @@ from .base import PreserveFigureMixin, TrackNewFiguresAndAxes
 default = _default()
 
 
-
 def _make_path(output_file: Union[str, Path]) -> None:
     """Ensure that output_file is going into a path that exists."""
     match output_file:
@@ -179,7 +178,10 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
                 path_value = Path(value)
                 ext = path_value.suffix[1:]
                 if ext and ext not in self.formats:
-                    self.formats.append(ext)
+                    # Ensure we're modifying the instance's format list, not the default
+                    if not self._formats:
+                        self._formats = list(default.formats)
+                    self._formats.append(ext)
                 self._filename = path_value.parent / path_value.stem
             case _:
                 raise TypeError(f"Cannot interpet {value} as a filename.")
@@ -223,6 +225,8 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
                 self._formats = list(value)
             case None if not self._formats:  # Use default if formats aren't set
                 self._formats = default.formats
+            case None:  # formats=None but self._formats already has values, keep them
+                pass
             case _:
                 raise TypeError(f"Invalid formats specified {value}. Expected str, iterable, or None.")
 
@@ -317,7 +321,10 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         return self
 
     def __exit__(
-        self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException], traceback: Optional[TracebackType]
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType],
     ) -> None:
         """Exit style context, save new figures, and optionally close them."""
         # Exit all contexts managed by ExitStack
@@ -386,4 +393,3 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             parts = filename_str.rsplit(".", 1)
             filename_str = f"{parts[0]}-{counter}.{parts[1]}" if len(parts) > 1 else f"{filename_str}-{counter}"
         return filename_str
-
