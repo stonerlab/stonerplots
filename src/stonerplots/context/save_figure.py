@@ -18,7 +18,6 @@ from .base import PreserveFigureMixin, TrackNewFiguresAndAxes
 default = _default()
 
 
-
 def _make_path(output_file: Union[str, Path]) -> None:
     """Ensure that output_file is going into a path that exists."""
     match output_file:
@@ -322,7 +321,10 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         return self
 
     def __exit__(
-        self, exc_type: Optional[Type[BaseException]], exc_value: Optional[BaseException], traceback: Optional[TracebackType]
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType],
     ) -> None:
         """Exit style context, save new figures, and optionally close them."""
         # Exit all contexts managed by ExitStack
@@ -391,4 +393,3 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             parts = filename_str.rsplit(".", 1)
             filename_str = f"{parts[0]}-{counter}.{parts[1]}" if len(parts) > 1 else f"{filename_str}-{counter}"
         return filename_str
-
