@@ -121,7 +121,7 @@ class TexEngFormatter(EngFormatter):
                             v /= 1000
                             pre += 3
 
-                    ret = f"${v}\\mathrm{{{self.prefix[int(pre)]} {self.unit}}}$"
+                    ret = f"${v}\\mathrm{{{self.prefix[pre]} {self.unit}}}$"
                 except (OverflowError, ZeroDivisionError, FloatingPointError, KeyError):
                     ret = f"${value:g}\\,\\mathrm{{{self.unit}}}$"
         else:
@@ -220,3 +220,4 @@ class PlotLabeller(TrackNewFiguresAndAxes):
                         if not isinstance(axis.get_minor_locator(), NullFormatter):
                             axis.set_minor_locator(elem)
         super().__exit__(exc_type, exc_value, traceback)
+
