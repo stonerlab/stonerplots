@@ -109,16 +109,25 @@ class TestPathValidation:
     @pytest.mark.skipif(sys.platform != "win32", reason="Windows-specific test")
     def test_validate_path_security_traversal_to_windows(self):
         """Test that directory traversal to Windows system directories is blocked."""
-        # Try to reach Windows directory
+        import os
+        # Use the actual Windows directory from environment
+        windows_dir = os.environ.get("SystemRoot", "C:\\Windows")
+        # Try to write to a path inside the Windows directory using .. traversal
+        # Path like "C:\Windows\Temp\..\System32\config" should be blocked
+        test_path = os.path.join(windows_dir, "Temp", "..", "System32", "test.txt")
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
-            # This should resolve to something like C:\Windows
-            validate_path_security("../" * 20 + "Windows/System32/config")
+            validate_path_security(test_path)
 
     @pytest.mark.skipif(sys.platform != "win32", reason="Windows-specific test")
     def test_validate_path_security_traversal_to_program_files(self):
         """Test that directory traversal to Program Files is blocked on Windows."""
+        # Use the actual Program Files directory from environment
+        program_files = os.environ.get("ProgramFiles", "C:\\Program Files")
+        # Try to write to a path inside Program Files using .. traversal
+        # Path like "C:\Program Files\Common Files\..\test.png" should be blocked
+        test_path = os.path.join(program_files, "Common Files", "..", "test.png")
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
-            validate_path_security("../" * 20 + "Program Files/test.png")
+            validate_path_security(test_path)
 
     @pytest.mark.skipif(sys.platform != "darwin", reason="MacOS-specific test")
     def test_validate_path_security_traversal_to_system_macos(self):
@@ -150,7 +159,7 @@ class TestSavedFigureWithValidation:
             output_path = Path(tmpdir) / "test_output.png"
 
             with SavedFigure(filename=str(output_path), style="default", autoclose=True):
-                fig, ax = plt.subplots()
+                _, ax = plt.subplots()
                 ax.plot([1, 2, 3], [4, 5, 6])
 
             # File should be created
@@ -175,8 +184,13 @@ class TestSavedFigureWithValidation:
         with tempfile.TemporaryDirectory() as tmpdir:
             template_path = Path(tmpdir) / "figure_{label}.png"
 
-            # Use a malicious label that tries to escape to /etc
-            malicious_label = "../" * 20 + "etc/passwd"
+            # Use a platform-appropriate malicious label that tries to escape to system directories
+            if sys.platform == "win32":
+                malicious_label = "../" * 20 + "Windows/System32/config"
+            elif sys.platform == "darwin":
+                malicious_label = "../" * 20 + "System/Library/test"
+            else:
+                malicious_label = "../" * 20 + "etc/passwd"
 
             with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
                 with SavedFigure(filename=str(template_path), style="default", autoclose=True):
