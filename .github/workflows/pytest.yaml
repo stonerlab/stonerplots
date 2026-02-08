@@ -3,6 +3,8 @@ name: pytest
 on:
   push:
     branches: [main] # branch to trigger deployment
+  pull_request:
+    branches: [main] # trigger on pull requests to main
 
 # workflow_dispatch:        # Un comment line if you also want to trigger action manually
 defaults:
@@ -20,7 +22,9 @@ jobs:
     steps:
       - name: Setup TeX Live (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get install -y texlive-latex-extra texlive-latex-recommended texlive-fonts-recommended cm-super dvipng
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-latex-extra texlive-latex-recommended texlive-fonts-recommended cm-super dvipng
       - name: Setup TeX Live (macOS)
         if: runner.os == 'macOS'
         run: |
