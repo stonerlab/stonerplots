@@ -107,28 +107,33 @@ class StonerInsetLocator:
     def __init__(self, bounds: List[float], transform: Any) -> None:
         """Initialize with bounds and transform."""
         self._internal = None
+        self._init_error: ImportError | None = None
         try:
-            # We isolate the private import here to keep the module namespace clean
-            # If matplotlib's internal API changes, this is the only line that should require modification.
+            # We isolate the private import here to keep the module namespace clean.
+            # If matplotlib's internal API changes, this is the only line to fix.
+            # pylint: disable=import-outside-toplevel
             from matplotlib.axes._base import _TransformedBoundsLocator  # type: ignore[attr-defined]
-
-            self._internal = _TransformedBoundsLocator(bounds, transform)
-        except Exception as e:
+        except ImportError as e:
             self._init_error = e
+        else:
+            self._internal = _TransformedBoundsLocator(bounds, transform)
 
     def __call__(self, ax: Axes, renderer: Any) -> Any:
         """Execute the internal locator logic."""
         if self._internal is None:
             raise RuntimeError(
                 f"stonerplots: Inset positioning failed. Matplotlib's internal API "
-                f"is unavailable or has changed: {getattr(self, '_init_error', 'Unknown error')}"
+                f"is unavailable or has changed: {self._init_error}"
             )
         return self._internal(ax, renderer)
 
     def __repr__(self) -> str:
         """Return a helpful string representation for debugging."""
         status = "active" if self._internal else "broken"
-        return f"<StonerInsetLocator ({status}) wrapping matplotlib.axes._base._TransformedBoundsLocator>"
+        return (
+            f"<StonerInsetLocator ({status}) wrapping "
+            "matplotlib.axes._base._TransformedBoundsLocator>"
+        )
 
 
 def move_inset(parent: Optional[Union[Figure, Axes]], inset_axes: Axes, new_bbox: Bbox) -> None:
