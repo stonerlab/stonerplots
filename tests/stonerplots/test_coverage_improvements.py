@@ -10,10 +10,12 @@ This test module addresses the specific recommendations in COVERAGE_REPORT.md:
 import numpy as np
 import pytest
 from matplotlib import pyplot as plt
+from unittest.mock import MagicMock, patch
 
 from stonerplots.context.base import PlotContextSequence, RavelList
 from stonerplots.context.noframe import CentredAxes
 from stonerplots.format import TexEngFormatter, TexFormatter
+from stonerplots.util import StonerInsetLocator
 
 
 class TestFormatHelperMethods:
@@ -306,5 +308,49 @@ class TestBaseCollectionProtocol:
         plt.close(fig)
 
 
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+class TestStonerInsetLocator:
+    """Test the StonerInsetLocator adapter class."""
+
+    # pylint: disable=protected-access
+
+    def test_locator_is_callable(self):
+        """Test that the locator is callable as expected by matplotlib."""
+        bounds = [0.1, 0.1, 0.3, 0.3]
+        fig, ax = plt.subplots()
+        locator = StonerInsetLocator(bounds, ax.transAxes)
+        assert callable(locator)
+        plt.close(fig)
+
+    def test_locator_runtime_error_on_missing_internal(self):
+        """Test that a RuntimeError is raised if the internal locator is missing."""
+        fig, ax = plt.subplots()
+        locator = StonerInsetLocator([0, 0, 1, 1], ax.transAxes)
+        locator._internal = None  # Simulate missing internal API
+        with pytest.raises(RuntimeError, match="Inset positioning failed"):
+            locator(ax, None)
+        plt.close(fig)
+
+    def test_locator_fallback_on_missing_api(self):
+        """Test that _internal is None and _init_error is set when the API is unavailable."""
+
+        with patch.dict("sys.modules", {"matplotlib.axes._base": None}):
+            locator = StonerInsetLocator([0, 0, 1, 1], None)
+        assert locator._internal is None
+        assert locator._init_error is not None
+
+    def test_locator_call_delegation(self):
+        """Test that calling the adapter delegates to the internal locator."""
+
+        fig, ax = plt.subplots()
+        locator = StonerInsetLocator([0, 0, 1, 1], ax.transAxes)
+
+        # Replace internal with a mock to verify delegation
+        mock_internal = MagicMock()
+        locator._internal = mock_internal
+
+        ax_mock = MagicMock()
+        renderer_mock = MagicMock()
+        locator(ax_mock, renderer_mock)
+
+        mock_internal.assert_called_once_with(ax_mock, renderer_mock)
+        plt.close(fig)
