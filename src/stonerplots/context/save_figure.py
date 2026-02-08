@@ -371,7 +371,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             >>> sf.generate_filename("test", 1)
             'plot_test.png'
         """
-        if not self.filename:
+        if self.filename is None:
             return None
 
         path_template: Path
@@ -386,3 +386,4 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             parts = filename_str.rsplit(".", 1)
             filename_str = f"{parts[0]}-{counter}.{parts[1]}" if len(parts) > 1 else f"{filename_str}-{counter}"
         return filename_str
+
