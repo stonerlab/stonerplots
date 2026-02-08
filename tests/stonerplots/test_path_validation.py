@@ -50,7 +50,7 @@ class TestPathSecurityModule:
         """Test that normal paths are not flagged as high-risk."""
         assert not is_high_risk_path("normal/path.txt")
         assert not is_high_risk_path("relative/safe/path.png")
-        assert not is_high_risk_path("/tmp/test.txt")
+        assert not is_high_risk_path("/tmp/test.txt")  # nosec
 
     def test_is_high_risk_path_no_traversal(self):
         """Test that paths without .. are not high-risk."""
@@ -148,11 +148,11 @@ class TestSavedFigureWithValidation:
         """Test that SavedFigure works with safe paths."""
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = Path(tmpdir) / "test_output.png"
-            
+
             with SavedFigure(filename=str(output_path), style="default", autoclose=True):
                 fig, ax = plt.subplots()
                 ax.plot([1, 2, 3], [4, 5, 6])
-            
+
             # File should be created
             assert output_path.exists()
 
@@ -160,12 +160,12 @@ class TestSavedFigureWithValidation:
         """Test that SavedFigure works with template substitution and safe labels."""
         with tempfile.TemporaryDirectory() as tmpdir:
             template_path = Path(tmpdir) / "figure_{label}.png"
-            
+
             with SavedFigure(filename=str(template_path), style="default", autoclose=True):
                 fig = plt.figure("test_label")
                 ax = fig.add_subplot(111)
                 ax.plot([1, 2, 3], [4, 5, 6])
-            
+
             # File should be created with label substituted
             expected_path = Path(tmpdir) / "figure_test_label.png"
             assert expected_path.exists()
@@ -174,10 +174,10 @@ class TestSavedFigureWithValidation:
         """Test that SavedFigure blocks malicious labels in template substitution."""
         with tempfile.TemporaryDirectory() as tmpdir:
             template_path = Path(tmpdir) / "figure_{label}.png"
-            
+
             # Use a malicious label that tries to escape to /etc
             malicious_label = "../" * 20 + "etc/passwd"
-            
+
             with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
                 with SavedFigure(filename=str(template_path), style="default", autoclose=True):
                     fig = plt.figure(malicious_label)
@@ -190,17 +190,17 @@ class TestSavedFigureWithValidation:
             # Create a subdirectory and try to save to parent (tmpdir)
             subdir = Path(tmpdir) / "subdir"
             subdir.mkdir(parents=True, exist_ok=True)
-            
+
             # Change to subdir to test relative parent path
             original_cwd = os.getcwd()
             try:
                 os.chdir(subdir)
                 output_path = "../test_output.png"
-                
+
                 with SavedFigure(filename=output_path, style="default", autoclose=True):
                     fig, ax = plt.subplots()
                     ax.plot([1, 2, 3], [4, 5, 6])
-                
+
                 # File should be created in parent directory (tmpdir)
                 expected_path = Path(tmpdir) / "test_output.png"
                 assert expected_path.exists()
