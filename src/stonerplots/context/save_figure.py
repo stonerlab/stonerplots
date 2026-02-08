@@ -371,7 +371,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             >>> sf.generate_filename("test", 1)
             'plot_test.png'
         """
-        if self.filename is None:
+        if not self.filename:
             return None
 
         path_template: Path
