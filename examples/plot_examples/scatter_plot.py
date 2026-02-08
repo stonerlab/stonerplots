@@ -13,7 +13,7 @@ with SavedFigure(figures / "fig03.png", style=["stoner", "scatter", "latex"], au
     for i in range(7):
         x1 = np.random.normal(0, 0.5, 10)
         y1 = x1 + np.random.normal(0, 0.2, 10)
-        ax.plot(x1, y1, label=r"$^\#${}".format(i + 1))
+        ax.plot(x1, y1, label=rf"$^\#${i+1}")
     lgd = r"$\mathring{P}=\begin{cases}1 \mathrm{if \nu\geq0}\\0 \mathrm{if \nu<0}\end{cases}$"
     ax.legend(title=lgd, loc=2, ncol=2)
     xlbl = r"$\log_{10}\left(\frac{L_\mathrm{IR}}{\mathrm{L}_\odot}\right)$"
@@ -22,3 +22,4 @@ with SavedFigure(figures / "fig03.png", style=["stoner", "scatter", "latex"], au
     ax.set_ylabel(ylbl)
     ax.set_xlim([-2, 2])
     ax.set_ylim([-2, 2])
+
