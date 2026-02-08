@@ -109,7 +109,6 @@ class TestPathValidation:
     @pytest.mark.skipif(sys.platform != "win32", reason="Windows-specific test")
     def test_validate_path_security_traversal_to_windows(self):
         """Test that directory traversal to Windows system directories is blocked."""
-        import os
         # Use the actual Windows directory from environment
         windows_dir = os.environ.get("SystemRoot", "C:\\Windows")
         # Try to write to a path inside the Windows directory using .. traversal
@@ -212,7 +211,7 @@ class TestSavedFigureWithValidation:
                 output_path = "../test_output.png"
 
                 with SavedFigure(filename=output_path, style="default", autoclose=True):
-                    fig, ax = plt.subplots()
+                    _, ax = plt.subplots()
                     ax.plot([1, 2, 3], [4, 5, 6])
 
                 # File should be created in parent directory (tmpdir)
