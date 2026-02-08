@@ -109,16 +109,29 @@ class TestPathValidation:
     @pytest.mark.skipif(sys.platform != "win32", reason="Windows-specific test")
     def test_validate_path_security_traversal_to_windows(self):
         """Test that directory traversal to Windows system directories is blocked."""
-        # Try to reach Windows directory
+        import os
+        # Use the actual Windows directory from environment
+        windows_dir = os.environ.get("SystemRoot", "C:\\Windows")
+        # Try to write to a path inside the Windows directory
+        test_path = os.path.join(windows_dir, "System32", "config", "test.txt")
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
-            # This should resolve to something like C:\Windows
-            validate_path_security("../" * 20 + "Windows/System32/config")
+            # Create a path that uses .. to traverse and then go into Windows
+            # Start from a subdirectory and traverse up, then into Windows
+            relative_path = os.path.join("subdir", "..", "..", test_path.lstrip("\\").lstrip("/"))
+            validate_path_security(relative_path)
 
     @pytest.mark.skipif(sys.platform != "win32", reason="Windows-specific test")
     def test_validate_path_security_traversal_to_program_files(self):
         """Test that directory traversal to Program Files is blocked on Windows."""
+        import os
+        # Use the actual Program Files directory from environment
+        program_files = os.environ.get("ProgramFiles", "C:\\Program Files")
+        # Try to write to a path inside Program Files
+        test_path = os.path.join(program_files, "test.png")
         with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
-            validate_path_security("../" * 20 + "Program Files/test.png")
+            # Create a path that uses .. to traverse and then go into Program Files
+            relative_path = os.path.join("subdir", "..", "..", test_path.lstrip("\\").lstrip("/"))
+            validate_path_security(relative_path)
 
     @pytest.mark.skipif(sys.platform != "darwin", reason="MacOS-specific test")
     def test_validate_path_security_traversal_to_system_macos(self):
