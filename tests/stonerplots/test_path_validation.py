@@ -175,8 +175,13 @@ class TestSavedFigureWithValidation:
         with tempfile.TemporaryDirectory() as tmpdir:
             template_path = Path(tmpdir) / "figure_{label}.png"
             
-            # Use a malicious label that tries to escape to /etc
-            malicious_label = "../" * 20 + "etc/passwd"
+            # Use a platform-appropriate malicious label that tries to escape to system directories
+            if sys.platform == "win32":
+                malicious_label = "../" * 20 + "Windows/System32/config"
+            elif sys.platform == "darwin":
+                malicious_label = "../" * 20 + "System/Library/test"
+            else:
+                malicious_label = "../" * 20 + "etc/passwd"
             
             with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
                 with SavedFigure(filename=str(template_path), style="default", autoclose=True):

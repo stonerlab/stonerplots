@@ -113,13 +113,20 @@ def is_high_risk_path(path: Union[str, Path]) -> bool:
     sensitive_dirs = get_sensitive_directories()
     resolved_str = str(resolved)
     
-    # Windows-specific: Check for system drive root
+    # Windows-specific: Check for system drive root and normalize path
     if sys.platform == "win32":
         resolved_str = resolved_str.replace("\\", "/")
         if resolved.drive and resolved.parent == Path(resolved.drive + "/"):
             return True
+        # On Windows, use case-insensitive comparison
+        resolved_str_lower = resolved_str.lower()
+        for sensitive_dir in sensitive_dirs:
+            sensitive_dir_lower = sensitive_dir.lower()
+            if resolved_str_lower.startswith(sensitive_dir_lower + "/") or resolved_str_lower == sensitive_dir_lower:
+                return True
+        return False
     
-    # Check if resolved path is in a sensitive directory
+    # Check if resolved path is in a sensitive directory (case-sensitive for POSIX)
     for sensitive_dir in sensitive_dirs:
         if resolved_str.startswith(sensitive_dir + "/") or resolved_str == sensitive_dir:
             return True
