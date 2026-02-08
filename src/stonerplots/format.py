@@ -206,7 +206,7 @@ class PlotLabeller(TrackNewFiguresAndAxes):
         for ax in self.new_axes:
             for name in ("xaxis", "yaxis", "zaxis"):
                 axis = getattr(ax, name, None)
-                if not axis:
+                if axis is None:
                     continue
                 for elem in getattr(self, name):
                     if isinstance(elem, type):
@@ -220,4 +220,5 @@ class PlotLabeller(TrackNewFiguresAndAxes):
                         if not isinstance(axis.get_minor_locator(), NullFormatter):
                             axis.set_minor_locator(elem)
         super().__exit__(exc_type, exc_value, traceback)
+
 
