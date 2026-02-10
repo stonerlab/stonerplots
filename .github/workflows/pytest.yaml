@@ -41,6 +41,7 @@ jobs:
       - uses: mamba-org/setup-micromamba@617811f69075e3fd3ae68ca64220ad065877f246
         with:
           environment-name: myenv
+          channels: conda-forge,phygbu
           create-args: >-
             python=3.10
             pytest
