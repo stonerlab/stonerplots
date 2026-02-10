@@ -1,0 +1,10 @@
+name: mypy-environment
+channels:
+    - conda-forge
+    - phygbu
+dependencies:
+    - python
+    - mypy
+    - matplotlib
+    - numpy
+    - bad_path

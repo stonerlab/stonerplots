@@ -24,14 +24,9 @@ jobs:
 
       - uses: mamba-org/setup-micromamba@617811f69075e3fd3ae68ca64220ad065877f246
         with:
-          environment-name: myenv
-          channels: conda-forge,phygbu
-          create-args: >-
-            python=${{ matrix.python-version }}
-            mypy
-            matplotlib
-            numpy
-            bad_path
+          environment-file: .github/workflows/mypy-env.yml
+          environment-name: mypy-environment
+          create-args: python=${{ matrix.python-version }}
 
       - name: Install package
         run: pip install -e .
