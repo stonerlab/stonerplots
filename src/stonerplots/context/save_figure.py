@@ -11,7 +11,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from bad_path import DangerousPathError, is_dangerous_path
+from bad_path import DangerousPathError, is_dangerous_path  # type: ignore[import-untyped]
 from ..util import _default
 from .base import PreserveFigureMixin, TrackNewFiguresAndAxes
 

@@ -95,5 +95,6 @@ module = [
     "matplotlib.*",
     "numpy.*",
     "mpl_toolkits.*",
+    "bad_path.*",
 ]
 ignore_missing_imports = true
