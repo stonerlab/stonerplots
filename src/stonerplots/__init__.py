@@ -36,7 +36,7 @@ __all__ = [
     "TexEngFormatter",
     "default",
 ]
-__version__ = "1.9.0"
+__version__ = "1.9.1"
 
 # Default style handling.
 default = _default()
