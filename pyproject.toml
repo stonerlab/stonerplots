@@ -7,6 +7,9 @@ authors = [
 description = "This is a fork of scienceplots and provides a range of matplotlib styles for plotting physics..."
 readme = "README.md"
 requires-python = ">=3.10"
+dependencies = [
+    "bad_path",
+]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -92,5 +95,6 @@ module = [
     "matplotlib.*",
     "numpy.*",
     "mpl_toolkits.*",
+    "bad_path.*",
 ]
 ignore_missing_imports = true

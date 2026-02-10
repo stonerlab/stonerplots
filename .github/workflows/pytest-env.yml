@@ -1,0 +1,13 @@
+name: pytest-environment
+channels:
+    - conda-forge
+    - phygbu
+dependencies:
+    - python=3.10
+    - pytest
+    - numpy
+    - pytest-md
+    - pytest-emoji
+    - pytest-cov
+    - matplotlib
+    - bad_path

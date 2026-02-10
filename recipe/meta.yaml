@@ -14,6 +14,7 @@ build:
 
 requirements:
   host:
+    - bad_path
     - matplotlib >=3.8, <3.11
     - python >=3.10, <3.14
     - setuptools >=65.0
@@ -21,6 +22,7 @@ requirements:
     - numpy
     - pip
   run:
+    - bad_path
     - matplotlib >=3.6, <=3.11
     - numpy
     - python >=3.10, <3.14
