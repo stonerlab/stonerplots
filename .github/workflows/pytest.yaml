@@ -49,6 +49,7 @@ jobs:
             pytest-emoji
             pytest-cov
             matplotlib
+            bad_path
       - name: Install package
         run: pip install -e .
       - name: Run pytest

@@ -30,6 +30,7 @@ jobs:
             mypy
             matplotlib
             numpy
+            bad_path
 
       - name: Install package
         run: pip install -e .
@@ -63,6 +64,3 @@ jobs:
 
       - name: Run mypy on colours.py
         run: python -m mypy src/stonerplots/colours.py
-
-      - name: Run mypy on path_security.py
-        run: python -m mypy src/stonerplots/path_security.py

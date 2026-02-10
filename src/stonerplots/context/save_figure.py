@@ -11,7 +11,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
-from ..path_security import validate_path_security
+from bad_path import DangerousPathError, is_dangerous_path
 from ..util import _default
 from .base import PreserveFigureMixin, TrackNewFiguresAndAxes
 
@@ -350,7 +350,12 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
                 for fmt in self.formats:
                     output_file = Path(f"{filename}.{fmt.lower()}")
 
-                    validate_path_security(output_file)
+                    try:
+                        is_dangerous_path(output_file, raise_error=True)
+                    except DangerousPathError as e:
+                        raise ValueError(
+                            f"Invalid path: {output_file} (attempted write to sensitive system directory)"
+                        ) from e
                     _make_path(output_file)
                     fig.savefig(output_file)
 
