@@ -1,0 +1,12 @@
+# Set default behavior to automatically normalize line endings.
+* text=auto
+
+# Force YAML files to use LF line endings on checkout.
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Ensure shell scripts use LF line endings
+*.sh text eol=lf
+
+# Python files should use LF line endings
+*.py text eol=lf
