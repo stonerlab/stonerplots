@@ -214,6 +214,47 @@ An even more compact form can be used by utilising the re-use of the context man
 This approach has the advantage that the format and style are setup just once and so are consistent between
 reinvocations of the context manager.
 
+Security Considerations
+-----------------------
+
+Path Validation and TOCTOU Vulnerability
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+:py:class:`SavedFigure` validates output paths to prevent writing to sensitive system directories (such as ``/etc``,
+``/sys``, or Windows system directories). This protection guards against directory traversal attacks where malicious
+input could attempt to overwrite critical system files.
+
+However, there is an inherent **Time-of-Check-Time-of-Use (TOCTOU)** vulnerability in any path validation system. This
+is a race condition where the file system state could theoretically change between the time the path is validated
+(check) and the time the file is actually written (use). For example, a symbolic link could be created after validation
+but before the file write, potentially redirecting the write operation to a sensitive location.
+
+To minimise this risk, :py:class:`SavedFigure` performs the path validation check in the ``__exit__`` method immediately
+before calling :py:meth:`matplotlib.figure.Figure.savefig`. This reduces the window of opportunity for such an attack to
+the smallest possible interval. The relevant code sequence is:
+
+1. Generate the output filename based on templates and figure labels
+2. Validate the path is not pointing to a sensitive system directory
+3. Immediately call ``savefig()`` to write the file
+
+Despite these precautions, users should be aware that TOCTOU vulnerabilities are difficult to eliminate entirely in
+user-space code. The risk is most significant in environments where:
+
+- Multiple users or processes have write access to the output directory
+- Untrusted users can influence figure labels or filenames
+- The system is under active attack
+
+For maximum security in sensitive environments, consider:
+
+- Using dedicated output directories with restricted permissions
+- Validating and sanitising any user-provided input that influences filenames
+- Running the plotting code with minimal necessary file system permissions
+- Monitoring file system activity in high-security scenarios
+
+The path validation uses the `bad_path <https://pypi.org/project/bad_path/>`_ package, which maintains
+platform-specific lists of protected system directories. For more details on what paths are considered dangerous, refer
+to the bad_path package documentation.
+
 Setting Default Values
 ----------------------
 
