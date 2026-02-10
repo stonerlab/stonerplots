@@ -33,7 +33,7 @@ jobs:
           show-channel-urls: true
       - name: Set VERSION environment variable
         run: |
-          export VERSION=`sed -n 's/^__version__ = "\(.*\)"/\1/p' src/stonerplots/__init__.py`
+          export VERSION=`sed -n "s/^__version__ = ['\"\`]\(.*\)['\"\`]/\1/p" src/stonerplots/__init__.py`
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
       - name: Build and upload the conda packages
         uses: uibcdf/action-build-and-upload-conda-packages@4940704d2be7906d3bda5b00e3c3e4472fd7808f
