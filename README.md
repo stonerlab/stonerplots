@@ -1,15 +1,15 @@
 # Stoner Plots
 
-[![GitHub version](https://badge.fury.io/gh/stonerlab%2Fstonerplots.svg&cache-control=no-cache)](https://badge.fury.io/gh/stonerlab%2Fstonerplots)
-[![pytest](https://github.com/stonerlab/stonerplots/actions/workflows/pytest.yaml/badge.svg&cache-control=no-cache)](https://github.com/stonerlab/stonerplots/actions/workflows/pytest.yaml)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/bc7404ac3cbf432184a13b6c3cb88ea4&cache-control=no-cache)](https://app.codacy.com/gh/stonerlab/stonerplots/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![PyPI version](https://badge.fury.io/py/StonerPlots.svg&cache-control=no-cache)](https://badge.fury.io/py/StonerPlots)
-[![Build Docs](https://github.com/stonerlab/stonerplots/actions/workflows/publish_sphinx.yaml/badge.svg&cache-control=no-cache)](https://stonerlab.github.io/stonerplots/)
-[![Conda](https://github.com/stonerlab/stonerplots/actions/workflows/build_conda.yaml/badge.svg&cache-control=no-cache)](https://github.com/stonerlab/stonerplots/actions/workflows/build_conda.yaml)
-[![Conda Version](https://anaconda.org/phygbu/stonerplots/badges/version.svg&cache-control=no-cache)](https://anaconda.org/phygbu/stonerplots)
-![Not platform specific](https://anaconda.org/phygbu/stonerplots/badges/platforms.svg&cache-control=no-cache)
-![MIT Licensed](https://anaconda.org/phygbu/stonerplots/badges/license.svg&cache-control=no-cache)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15446411.svg&cache-control=no-cache)](https://doi.org/10.5281/zenodo.15446411)
+[![GitHub version](https://badge.fury.io/gh/stonerlab%2Fstonerplots.svg)](https://badge.fury.io/gh/stonerlab%2Fstonerplots)
+[![pytest](https://github.com/stonerlab/stonerplots/actions/workflows/pytest.yaml/badge.svg)](https://github.com/stonerlab/stonerplots/actions/workflows/pytest.yaml)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/bc7404ac3cbf432184a13b6c3cb88ea4)](https://app.codacy.com/gh/stonerlab/stonerplots/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![PyPI version](https://badge.fury.io/py/StonerPlots.svg)](https://badge.fury.io/py/StonerPlots)
+[![Build Docs](https://github.com/stonerlab/stonerplots/actions/workflows/publish_sphinx.yaml/badge.svg)](https://stonerlab.github.io/stonerplots/)
+[![Conda](https://github.com/stonerlab/stonerplots/actions/workflows/build_conda.yaml/badge.svg)](https://github.com/stonerlab/stonerplots/actions/workflows/build_conda.yaml)
+[![Conda Version](https://anaconda.org/phygbu/stonerplots/badges/version.svg)](https://anaconda.org/phygbu/stonerplots)
+![Not platform specific](https://anaconda.org/phygbu/stonerplots/badges/platforms.svg)
+![MIT Licensed](https://anaconda.org/phygbu/stonerplots/badges/license.svg)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15446411.svg)](https://doi.org/10.5281/zenodo.15446411)
 
 Stoner Plots is a fork of Science Plots with additional features to make plotting of scientific plots easier.
 
@@ -149,4 +149,5 @@ The doi and BibTex reference for stonerplots is: <https://doi.org/10.5281/zenodo
       doi          = {10.5281/zenodo.14026874},
       url          = {https://doi.org/10.5281/zenodo.14026874},
 }
+
 
