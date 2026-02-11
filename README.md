@@ -10,7 +10,7 @@
 ![GitHub Release Date](https://img.shields.io/github/release-date/stonerlab/stonerplots)
 [![PyPI version](https://badge.fury.io/py/StonerPlots.svg)](https://badge.fury.io/py/StonerPlots)
 [![Conda Version](https://anaconda.org/phygbu/stonerplots/badges/version.svg)](https://anaconda.org/phygbu/stonerplots)
-[[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15446411.svg)](https://doi.org/10.5281/zenodo.15446411)](https://doi.org/10.5281/zenodo.18603124)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15446411.svg)](https://doi.org/10.5281/zenodo.15446411)](https://doi.org/10.5281/zenodo.18603124)
 
 Stoner Plots is a fork of Science Plots with additional features to make plotting of scientific plots easier.
 
@@ -150,6 +150,7 @@ The doi and BibTex reference for stonerplots is: <https://doi.org/10.5281/zenodo
       doi          = {10.5281/zenodo.14026874},
       url          = {https://doi.org/10.5281/zenodo.14026874},
 }
+
 
 
 
