@@ -141,7 +141,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         self.use = use
 
     @property
-    def filename(self) -> Path:
+    def filename(self) -> Path | None:
         """Return filename as a Path object without extension.
 
         Returns:
