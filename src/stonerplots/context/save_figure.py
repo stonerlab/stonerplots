@@ -153,7 +153,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             PosixPath('plot')
         """
         if self._filename is None:
-            return default.filename
+            return getattr(default,"filename", None)
         return self._filename
 
     @filename.setter
@@ -171,7 +171,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         """
         match value:
             case None:  # use default filename
-                self._filename = default.filename
+                self._filename = getattr(default,"filename",None)
             case _ if not value:  # do not save the figure
                 self._filename = None
             case str() | Path():
