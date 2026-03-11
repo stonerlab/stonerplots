@@ -8,6 +8,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from matplotlib.ticker import FixedLocator
 
 from ..counter import counter
 from .base import PlotContextSequence, PreserveFigureMixin, RavelList
@@ -410,22 +411,77 @@ class StackVertical(MultiPanel):
             ax.yaxis.set_label_coords(label_pos, 0.5)
 
     def _fix_limits(self, ix: int, ax: Axes) -> None:
-        """Adjust the y-axis limits to ensure tick labels are inside the axes frame."""
+        """Adjust the y-axis limits to ensure tick labels are inside the axes frame.
+
+        For joined (no-gap) stacked subplots the frame lines of adjacent panels share the
+        same y-coordinate.  A tick label whose tick mark sits close to the shared edge will
+        have half its text rendered inside the neighbouring panel.  This method expands the
+        y-axis limits just enough so that every visible tick mark sits at least *dy* (half
+        a label height in axes units) away from the top and bottom frame edges, then freezes
+        the tick positions with a :class:`~matplotlib.ticker.FixedLocator` so that the
+        enlarged limits cannot cause the auto-locator to add new edge ticks that would
+        recreate the problem.
+        """
         fig = self.figure
+        # Log-scale axes use unevenly spaced ticks; the formula below assumes a linear
+        # mapping from data to axes units, so skip the adjustment for non-linear scales.
+        if ax.get_yscale() != "linear":
+            return
         ticklabels = ax.yaxis.get_ticklabels()
         if not ticklabels:
             return  # No tick labels to adjust for
         fnt_pts_val = ticklabels[0].get_fontsize()
         fnt_pts = float(fnt_pts_val) if isinstance(fnt_pts_val, (int, float, str)) else 10.0
         ax_height = ax.bbox.transformed(fig.transFigure.inverted()).height * fig.get_figheight() * 72
-        dy = 1.40 * fnt_pts / ax_height  # Space needed in axes units for labels 7/5 font size.
-        ylim = list(ax.get_ylim())
-        tr = ax.transData + ax.transAxes.inverted()  # Transform data to axes units
-        yticks = [tr.transform((0, x))[1] for x in ax.get_yticks()]  # Tick positions in axes units.
+        if ax_height <= 0:
+            return
+        dy = 1.40 * fnt_pts / ax_height  # Space needed in axes units for one full label height.
 
-        if len(yticks) > 1 and yticks[1] < dy and ix != len(self.axes) - 1:  # Adjust range for non-bottom plots
-            ylim[0] = tr.inverted().transform((0, -dy))[1]
-        if len(yticks) > 2 and yticks[-2] < 1.0 - dy and ix != 0:  # Adjust range for non-top plots
-            ylim[1] = tr.inverted().transform((0, 1 + dy))[1]
-        ax.set_ylim(ylim[0], ylim[1])
+        ylim = list(ax.get_ylim())
+        yticks_data = ax.get_yticks()
+        tr = ax.transData + ax.transAxes.inverted()  # Transform: data → axes units (0–1)
+        yticks_axes = [tr.transform((0, x))[1] for x in yticks_data]  # Tick positions in axes units.
+
+        # Identify ticks that lie within (or just outside) the visible frame so we know
+        # which are the extreme rendered ticks.  A small tolerance of 0.01 in axes units
+        # admits ticks that the auto-locator may place right at the boundary.
+        visible = [(td, ta) for td, ta in zip(yticks_data, yticks_axes) if -0.01 <= ta <= 1.01]
+        if not visible:
+            return
+
+        t_bottom_data, t_bottom_ax = min(visible, key=lambda x: x[1])
+        t_top_data, t_top_ax = max(visible, key=lambda x: x[1])
+
+        adjust_lower = ix != len(self.axes) - 1  # All subplots except the bottom-most
+        adjust_upper = ix != 0  # All subplots except the top-most
+
+        needs_lower = adjust_lower and t_bottom_ax < dy
+        needs_upper = adjust_upper and t_top_ax > 1.0 - dy
+
+        new_ylim = list(ylim)
+
+        if needs_lower and needs_upper:
+            # Both edges need padding: solve the system so that t_bottom sits at dy and
+            # t_top sits at (1 - dy) in the new axes coordinate frame.
+            tick_range = t_top_data - t_bottom_data
+            if tick_range <= 0 or 1.0 - 2.0 * dy <= 0:
+                return
+            total_range = tick_range / (1.0 - 2.0 * dy)  # 2.0: one dy margin on each edge
+            new_ylim[0] = t_bottom_data - dy * total_range
+            new_ylim[1] = t_top_data + dy * total_range
+        elif needs_lower:
+            # Only the bottom edge needs padding; keep the upper limit fixed.
+            # Solve: dy == (t_bottom_data - new_lower) / (ylim[1] - new_lower)
+            new_ylim[0] = (t_bottom_data - dy * ylim[1]) / (1.0 - dy)
+        elif needs_upper:
+            # Only the top edge needs padding; keep the lower limit fixed.
+            # Solve: (1 - dy) == (t_top_data - ylim[0]) / (new_upper - ylim[0])
+            new_ylim[1] = ylim[0] + (t_top_data - ylim[0]) / (1.0 - dy)
+
+        if new_ylim != ylim:
+            # Freeze tick positions so the enlarged limits do not cause the auto-locator
+            # to place new ticks near the frame edges, which would recreate the problem.
+            ax.yaxis.set_major_locator(FixedLocator([td for td, _ in visible]))
+
+        ax.set_ylim(new_ylim[0], new_ylim[1])
         self.figure.canvas.draw()
