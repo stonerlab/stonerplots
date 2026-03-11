@@ -5,7 +5,6 @@ These tests verify that the `_fix_limits` method in StackVertical correctly adju
 y-axis limits for joined subplots so that tick labels do not overflow into adjacent
 panels, using the algebraic approach with a FixedLocator to prevent feedback ticks.
 """
-import numpy as np
 import pytest
 from matplotlib import pyplot as plt
 from matplotlib.ticker import FixedLocator
