@@ -3,6 +3,7 @@ name: Build Docs
 on:
   push:
     branches: [main] # branch to trigger deployment
+  workflow_dispatch:
 
 jobs:
   pages:
