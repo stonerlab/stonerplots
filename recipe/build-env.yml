@@ -4,7 +4,6 @@ channels:
     - phygbu
     - conda-forge
 dependencies:
-   - conda-build
    - anaconda-client
    - setuptools
    - build

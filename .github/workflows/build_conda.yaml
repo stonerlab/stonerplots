@@ -25,6 +25,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@a4260408e20b96e80095f42ff7f1a15b27dd94ca
         with:
           python-version: ${{ matrix.python-version }}
+          conda-build-version: "*"  # conda subcommands must be installed in the base environment
           environment-file: recipe/build-env.yml    # Path to the build conda environment
           activate-environment: build-environment
           auto-update-conda: true
@@ -34,6 +35,10 @@ jobs:
         run: |
           export VERSION=`sed -n "s/^__version__ = ['\"]\\(.*\\)['\"]/\\1/p" src/stonerplots/__init__.py`
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+      - name: Verify Conda build tooling
+        run: |
+          conda list --name base conda-build
+          conda build --help >/dev/null
       - name: Build and upload the conda packages
         uses: uibcdf/action-build-and-upload-conda-packages@4940704d2be7906d3bda5b00e3c3e4472fd7808f
         with:
