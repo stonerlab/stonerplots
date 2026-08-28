@@ -30,12 +30,14 @@ jobs:
         run: |
           brew install --cask mactex-no-gui
           echo "/Library/TeX/texbin" >> $GITHUB_PATH
-      - name: Setup TeX Live (Windows)
+      - name: Setup MiKTeX 24.4 (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          choco install miktex -y
-          echo "C:\Program Files\MiKTeX\miktex\bin\x64" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          choco install miktex.install --version=24.4.0 -y --no-progress
+          $miktexBin = "C:\Program Files\MiKTeX\miktex\bin\x64"
+          $miktexBin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          & "$miktexBin\latex.exe" --version
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - uses: mamba-org/setup-micromamba@617811f69075e3fd3ae68ca64220ad065877f246
