@@ -3,7 +3,6 @@ channels:
     - conda-forge
     - phygbu
 dependencies:
-    - python=3.10
     - pytest
     - numpy
     - pytest-md

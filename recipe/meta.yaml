@@ -15,17 +15,17 @@ build:
 requirements:
   host:
     - bad_path
-    - matplotlib >=3.8, <3.11
-    - python >=3.10, <3.14
+    - matplotlib >=3.8
+    - python >=3.10
     - setuptools >=65.0
     - setuptools-scm >=8.0
     - numpy
     - pip
   run:
     - bad_path
-    - matplotlib >=3.6, <=3.11
+    - matplotlib >=3.8
     - numpy
-    - python >=3.10, <3.14
+    - python >=3.10
 
 test:
   imports:

@@ -11,6 +11,7 @@ Attributes:
 
 from pathlib import Path
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.colors import get_named_colors_mapping
 
@@ -36,7 +37,7 @@ __all__ = [
     "TexEngFormatter",
     "default",
 ]
-__version__ = "1.9.4"
+__version__ = "1.9.5"
 
 # Default style handling.
 default = _default()
@@ -45,18 +46,15 @@ default = _default()
 stonerplots_path = Path(__file__).parent
 styles_path = stonerplots_path / "styles"
 
-# Reads styles in /styles
-stylesheets = plt.style.core.read_style_directory(str(styles_path))  # type: ignore[attr-defined]
-# Reads styles in /styles subfolders
-for inode in styles_path.rglob("*"):
-    if inode.is_dir():
-        new_data_path = styles_path / inode
-        new_stylesheets = plt.style.core.read_style_directory(str(new_data_path))  # type: ignore[attr-defined]
-        stylesheets.update(new_stylesheets)
-
-# Update dictionary of styles
-plt.style.core.update_nested_dict(plt.style.library, stylesheets)  # type: ignore[attr-defined]
-plt.style.core.available[:] = sorted(plt.style.library.keys())
+# Load the bundled styles through Matplotlib's public configuration API.  Older
+# versions used helpers from matplotlib.style.core, but those private helpers
+# were removed in Matplotlib 3.11.
+stylesheets = {
+    style_file.stem: mpl.rc_params_from_file(style_file, use_default_template=False)
+    for style_file in styles_path.rglob("*.mplstyle")
+}
+plt.style.library.update(stylesheets)
+plt.style.available[:] = sorted(plt.style.library.keys())
 
 get_named_colors_mapping().update(tube_colours)
 get_named_colors_mapping().update(tube_colours_90)

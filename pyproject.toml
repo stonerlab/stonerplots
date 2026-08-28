@@ -9,6 +9,8 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "bad_path",
+    "matplotlib>=3.8",
+    "numpy",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
