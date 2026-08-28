@@ -5,7 +5,7 @@ from collections.abc import Iterable, Mapping
 from contextlib import ExitStack
 from pathlib import Path
 from types import TracebackType
-from typing import Any, List, Optional, Type, Union
+from typing import Any, List, Literal, Optional, Type, Union
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -40,10 +40,11 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
     and its settings can dynamically be reconfigured by calling the instance with new parameters.
 
     Args:
-        filename (str, Path, None):
+        filename (str, Path, False, None):
             The base filename or target directory for saving figures.
             - If `filename` is a directory, the figure's label is used to generate the filename.
             - If `filename` includes placeholders (e.g., `{label}`, `{number}`), they will be replaced dynamically.
+            - If `False`, figures are not saved until a filename is supplied on a later call.
         style (list[str], str, None):
             One or more matplotlib stylesheets to apply. If a single string is provided, it is split by commas
             to form a list of styles. Defaults to ["stoner"].
@@ -115,7 +116,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
 
     def __init__(
         self,
-        filename: Optional[Union[str, Path]] = None,
+        filename: Optional[Union[str, Path, Literal[False]]] = None,
         style: Optional[Union[str, Iterable[str]]] = None,
         autoclose: bool = False,
         formats: Optional[Union[str, Iterable[str]]] = None,
@@ -126,7 +127,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         """Initialize with default settings."""
         # Internal state initialization
         super().__init__(include_open=include_open)
-        self._filename: Optional[Path] = None
+        self._filename: Optional[Path] | Literal[False] = None
         self._formats: List[str] = []
         self._style: List[str] = []
         self._extra: dict[str, Any] = {}
@@ -141,7 +142,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         self.use = use
 
     @property
-    def filename(self) -> Path | None:
+    def filename(self) -> Path | None | Literal[False]:
         """Return filename as a Path object without extension.
 
         Returns:
@@ -157,7 +158,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         return self._filename
 
     @filename.setter
-    def filename(self, value: Optional[Union[str, Path]]) -> None:
+    def filename(self, value: Optional[Union[str, Path, Literal[False]]]) -> None:
         """Set filename and extract its extension if valid.
 
         Args:
@@ -172,8 +173,8 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         match value:
             case None:  # use default filename
                 self._filename = getattr(default,"filename",None)
-            case _ if not value:  # do not save the figure
-                self._filename = None
+            case False:  # do not save the figure
+                self._filename = False
             case str() | Path():
                 path_value = Path(value)
                 ext = path_value.suffix[1:]
@@ -295,7 +296,7 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         match args:
             case (filename,) if isinstance(filename, (str, Path)):
                 settings["filename"] = filename
-            case tuple() if not len(args) and self.filename is not None:
+            case tuple() if not len(args):
                 pass
             case _:
                 raise ValueError("Only a single positional argument that is either a string or path is supported")
@@ -383,18 +384,18 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
             >>> sf.generate_filename("test", 1)
             'plot_test.png'
         """
-        if not self.filename:
+        filename_template = self.filename
+        if not filename_template:
             return None
 
-        path_template: Path
-        if self.filename.is_dir():
-            path_template = self.filename / "{label}"
+        if filename_template.is_dir():
+            path_template = filename_template / "{label}"
         else:
-            path_template = self.filename if self.filename is not None else Path("{label}")
+            path_template = filename_template
 
         filename_str = str(path_template).format(label=label, number=counter)
         # Append counter if filename lacks placeholders and multiple files
-        if "{label}" not in str(self.filename) and "{number}" not in str(self.filename) and counter > 1:
+        if "{label}" not in str(filename_template) and "{number}" not in str(filename_template) and counter > 1:
             parts = filename_str.rsplit(".", 1)
             filename_str = f"{parts[0]}-{counter}.{parts[1]}" if len(parts) > 1 else f"{filename_str}-{counter}"
         return filename_str

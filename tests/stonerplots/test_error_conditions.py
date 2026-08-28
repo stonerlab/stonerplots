@@ -96,6 +96,13 @@ class TestUtilErrors:
 class TestSaveFigureErrors:
     """Test error conditions in save_figure.py."""
 
+    def test_saved_figure_without_filename_can_be_reused(self):
+        """An empty call must preserve an explicit no-save configuration."""
+        cm = SavedFigure(False)
+
+        assert cm.filename is False
+        assert cm() is cm
+
     def test_make_path_invalid_type(self):
         """Test that _make_path raises TypeError for invalid type."""
         with pytest.raises(TypeError, match="output filename should be a string or pathlib.Path"):
