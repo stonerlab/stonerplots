@@ -317,7 +317,9 @@ class SavedFigure(TrackNewFiguresAndAxes, PreserveFigureMixin):
         if self.style:
             self._context_stack.enter_context(mpl.style.context(self.style))
         if self.extra:
-            self._context_stack.enter_context(mpl.rc_context(rc=self.extra))
+            # RcParams preserves the runtime validation already expected here
+            # and narrows string keys to Matplotlib's RcKeyType for type checkers.
+            self._context_stack.enter_context(mpl.rc_context(rc=mpl.RcParams(self.extra)))
 
         return self
 
