@@ -9,9 +9,12 @@ import os
 import sys
 import tempfile
 from pathlib import Path
+from unittest.mock import Mock
 
+from bad_path import add_user_path, remove_user_path
 import pytest
 from matplotlib import pyplot as plt
+from matplotlib.figure import Figure
 
 from stonerplots.context.save_figure import SavedFigure
 
@@ -53,24 +56,31 @@ class TestSavedFigureWithValidation:
             expected_path = Path(tmpdir) / "figure_test_label.png"
             assert expected_path.exists()
 
-    def test_saved_figure_blocks_malicious_label(self):
-        """Test that SavedFigure blocks malicious labels in template substitution."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            template_path = Path(tmpdir) / "figure_{label}.png"
-
-            # Use a platform-appropriate malicious label that tries to escape to system directories
-            if sys.platform == "win32":
-                malicious_label = "../" * 20 + "Windows/System32/config"
-            elif sys.platform == "darwin":
-                malicious_label = "../" * 20 + "System/Library/test"
-            else:
-                malicious_label = "../" * 20 + "etc/passwd"
-
+    def test_saved_figure_blocks_malicious_label(self, tmp_path, monkeypatch):
+        """Validate substituted labels independently of the temporary directory's drive."""
+        protected = tmp_path / "protected"
+        protected.mkdir()
+        template_path = tmp_path / "plots" / "figure_{label}.png"
+        # The first '..' becomes part of 'figure_..'; the next two escape
+        # that component and the plots directory, reaching the protected sibling.
+        malicious_label = "../../../protected/config"
+        # Fail immediately if validation permits any filesystem or renderer work.
+        make_path = Mock(side_effect=AssertionError("Directory creation must follow validation"))
+        savefig = Mock(side_effect=AssertionError("Saving must follow validation"))
+        monkeypatch.setattr("stonerplots.context.save_figure._make_path", make_path)
+        monkeypatch.setattr(Figure, "savefig", savefig)
+        add_user_path(protected)
+        try:
             with pytest.raises(ValueError, match="attempted write to sensitive system directory"):
                 with SavedFigure(filename=str(template_path), style="default", autoclose=True):
                     fig = plt.figure(malicious_label)
                     ax = fig.add_subplot(111)
                     ax.plot([1, 2, 3], [4, 5, 6])
+            make_path.assert_not_called()
+            savefig.assert_not_called()
+            assert not list(protected.iterdir())
+        finally:
+            remove_user_path(protected)
 
     def test_saved_figure_allows_parent_directory_in_safe_area(self):
         """Test that SavedFigure allows using parent directory if it's in a safe area."""

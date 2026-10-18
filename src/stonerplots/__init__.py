@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import get_named_colors_mapping
 
 from .colours import tube_colours, tube_colours_10, tube_colours_50, tube_colours_70, tube_colours_90
-from .context import CentredAxes, DoubleYAxis, InsetPlot, MultiPanel, SavedFigure, StackVertical
+from .context import CentredAxes, DoubleYAxis, InsetPlot, MultiPanel, OffsetPlots, SavedFigure, StackVertical
 from .counter import counter, roman
 from .format import PlotLabeller, TexEngFormatter, TexFormatter
 from .util import _default
@@ -27,6 +27,7 @@ __all__ = [
     "SavedFigure",
     "InsetPlot",
     "StackVertical",
+    "OffsetPlots",
     "MultiPanel",
     "DoubleYAxis",
     "counter",
@@ -37,7 +38,7 @@ __all__ = [
     "TexEngFormatter",
     "default",
 ]
-__version__ = "1.9.6"
+__version__ = "1.9.7"
 
 # Default style handling.
 default = _default()

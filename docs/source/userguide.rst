@@ -356,6 +356,7 @@ size relative to the parent axes. See `Inset Plots<insetplot>` for the full expl
    Labelling Ticks <plotlabeller>
    Centred Axes <centredaxes>
    Stacked Plots <stackvertical>
+   Offset Datasets <offsetplots>
    Multi-Panel Plots <multipanel>
    Double-Y-Axis Plots <doubleyaxis>
    Inset Plots <insetplot>

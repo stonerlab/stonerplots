@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.9.7 Release
+
+Release date: 18 October 2026.
+
+- Make the SavedFigure label-traversal regression independent of the Windows
+  system drive, using a temporary protected destination and checking rejection
+  before directory creation or saving.
+- Add OffsetPlots to offset related datasets on each new axes, with additive
+  linear spacing, multiplicative log spacing, optional line/scatter pairing and
+  complete error-bar adjustment. Reuse axes tracking and figure preservation.
+- Document OffsetPlots with linear, logarithmic and error-bar examples and an
+  illustrated executable example. Preserve explicit limits and caller-owned data.
+
 ## v1.9.6 Release
 
 - Fix #80: give each PlotLabeller axis and ticker slot an independent locator and formatter;

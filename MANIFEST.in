@@ -1,1 +1,5 @@
 global-include *.mplstyle
+recursive-include docs/source *.rst
+recursive-include examples/plot_examples *.py
+recursive-include examples/figures *.png *.svg
+recursive-include tests *.py

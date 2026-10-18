@@ -87,6 +87,8 @@ The package is designed to work by using python context managers to aid plotting
 - StackVertical - make a multi-panel plot where the panels are arranged in a vertical stack and pushed together
   so that the top-x-axis on one frame is the bottom of the next.
 - MultiPanel - a general-purpose multi-panel plotting helper.
+- OffsetPlots - separate related datasets with constant y offsets or log-axis factors,
+  pairing lines with scatter points and moving complete error-bar plots together.
 - InsetPlot - create an inset set of axes.
 - DoubleYAxis - setup the righthand y axis for a second scale and optional colour the y-axes differently and
   merge the legend into a single legend.
