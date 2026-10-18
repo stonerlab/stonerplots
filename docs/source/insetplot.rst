@@ -19,6 +19,12 @@ This will create an inset that is then automatically placed in the best location
 current axes, so that inside the context manager, the current axes are the inset plot and afterwards, they are restored
 to the original active axes.
 
+The restored axes may belong to a different figure from the inset's parent. Nested contexts restore
+the enclosing inset, and restoration also runs if plotting or inset placement raises an exception.
+With ``switch_to_inset=False``, creating the inset leaves the previously active figure and axes selected.
+The axes returned by the context remain attached to their figure and can still be used after exit;
+repositioning updates their locator without replacing the axes or their artists.
+
 Controlling the Inset Location
 ------------------------------
 
@@ -70,3 +76,7 @@ the second inset in the best remaining location::
         inset_1.plot(x_inset_1, y_inset_1)
     with InsetPlot() as inset_2:
         inset_2.plot(x_inset_2, y_inset_2)
+
+Automatic placement checks line paths and scatter positions, but does not include the full drawn
+extent of markers. Large markers can therefore overlap an automatically placed inset; use an explicit
+``loc`` when this occurs (issue #49).

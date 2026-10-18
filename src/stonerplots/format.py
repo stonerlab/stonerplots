@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """Additional matplotlib formatting classes."""
 
+from copy import deepcopy
 from typing import Any, Optional, Union
 
 import numpy as np
-from matplotlib.ticker import EngFormatter, Formatter, Locator, NullFormatter
+from matplotlib.ticker import EngFormatter, Formatter, Locator, NullFormatter, NullLocator
 from numpy.ma import MaskedArray
 
 from .context.base import TrackNewFiguresAndAxes
@@ -150,10 +151,12 @@ class PlotLabeller(TrackNewFiguresAndAxes):
     Notes:
         The PlotLabeller Context handler will apply any given axis tick locators and formatters to
         any plots created inside the context handler. If Formatter/Locator classes are passed in, these
-        are instantiated with default parameters.
+        are instantiated with default parameters for each target ticker slot. Supplied instances are
+        deep-copied for each slot, excluding their owning Axis, so their configuration is preserved
+        without rebinding the caller's instance or sharing mutable ticker state.
 
         Both major and minor formatters/locators are handled: if a minor formatter/locator is already set
-        (i.e., not NullFormatter), the same formatter/locator will be applied to it as well.
+        (i.e., not NullFormatter/NullLocator), an independent formatter/locator is applied to it as well.
 
         The default is to not change the Locator and set the Formatters to use the TexEngFormatter that
         renders the labels with LaTeX codes to allow proper micro signs.
@@ -187,17 +190,28 @@ class PlotLabeller(TrackNewFiguresAndAxes):
         """Initialize axis with given formatters or locators."""
         if not isinstance(axis, (list, tuple)):
             axis = [axis]
-        formatted_axes: list[Union[Formatter, Locator]] = []
+        formatted_axes: list[Union[type[Formatter], type[Locator], Formatter, Locator]] = []
         for elem in axis:
-            if isinstance(elem, type):
-                elem = elem()
-            if not isinstance(elem, (Locator, Formatter)):
+            valid = (
+                issubclass(elem, (Locator, Formatter))
+                if isinstance(elem, type)
+                else isinstance(elem, (Locator, Formatter))
+            )
+            if not valid:
                 raise TypeError(
                     f"{label} should only contain matplotlib.ticker.Formatter subclasses "
                     "or instances of matplotlib.ticker.Locator"
                 )
             formatted_axes.append(elem)
         setattr(self, f"{label}axis", formatted_axes)
+
+    @staticmethod
+    def _new_ticker(elem: Union[type[Formatter], type[Locator], Formatter, Locator]) -> Union[Formatter, Locator]:
+        """Create a ticker without copying a previously bound Axis and its figure."""
+        if isinstance(elem, type):
+            return elem()
+        axis = getattr(elem, "axis", None)
+        return deepcopy(elem, {id(axis): None} if axis is not None else {})
 
     def __exit__(
         self, exc_type: Optional[type[BaseException]], exc_value: Optional[BaseException], traceback: Any
@@ -208,17 +222,14 @@ class PlotLabeller(TrackNewFiguresAndAxes):
                 axis = getattr(ax, name, None)
                 if axis is None:
                     continue
-                for elem in getattr(self, name):
-                    if isinstance(elem, type):
-                        elem = elem()
+                for template in getattr(self, name):
+                    elem = self._new_ticker(template)
                     if isinstance(elem, Formatter):
                         axis.set_major_formatter(elem)
                         if not isinstance(axis.get_minor_formatter(), NullFormatter):
-                            axis.set_minor_formatter(elem)
+                            axis.set_minor_formatter(self._new_ticker(template))
                     elif isinstance(elem, Locator):
                         axis.set_major_locator(elem)
-                        if not isinstance(axis.get_minor_locator(), NullFormatter):
-                            axis.set_minor_locator(elem)
+                        if not isinstance(axis.get_minor_locator(), NullLocator):
+                            axis.set_minor_locator(self._new_ticker(template))
         super().__exit__(exc_type, exc_value, traceback)
-
-

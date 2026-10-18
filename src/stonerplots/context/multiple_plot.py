@@ -484,4 +484,3 @@ class StackVertical(MultiPanel):
             ax.yaxis.set_major_locator(FixedLocator([td for td, _ in visible]))
 
         ax.set_ylim(new_ylim[0], new_ylim[1])
-        self.figure.canvas.draw()

@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.9.6 Release
+
+- Fix #80: give each PlotLabeller axis and ticker slot an independent locator and formatter;
+  preserve configured instances without rebinding them, and keep disabled minor ticks disabled.
+- Fix #79: restore the previously current figure and axes after InsetPlot, including nested
+  contexts, exceptions and contexts with switching disabled. Preserve the returned inset axes.
+- Fix #56: batch stacked-plot limit adjustments between the initial layout draw and final render,
+  avoiding a full canvas redraw for every panel.
+- Fix #50: check parsed DoubleYAxis colour entries directly and accept the first valid negative index.
+- Document the marker-size limitation of automatic inset placement (#49).
+
 ## v 1.9.4 Release
 
 Lots of missing changelog entries.

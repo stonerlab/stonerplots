@@ -147,17 +147,13 @@ class DoubleYAxis(PreserveFigureMixin):
         self._switch = switch_to_y2
 
     def good_colour(self, axis: int) -> bool:
-        """Return True if we have a colours defined for this axis."""
+        """Return True if the normalised colour list defines this axis."""
         axis = int(axis)
-        if self.colours is None:
-            return False
-        match self.colours:
-            case list() if -len(self.colours) < axis < len(self.colours):
-                return self.colours[axis] is not None
-            case str() if -len(self.colours) < axis < len(self.colours):
-                return True
-            case _:
-                return False
+        return (
+            self.colours is not None
+            and -len(self.colours) <= axis < len(self.colours)
+            and self.colours[axis] is not None
+        )
 
     def __enter__(self) -> Axes:
         """Handle context entry for managing temporary switchable axes in a Matplotlib figure.
@@ -177,7 +173,10 @@ class DoubleYAxis(PreserveFigureMixin):
         return self.ax2
 
     def __exit__(
-        self, exc_type: Optional[Type[BaseException]], value: Optional[BaseException], traceback: Optional[TracebackType]
+        self,
+        exc_type: Optional[Type[BaseException]],
+        value: Optional[BaseException],
+        traceback: Optional[TracebackType],
     ) -> None:
         """Handle the exit portion of the context manager.
 

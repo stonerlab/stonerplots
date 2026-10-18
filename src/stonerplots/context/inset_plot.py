@@ -39,8 +39,8 @@ class InsetPlot(PreserveFigureMixin):
             Specifies whether `width` and `height` are given as fractions of the parent axes
             ("fraction") or in inches. Default is "fraction".
         switch_to_inset (bool):
-            If `True`, the inset axes become the current axes within the context, and the parent
-            axes are restored when the context ends. Default is `True`.
+            If `True`, the inset axes become the current axes within the context. The previously
+            current figure and axes are restored when the context ends. Default is `True`.
         padding (float, float):
             The padding between the inset and the parent axes. Default is `0.02,0.02`.
 
@@ -108,8 +108,9 @@ class InsetPlot(PreserveFigureMixin):
 
     def __enter__(self) -> Axes:
         """Create the inset axes using the axes_grid toolkit."""
+        self._store_current_figure_and_axes()
         # Support for axes wrappers: check if _ax is a wrapper with an 'ax' attribute
-        if isinstance(ax_attr:=getattr(self._ax, "ax", None), Axes):
+        if isinstance(ax_attr := getattr(self._ax, "ax", None), Axes):
             self.ax = ax_attr  # type: ignore[union-attr]
         elif isinstance(self._ax, Axes):
             self.ax = self._ax
@@ -123,21 +124,27 @@ class InsetPlot(PreserveFigureMixin):
         self.axins = axins
         if self.switch_to_inset:
             plt.sca(self.axins)
+        else:
+            # The toolkit may select the inset's figure while adding its axes.
+            self._restore_current_figure_and_axes()
         return self.axins
 
     def __exit__(
-        self, exc_type: Optional[Type[BaseException]], value: Optional[BaseException], traceback: Optional[TracebackType]
+        self,
+        exc_type: Optional[Type[BaseException]],
+        value: Optional[BaseException],
+        traceback: Optional[TracebackType],
     ) -> None:
         """Reposition the inset as the standard positioning can cause labels to overlap."""
-        if self.loc == 0:
-            self.loc, _ = find_best_position(self.ax, self.axins)
-        inset_location = new_bbox_for_loc(self.axins, self.ax, self.loc, self.padding)
-        # We need to give co-ordinates in axes units, not figure units.
-        position = inset_location.transformed(self.ax.figure.transFigure).transformed(self.ax.transAxes.inverted())
+        try:
+            if self.loc == 0:
+                self.loc, _ = find_best_position(self.ax, self.axins)
+            inset_location = new_bbox_for_loc(self.axins, self.ax, self.loc, self.padding)
+            # We need to give co-ordinates in axes units, not figure units.
+            position = inset_location.transformed(self.ax.figure.transFigure).transformed(self.ax.transAxes.inverted())
 
-        # Matplotlib won;t let you move an inset in 3.10, so instead we need to create a new one and copy!
-        move_inset(self.ax, self.axins, position)
-        self.ax.figure.canvas.draw()
-
-        if self.switch_to_inset:
+            # Updating the locator preserves the returned axes and all its artists.
+            move_inset(self.ax, self.axins, position)
+            self.ax.figure.canvas.draw()
+        finally:
             self._restore_current_figure_and_axes()

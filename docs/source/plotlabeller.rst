@@ -18,6 +18,12 @@ You can pass optional parameters *x*, *y* and *z* to the :py:class:`PlotLabeller
 * A list or tuple of either of the above. This allows both a locator and a formatter to be specified for
   the corresponding axes within one :py:class:`PlotLabeller` context manager.
 
+Classes are instantiated separately for each target axis and each major or minor ticker slot.
+Configured instances are deep-copied for each slot without copying their existing owning axis.
+The original instance remains unchanged, even if it is already attached to another plot.
+Custom ticker instances must therefore support Python's :py:func:`copy.deepcopy` protocol.
+Disabled minor locators and formatters (``NullLocator`` and ``NullFormatter``) remain disabled.
+
 To use :py:class:`PlotLabeller`, you would typically just stack it with SavedFigure::
 
     with (SavedFigure(figures / "fig01c.png", style=["stoner"], autoclose=__name__ != "__main__"),
