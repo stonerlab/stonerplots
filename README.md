@@ -92,6 +92,8 @@ The package is designed to work by using python context managers to aid plotting
 - InsetPlot - create an inset set of axes.
 - DoubleYAxis - setup the righthand y axis for a second scale and optional colour the y-axes differently and
   merge the legend into a single legend.
+- DoubleXAxis - add a separate top x scale sharing the y-axis, with matching colour and legend options.
+- DoubleXYAxis - add independent top x and right y scales for a second dataset, with matching colour and legend options.
 
 ## Colour Cycles
 

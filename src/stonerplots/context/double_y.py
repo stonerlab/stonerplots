@@ -1,18 +1,13 @@
-# -*- coding: utf-8 -*-
-"""Context Manager for Double Y axis plots."""
+"""Context manager for a separate right y-axis."""
 
-from types import TracebackType
-from typing import Optional, Type, Union
+from typing import Optional, Union
 
-from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 
-from ..util import copy_properties, find_best_position
-from .base import PreserveFigureMixin
-from .base import locations as _locations
+from .double_base import DoubleAxisBase
 
 
-class DoubleYAxis(PreserveFigureMixin):
+class DoubleYAxis(DoubleAxisBase):
     """Context manager to facilitate plotting with dual Y-axes on a Matplotlib figure.
 
     This class simplifies creating plots with primary and secondary Y-axes, allowing customised
@@ -70,7 +65,7 @@ class DoubleYAxis(PreserveFigureMixin):
         >>> plt.show()
     """
 
-    locations = _locations
+    _coordinates = ("y",)
 
     def __init__(
         self,
@@ -80,169 +75,10 @@ class DoubleYAxis(PreserveFigureMixin):
         colours: Optional[Union[list, tuple, str]] = None,
         switch_to_y2: bool = True,
     ) -> None:
-        """Initialize the DoubleYAxis context manager.
+        """Configure the primary axes, legend, colours and current-axes switch."""
+        super().__init__(ax, legend, loc, colours, switch_to_y2)
 
-        Ensures proper validation and formatting of input parameters.
-
-        Args:
-            ax (matplotlib.axes.Axes | None):
-                The primary axis object. Defaults to `None`, in which case the current axis
-                (`plt.gca()`) is used.
-            legend (bool):
-                Whether to display the legend on the plot. Defaults to `True`.
-            loc (str | int):
-                The location of the legend, normalized to lowercase and stripped of extra spaces
-                for string values (e.g., 'best', 'upper left'). Defaults to `'best'`.
-            colours (list | tuple | str | None):
-                Colours for the primary and secondary Y-axes:
-                - Strings are split into a list using commas (e.g., `"green, red"`).
-                - Lists/tuples with two elements define colours for both axes. Extra colours
-                  are truncated, and missing values are set to `None`.
-                - If `None`, no specific colours are set. Defaults to `None`.
-            switch_to_y2 (bool):
-                If `True`, activates the secondary Y-axis as the current axis upon entering
-                the context. Defaults to `True`.
-
-        Raises:
-            ValueError:
-                If the `loc` argument is a string not recognized as a valid legend location.
-            TypeError:
-                If the `loc` argument is not a string or integer, or if `colours` is not in the
-                expected format (list, tuple, or comma-separated string).
-        """
-        super().__init__()
-
-        self._ax = ax
-        self.ax: Optional[Axes] = None
-        self.ax2: Optional[Axes] = None
-
-        # Configure legend location
-        match loc:
-            case str():
-                loc = loc.lower().replace("-", " ").strip()
-                if loc not in self.locations:
-                    raise ValueError(f"Location '{loc}' not recognised!")
-                loc = self.locations[loc]
-            case int():
-                pass
-            case _:
-                raise TypeError(f"Legend location must be of type str or int, got {type(loc)}.")
-        self.loc = loc
-        self.legend = legend
-
-        # Configure axis colours
-        colours_list: Optional[list] = None
-        if isinstance(colours, str):
-            colours_list = [x.strip() for x in colours.split(",")]
-        elif isinstance(colours, (list, tuple)):
-            if len(colours) < 2:
-                colours_list = [None] * (2 - len(colours)) + list(colours)
-            elif len(colours) > 2:
-                colours_list = list(colours[:2])
-            else:
-                colours_list = list(colours)
-        elif colours is not None:
-            raise TypeError(f"Colours must be a list, tuple, or string, not {type(colours)}.")
-        self.colours = colours_list
-        self._switch = switch_to_y2
-
-    def good_colour(self, axis: int) -> bool:
-        """Return True if the normalised colour list defines this axis."""
-        axis = int(axis)
-        return (
-            self.colours is not None
-            and -len(self.colours) <= axis < len(self.colours)
-            and self.colours[axis] is not None
-        )
-
-    def __enter__(self) -> Axes:
-        """Handle context entry for managing temporary switchable axes in a Matplotlib figure.
-
-        Returns:
-            (matplotlib.axes.Axes):
-                The secondary Y-axis created through `twinx()`.
-        """
-        self._store_current_figure_and_axes()
-        ax_attr = getattr(self._ax, "ax", None)
-        if isinstance(ax_attr, Axes):
-            self._ax = self._ax.ax  # type: ignore[union-attr]
-        self.ax = self._ax if isinstance(self._ax, Axes) else plt.gca()
-        self.ax2 = self.ax.twinx()
-        if self._switch:
-            plt.sca(self.ax2)  # Set the secondary axis as the current axis
-        return self.ax2
-
-    def __exit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        value: Optional[BaseException],
-        traceback: Optional[TracebackType],
-    ) -> None:
-        """Handle the exit portion of the context manager.
-
-        Customise axis properties, legends, and restoring the original figure and axes.
-
-        This method ensures dual Y-axes share customisable colour properties and adjusts their
-        visibility. Legends from both axes are merged and updated to their defined location.
-
-        Args:
-            exc_type (type | None):
-                The exception type, if one occurs during the `with` block. Set to `None` if no
-                exception occurred.
-            value (BaseException | None):
-                The exception instance, if one occurs during the `with` block. Set to `None`
-                if no exception occurred.
-            traceback (types.TracebackType | None):
-                The traceback object, if an exception occurs. Set to `None` if no exception occurred.
-
-        Returns:
-            bool:
-                Returns `False` to propagate exceptions, if any occur, during the `with` block.
-        """
-        # Configure axis visibility and position
+    def _create_secondary_axes(self) -> Axes:
+        """Create the overlaid axes, sharing the primary x coordinate."""
         assert self.ax is not None
-        assert self.ax2 is not None
-
-        self.ax2.spines["left"].set_visible(False)
-        self.ax2.yaxis.tick_right()
-        self.ax.spines["right"].set_visible(False)
-        self.ax.yaxis.tick_left()
-
-        # Apply colours to the primary axis
-        if self.good_colour(0):
-            assert self.colours is not None
-            self.ax.tick_params(axis="y", labelcolor=self.colours[0])
-            self.ax.yaxis.label.set_color(self.colours[0])
-            self.ax.spines["left"].set_color(self.colours[0])
-            self.ax.tick_params(axis="y", which="both", colors=self.colours[0])
-
-        # Apply colours to the secondary axis
-        if self.good_colour(1):
-            assert self.colours is not None
-            self.ax2.tick_params(axis="y", labelcolor=self.colours[1])
-            self.ax2.yaxis.label.set_color(self.colours[1])
-            self.ax2.spines["right"].set_color(self.colours[1])
-            self.ax2.tick_params(axis="y", which="both", colors=self.colours[1])
-
-        # Merge legends from primary and secondary axes
-        if self.legend:
-            if not (lg1 := self.ax.get_legend()):
-                lg1 = self.ax.legend()
-            if not (lg2 := self.ax2.get_legend()):
-                lg2 = self.ax2.legend()
-            handles1, labels1 = self.ax.get_legend_handles_labels()
-            handles2, labels2 = self.ax2.get_legend_handles_labels()
-            prop1 = lg1.properties()
-            prop2 = lg2.properties()
-            lg1.remove()
-            lg2.remove()
-            legend = self.ax.legend(handles1 + handles2, labels1 + labels2, loc=self.loc)
-            if self.loc == 0:  # Auto-detect the best location if applicable
-                self.loc, _ = find_best_position(self.ax, legend)  # type: ignore[arg-type]
-                legend.remove()
-                legend = self.ax.legend(handles1 + handles2, labels1 + labels2, loc=self.loc)
-            copy_properties(legend, prop2 | prop1)
-
-        # Restore the original figure and axes
-        if self._switch:
-            self._restore_current_figure_and_axes()
+        return self.ax.twinx()

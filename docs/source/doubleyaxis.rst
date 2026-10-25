@@ -26,6 +26,9 @@ Finally, on exit, the original axes are set to be the current axes.
 Legend Control
 --------------
 
+For a separate top x-axis, or independent top and right axes, see
+:doc:`Double X and XY Axis Context Managers <doublexaxis>`.
+
 There are two keyword parameters that affect the legend behaviour. `legend` is a boolean switch that, if set to
 `False`, ensures the context manager takes no action over the legends. If set to `True`, then at exit, the context
 manager will remove any existing legends from the two y-axes and create a new merged legend on the original (left)

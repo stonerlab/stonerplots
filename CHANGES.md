@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.9.8 Release
+
+Release date: 25 October 2026.
+
+- Add DoubleXAxis for a separate top x scale and DoubleXYAxis for independent
+  top x and right y scales. All three managers share DoubleAxisBase for legend,
+  colour and pyplot state handling.
+- Preserve the current axes when switching is disabled in the double-axis contexts.
+- Restore the previous figure and axes if double-axis legend finalisation fails.
+- Add guide/API documentation, an illustrated example and regression coverage for
+  all three double-axis contexts.
+
 ## v1.9.7 Release
 
 Release date: 18 October 2026.

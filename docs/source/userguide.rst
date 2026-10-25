@@ -359,4 +359,5 @@ size relative to the parent axes. See `Inset Plots<insetplot>` for the full expl
    Offset Datasets <offsetplots>
    Multi-Panel Plots <multipanel>
    Double-Y-Axis Plots <doubleyaxis>
+   Double-X and XY-Axis Plots <doublexaxis>
    Inset Plots <insetplot>
