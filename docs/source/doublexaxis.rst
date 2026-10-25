@@ -4,8 +4,8 @@ Double X and XY Axis Context Managers
 :py:class:`stonerplots.DoubleXAxis` adds a top x-axis with an independent scale,
 sharing the original y-axis. :py:class:`stonerplots.DoubleXYAxis` adds independent
 top x and right y scales. Both return a single Matplotlib ``Axes`` for plotting
-the second dataset and mirror :doc:`DoubleYAxis <doubleyaxis>` for legend
-merging, colours, explicit parent axes and current-axes restoration.
+the second dataset. See :doc:`Double-axis context managers <doubleaxis>` for
+an overview of all three variants and their shared options.
 
 Basic Usage
 -----------

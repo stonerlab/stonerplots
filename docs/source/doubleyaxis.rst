@@ -3,6 +3,10 @@ DoubleYAxis Context Manager
 
 .. currentmodule:: stonerplots.context.double_y
 
+For an overview of ``DoubleYAxis``, ``DoubleXAxis`` and ``DoubleXYAxis``, and
+their shared options, see :doc:`Double-axis context managers <doubleaxis>`.
+This page describes the right y-axis variant.
+
 A double-y-axis plot is one where one dataset is plotted referenced to the y-axis on the left of the frame and a second
 dataset is plotted against the y-axis on the right-hand side of the frame. This works well when you want to show two
 different parameters that are dependent on the same independent variable.
@@ -26,9 +30,6 @@ Finally, on exit, the original axes are set to be the current axes.
 Legend Control
 --------------
 
-For a separate top x-axis, or independent top and right axes, see
-:doc:`Double X and XY Axis Context Managers <doublexaxis>`.
-
 There are two keyword parameters that affect the legend behaviour. `legend` is a boolean switch that, if set to
 `False`, ensures the context manager takes no action over the legends. If set to `True`, then at exit, the context
 manager will remove any existing legends from the two y-axes and create a new merged legend on the original (left)
@@ -43,8 +44,9 @@ Colouring the Axes
 
 The `colours` parameter is used to set the colour of the two y-axis spines, tick labels, and axis labels. It can either
 be a comma-separated string of two named colours, or a 2-element list or tuple of colours for left and right axes. If
-only one element is supplied, it is assumed to be the colour of the right-hand axes. Values of `None` signal that the
-axis is not to be coloured.
+only one element is supplied in a list or tuple, it is assumed to be the colour of the right-hand axes.
+A single-colour string colours the left-hand axes. For an explicit secondary-only colour, use
+``colours=(None, "piccadilly")``. Values of ``None`` signal that the axis is not to be coloured.
 
 Other Parameters
 ----------------
@@ -77,5 +79,5 @@ manager::
 
 
 .. image:: ../../examples/figures/fig7d.svg
-   :alt: 2x2 multi-panel plot.
+   :alt: Two related datasets plotted against separate left and right y scales with a common x coordinate.
    :align: center

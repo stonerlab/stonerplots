@@ -236,9 +236,9 @@ Double and Multi-Panel Figures
 
 .. currentmodule:: stonerplots.context.multiple_plot
 
-When you want your reader/examiner to compare two related datasets with different y-ranges, you can use a double y
-axis plot. With this, you place both quantities on the same plot, but one is referred to a left hand y-axis and the
-second to the right. Stonerplots offers the :py:class:`DoubleYAxis` context manager to help.
+When two related datasets need different scales, StonerPlots offers three double-axis context managers:
+:py:class:`stonerplots.DoubleYAxis` adds a right y-axis, :py:class:`stonerplots.DoubleXAxis` adds a top x-axis,
+and :py:class:`stonerplots.DoubleXYAxis` adds both. Each overlays a second plotting axes on the same plot frame.
 
 If you have several quantities that are all functions of the same independent variable, and plotting them all on a
 single (or double) set of axes would be overly complex, a stack of plots with a common x-axis can be a good choice.
@@ -249,26 +249,53 @@ Finally, for more general multipanel figure plotting, stonerplots offers the :py
 set up the :py:class:`matplotlib.axes.Axes` instances for you. This can also support irregular grids of panels as well
 as regular ones.
 
-Double Y Axis Plots
-~~~~~~~~~~~~~~~~~~~
+Double-Axis Context Managers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In this case, we have two quantities that need to be plotted on a common x axis, but the scales are rather different.
-Furthermore, it can be useful to colour each scale, possibly to match the dataset being plotted::
+Choose the context manager according to which coordinates need independent scales:
 
-    with SavedFigure("double-y.png", style="stoner"):
-        plt.figure() # Create the figure in the stoner style
-        plt.plot(...) # Plot the first dataset using the default left-hand axes.
-        with DoubleYAxis():
-            plt.plot(...) # This now works with the second y-axis on the right of the plot.
+.. list-table:: Choosing a double-axis context manager
+   :header-rows: 1
+   :widths: 25 40 35
 
-The :py:class:`SavedFigure` context manager is doing its usual thing here (note the style can be given as a simple
-string). The inner :py:class:`DoubleYAxis` context manager creates a second set of axes which share the x-axis of the
-original plot. On exit from the context manager, it can optionally colour the left and right axes and by default will
-also merge legends for the two sets of data and try to locate them in the best location, taking account of both sets
-of data. See :doc:`Double Y-axis plots<doubleyaxis>` for further details.
+   * - Context manager
+     - Independent scales
+     - Shared coordinate
+   * - :py:class:`stonerplots.DoubleYAxis`
+     - Left and right y-axes
+     - x
+   * - :py:class:`stonerplots.DoubleXAxis`
+     - Bottom and top x-axes
+     - y
+   * - :py:class:`stonerplots.DoubleXYAxis`
+     - Bottom/left and top/right axes
+     - Neither x nor y
 
-.. image:: ../../examples/figures/fig7d.svg
-  :alt: Double Y axis plot
+All three use the same plotting pattern. Plot the first dataset on the original axes, then plot the second inside
+the context. For example, two datasets with different horizontal scales but a common vertical scale can use
+``DoubleXAxis``::
+
+    import matplotlib.pyplot as plt
+    from stonerplots import DoubleXAxis, SavedFigure
+
+    with SavedFigure("double-x.png", style="stoner"):
+        fig, ax = plt.subplots()
+        ax.plot([0, 1, 2], [0, 1, 0], color="central", label="Primary")
+        ax.set(xlabel="Time (s)", ylabel="Signal (V)")
+        with DoubleXAxis(ax=ax, colours=("central", "piccadilly")) as ax2:
+            ax2.plot([10, 20, 30], [0, 0.8, 0], color="piccadilly", label="Secondary")
+            ax2.set_xlabel("Distance (mm)")
+
+The context returns the secondary ``Axes`` and makes it current by default, so ``plt.plot`` also targets it inside
+the block. On exit, it restores the previously current figure and axes, optionally colours the independent scales,
+and by default merges both datasets' legend entries. Automatic legend placement considers both datasets.
+``DoubleXYAxis`` returns one secondary axes with both coordinates independent; it does not convert coordinates
+between scales.
+
+See :doc:`Double-axis context managers <doubleaxis>` for the shared options and examples of all three variants.
+
+.. image:: ../../examples/figures/double_axes.png
+  :alt: Comparison of a double x-axis plot sharing y and a double xy-axis plot with independent top and right scales.
   :align: center
 
 StackVertical Context Manager
@@ -358,6 +385,5 @@ size relative to the parent axes. See `Inset Plots<insetplot>` for the full expl
    Stacked Plots <stackvertical>
    Offset Datasets <offsetplots>
    Multi-Panel Plots <multipanel>
-   Double-Y-Axis Plots <doubleyaxis>
-   Double-X and XY-Axis Plots <doublexaxis>
+   Double-Axis Context Managers <doubleaxis>
    Inset Plots <insetplot>
